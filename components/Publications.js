@@ -1,78 +1,206 @@
-import bibtexParse from 'bibtex-parse-js';
-import Image from 'next/image';
-import { personalInfo } from '@/website.config';
-import { CustomMDX } from '@/components/mdx';
+import React from "react";
+import { personalInfo } from "@/website.config";
+import { CustomMDX } from "@/components/mdx";
+import bibtexParse from "bibtex-parse-js";
+import { RiGlobeLine, RiFilePdfLine, RiCodeLine } from "react-icons/ri";
+import { BiBookAlt } from "react-icons/bi"; // Corrected arXiv icon
 
 function authorProcess(authorsStr, personalInfo) {
-  const authors = authorsStr.split('and');
+  const authors = authorsStr.split("and");
 
   const boldedAuthors = authors.map((author) => {
-    author = author.trim().split(', ').reverse().join(' ').trim();
+    author = author.trim().split(", ").reverse().join(" ").trim();
 
     if (author === personalInfo) {
-      // console.log(author);
       return `**${personalInfo}**`;
     }
 
     return author;
   });
 
-  return boldedAuthors.join(', ');
+  return boldedAuthors.join(", ");
 }
+
+function PublicationCard({ title, authors, journal, year, award, links }) {
+  return (
+    // <div className="flex flex-col border border-neutral-200 dark:border-neutral-700 rounded-xl bg-white dark:bg-neutral-800 hover:shadow-sm p-6 gap-2 overflow-hidden overflow-x-hidden">
+    //   {/* Title Section */}
+    //   <h2 className="text-lg font-semibold text-neutral-900 dark:text-neutral-100">
+    //     {links.project ? (
+    //       <a href={links.project} className="underline hover:text-blue-500">
+    //         {title}
+    //       </a>
+    //     ) : (
+    //       title
+    //     )}
+    //   </h2>
+
+    //   {/* Authors Section */}
+    //   <div className="text-neutral-600 dark:text-neutral-300 font-light">
+    //     <CustomMDX source={authors} />
+    //   </div>
+
+    //   {/* Details Section */}
+    //   <div className="text-sm text-neutral-600 dark:text-neutral-300">
+    //     <span className="mr-2 italic">{journal}</span>
+    //     <span className="mr-2">{year}</span>
+    //     {award && <span className="font-bold">{award}</span>}
+    //   </div>
+
+    //   {/* Action Buttons Section */}
+    //   <div className="flex flex-wrap gap-2">
+    //     {links.project && (
+    //       <a
+    //         href={links.project}
+    //         target="_blank"
+    //         rel="noopener noreferrer"
+    //         className="inline-flex items-center gap-2 px-3 py-1 text-sm font-medium text-neutral-700 dark:text-neutral-300 bg-neutral-100 dark:bg-neutral-700 rounded-lg hover:bg-neutral-200 dark:hover:bg-neutral-600"
+    //       >
+    //         <RiGlobeLine size={16} /> Project Page
+    //       </a>
+    //     )}
+    //     {links.pdf && (
+    //       <a
+    //         href={links.pdf}
+    //         target="_blank"
+    //         rel="noopener noreferrer"
+    //         className="inline-flex items-center gap-2 px-3 py-1 text-sm font-medium text-neutral-700 dark:text-neutral-300 bg-neutral-100 dark:bg-neutral-700 rounded-lg hover:bg-neutral-200 dark:hover:bg-neutral-600"
+    //       >
+    //         <RiFilePdfLine size={16} /> PDF
+    //       </a>
+    //     )}
+    //     {links.arxiv && (
+    //       <a
+    //         href={links.arxiv}
+    //         target="_blank"
+    //         rel="noopener noreferrer"
+    //         className="inline-flex items-center gap-2 px-3 py-1 text-sm font-medium text-neutral-700 dark:text-neutral-300 bg-neutral-100 dark:bg-neutral-700 rounded-lg hover:bg-neutral-200 dark:hover:bg-neutral-600"
+    //       >
+    //         <BiBookAlt size={16} /> arXiv
+    //       </a>
+    //     )}
+    //     {links.code && (
+    //       <a
+    //         href={links.code}
+    //         target="_blank"
+    //         rel="noopener noreferrer"
+    //         className="inline-flex items-center gap-2 px-3 py-1 text-sm font-medium text-neutral-700 dark:text-neutral-300 bg-neutral-100 dark:bg-neutral-700 rounded-lg hover:bg-neutral-200 dark:hover:bg-neutral-600"
+    //       >
+    //         <RiCodeLine size={16} /> Code
+    //       </a>
+    //     )}
+    //   </div>
+    // </div>
+
+    <div className="flex flex-col border border-neutral-200 dark:border-neutral-700 rounded-xl bg-white dark:bg-neutral-800 hover:shadow-sm p-6 gap-2.5 overflow-hidden overflow-x-hidden hover:shadow-lg transition-shadow">
+  {/* Title Section */}
+  <h2 className="text-lg font-semibold text-neutral-900 dark:text-neutral-100">
+    {links.project ? (
+      <a href={links.project} className="underline hover:text-blue-500">
+        {title}
+      </a>
+    ) : (
+      title
+    )}
+  </h2>
+
+  {/* Authors Section */}
+  <div className="text-sm text-neutral-600 dark:text-neutral-300 font-light">
+    <CustomMDX source={authors} />
+  </div>
+
+  {/* Details Section */}
+  <div className="text-sm text-neutral-600 dark:text-neutral-300">
+    <span className="mr-2 italic">{journal}</span>
+    <span className="mr-2">{year}</span>
+    {award && <span className="font-bold">{award}</span>}
+  </div>
+
+  {/* Action Buttons Section */}
+  <div className="flex flex-wrap gap-2">
+    {links.project && (
+      <a
+        href={links.project}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="inline-flex items-center gap-2 px-3 py-1 text-sm font-medium text-neutral-700 dark:text-neutral-300 bg-neutral-100 dark:bg-neutral-700 rounded-lg hover:bg-neutral-200 dark:hover:bg-neutral-600 transition-shadow"
+      >
+        <RiGlobeLine size={16} /> Project Page
+      </a>
+    )}
+    {links.pdf && (
+      <a
+        href={links.pdf}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="inline-flex items-center gap-2 px-3 py-1 text-sm font-medium text-neutral-700 dark:text-neutral-300 bg-neutral-100 dark:bg-neutral-700 rounded-lg hover:bg-neutral-200 dark:hover:bg-neutral-600 transition-shadow"
+      >
+        <RiFilePdfLine size={16} /> PDF
+      </a>
+    )}
+    {links.arxiv && (
+      <a
+        href={links.arxiv}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="inline-flex items-center gap-2 px-3 py-1 text-sm font-medium text-neutral-700 dark:text-neutral-300 bg-neutral-100 dark:bg-neutral-700 rounded-lg hover:bg-neutral-200 dark:hover:bg-neutral-600 transition-shadow"
+      >
+        <BiBookAlt size={16} /> arXiv
+      </a>
+    )}
+    {links.code && (
+      <a
+        href={links.code}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="inline-flex items-center gap-2 px-3 py-1 text-sm font-medium text-neutral-700 dark:text-neutral-300 bg-neutral-100 dark:bg-neutral-700 rounded-lg hover:bg-neutral-200 dark:hover:bg-neutral-600 transition-shadow"
+      >
+        <RiCodeLine size={16} /> Code
+      </a>
+    )}
+  </div>
+</div>
+
+
+  );
+}
+
 
 export default function Publications({ bibtex }) {
   const parsed = bibtexParse.toJSON(bibtex);
 
   return (
-    <ol className="flex flex-col gap-4">
-      {parsed.map((item) => {
+    <section className="grid gap-5 transition-all h-auto">
+      {parsed.map((item, index) => {
         const processedAuthors = authorProcess(
-          item.entryTags.author,
+          item.entryTags?.author || "",
           personalInfo.name
         );
+
+        // Generate links from bibtex fields
+        const links = {
+          project: item.entryTags?.project || null,
+          pdf: item.entryTags?.pdf || null,
+          arxiv: item.entryTags?.arxiv || null,
+          code: item.entryTags?.code || null,
+        };
+
         return (
-          <li key={item.entryTags.title} className=" list-decimal">
-            <h2 className="text-base font-medium dark:text-neutral-50">
-              {item.entryTags.url ? (
-                <a href={item.entryTags.url} className="underline">
-                  {item.entryTags.title.replace(/{|}/g, '')}
-                </a>
-              ) : (
-                item.entryTags.title.replace(/{|}/g, '')
-              )}
-            </h2>
-
-            <div className=" font-light text-neutral-600 dark:text-neutral-300">
-              {<CustomMDX source={processedAuthors} />}
-
-              <span className=" mr-2 italic font-normal">
-                {item.entryTags.journal?.replace(/{|}/g, '') ||
-                  item.entryTags.booktitle?.replace(/{|}/g, '')}
-              </span>
-              <span className="mr-2">{item.entryTags.year}</span>
-              {item.entryTags.award &&
-                (item.entryTags.award === 'Honorable Mention' ? (
-                  <Image
-                    src="/honor.jpg"
-                    alt="Honorable Mention"
-                    width={20}
-                    height={20}
-                    className=" h-5 w-5 inline-block mr-2"
-                  />
-                ) : (
-                  <Image
-                    src="/best.jpg"
-                    alt="Honorable Mention"
-                    width={20}
-                    height={20}
-                    className="h-5 w-5 inline-block mr-2"
-                  />
-                ))}
-              <span className="font-bold h-5">{item.entryTags.award}</span>
-            </div>
-          </li>
+          <PublicationCard
+            key={index} // Using index as fallback if title is not unique
+            title={(item.entryTags?.title || "").replace(/{|}/g, "")}
+            authors={processedAuthors}
+            journal={
+              item.entryTags?.journal?.replace(/{|}/g, "") ||
+              item.entryTags?.booktitle?.replace(/{|}/g, "") ||
+              "N/A"
+            }
+            year={item.entryTags?.year || "N/A"}
+            award={item.entryTags?.award || null}
+            links={links}
+          />
         );
       })}
-    </ol>
+    </section>
   );
 }

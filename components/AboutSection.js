@@ -74,7 +74,7 @@ export default function AboutSection() {
             alt="profile image"
             width={120}
             height={120}
-            className="hidden md:block object-cover aspect-square"
+            className="hidden md:block object-cover aspect-square rounded-[20px]"
           ></Image>
         )}
       </div>
