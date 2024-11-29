@@ -43,9 +43,7 @@ jobs:
         run: pnpm install
 
       - name: Build with Next.js
-        run: |
-          pnpm next build
-          pnpm next export # Required for static export to GitHub Pages
+        run: pnpm next build
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
