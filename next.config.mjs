@@ -4,7 +4,16 @@ import createMDX from "@next/mdx";
 const nextConfig = {
   // Configure `pageExtensions` to include markdown and MDX files
   pageExtensions: ["js", "jsx", "md", "mdx", "ts", "tsx"],
-  // Optionally, add any other Next.js config below
+
+  // Configure static export for GitHub Pages
+  output: "export",
+  basePath: "/stephenyang", // Replace <repository-name> with your GitHub repository name
+  trailingSlash: true, // Ensures paths end with a trailing slash for GitHub Pages compatibility
+  images: {
+    unoptimized: true, // Disable server-side image optimization
+  },
+
+  // Add any additional Next.js config below
   webpack: (config, { isServer }) => {
     config.module.rules.push({
       test: /\.bib$/,
