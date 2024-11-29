@@ -24,20 +24,23 @@ jobs:
           node-version: 18
           cache: 'pnpm'
 
-      # Step 3: Install dependencies
+      # Step 3: Install pnpm
+      - name: Install pnpm
+        run: npm install -g pnpm
+
+      # Step 4: Install dependencies
       - name: Install dependencies
         run: pnpm install
 
-      # Step 4: Build the application
+      # Step 5: Build the application
       - name: Build the application
         run: pnpm run build
 
-      # Optional Step 5: Run tests
+      # Optional Step 6: Run tests
       - name: Run tests
         run: pnpm run test
 
-      # Step 6: Deploy to Vercel (or another deployment platform)
-      # Replace with your deployment platform configuration
+      # Step 7: Deploy to Vercel (or another deployment platform)
       - name: Deploy to Vercel
         uses: amondnet/vercel-action@v20
         with:
