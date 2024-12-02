@@ -200,7 +200,7 @@ export const personalInfo = {
       endYear: '2023',
     }
   ],
-  cvUrl: '/stephenyang/Resume_StephenYang.pdf', 
+  cvUrl: '/Resume_StephenYang.pdf', 
   honors: [
 
     {
