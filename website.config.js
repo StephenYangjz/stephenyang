@@ -1,6 +1,6 @@
 export const personalInfo = {
   name: 'Stephen Yang',
-  profilePicture: '/profile.jpg', //optional
+  profilePicture: '/stephenyang/profile.jpg', //optional
   role: 'Research Engineer',
   university: 'Applied Intuition',
   universityWebsite: 'https://www.appliedintuition.com/',
@@ -200,7 +200,7 @@ export const personalInfo = {
       endYear: '2023',
     }
   ],
-  cvUrl: 'Resume_StephenYang.pdf', 
+  cvUrl: '/stephenyang/Resume_StephenYang.pdf', 
   honors: [
 
     {
