@@ -1,62 +1,25 @@
-name: Deploy Next.js site to Pages
+const createMDX = require("@next/mdx");
 
-on:
-  push:
-    branches: ["main"]
-  workflow_dispatch:
+const isProd = process.env.NODE_ENV === "production";
 
-permissions:
-  contents: read
-  pages: write
-  id-token: write
+const nextConfig = {
+  pageExtensions: ["js", "jsx", "md", "mdx", "ts", "tsx"],
+  output: "export",
+  basePath: isProd ? "/stephenyang" : "",
+  assetPrefix: isProd ? "/stephenyang/" : "",
+  trailingSlash: true,
+  images: {
+    unoptimized: true,
+  },
+  webpack: (config, { isServer }) => {
+    config.module.rules.push({
+      test: /\.bib$/,
+      use: "raw-loader",
+    });
+    return config;
+  },
+};
 
-concurrency:
-  group: "pages"
-  cancel-in-progress: false
+const withMDX = createMDX();
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 8
-          node-version: 20
-
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
-
-      - name: Restore cache
-        uses: actions/cache@v4
-        with:
-          path: |
-            .next/cache
-          key: ${{ runner.os }}-nextjs-${{ hashFiles('**/pnpm-lock.yaml') }}-${{ hashFiles('**.[jt]s', '**.[jt]sx') }}
-          restore-keys: |
-            ${{ runner.os }}-nextjs-${{ hashFiles('**/pnpm-lock.yaml') }}-
-
-      - name: Install dependencies
-        run: pnpm install
-
-      - name: Build with Next.js
-        run: pnpm next build
-
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: ./out
-
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+module.exports = withMDX(nextConfig);
