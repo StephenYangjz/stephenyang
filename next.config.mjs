@@ -1,40 +1,62 @@
-import createMDX from "@next/mdx";
+name: Deploy Next.js site to Pages
 
-/** @type {import('next').NextConfig} */
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
 
-// Detect if the app is running in production
-const isProd = process.env.NODE_ENV === "production";
+permissions:
+  contents: read
+  pages: write
+  id-token: write
 
-// Define the base Next.js configuration
-const nextConfig = {
-  // Configure `pageExtensions` to include markdown and MDX files
-  pageExtensions: ["js", "jsx", "md", "mdx", "ts", "tsx"],
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
 
-  // Configure static export for GitHub Pages
-  output: "export", // Required for static export in newer Next.js versions
-  basePath: isProd ? "/stephenyang" : "", // Replace with your GitHub repository name
-  assetPrefix: isProd ? "/stephenyang/" : "",
-  trailingSlash: true, // Ensures paths end with a trailing slash for GitHub Pages compatibility
-  images: {
-    unoptimized: true, // Disable server-side image optimization for GitHub Pages
-  },
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
-  // Add any additional Next.js config below
-  webpack: (config, { isServer }) => {
-    // Add custom rules for handling .bib files
-    config.module.rules.push({
-      test: /\.bib$/,
-      use: "raw-loader",
-    });
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 8
+          node-version: 20
 
-    return config;
-  },
-};
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
 
-// Create the MDX configuration and merge with Next.js configuration
-const withMDX = createMDX({
-  // Add markdown plugins here, as desired
-});
+      - name: Restore cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            .next/cache
+          key: ${{ runner.os }}-nextjs-${{ hashFiles('**/pnpm-lock.yaml') }}-${{ hashFiles('**.[jt]s', '**.[jt]sx') }}
+          restore-keys: |
+            ${{ runner.os }}-nextjs-${{ hashFiles('**/pnpm-lock.yaml') }}-
 
-// Export the combined configuration
-export default withMDX(nextConfig);
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build with Next.js
+        run: pnpm next build
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./out
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
