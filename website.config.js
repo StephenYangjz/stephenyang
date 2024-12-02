@@ -1,6 +1,6 @@
 export const personalInfo = {
   name: 'Stephen Yang',
-  profilePicture: '/stephenyang/profile.jpg', //optional
+  profilePicture: '/profile.jpg', //optional
   role: 'Research Engineer',
   university: 'Applied Intuition',
   universityWebsite: 'https://www.appliedintuition.com/',

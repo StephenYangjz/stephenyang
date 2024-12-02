@@ -1,8 +1,7 @@
-# Academic Homepage Template
+# Stephen Yang's Homepage
 
-This project is an academic homepage template built with Next.js, Tailwind CSS, and ShadcnUI. The design is minimalistic and modern, providing a clean and professional look for academic portfolios. It supports deployment to Zeabur and can directly parse `.bib` files to display publications.
+This project is an academic homepage built with Next.js, Tailwind CSS, and ShadcnUI. The design is minimalistic and modern, providing a clean and professional look for academic portfolios. It supports deployment to Github Pages and can directly parse `.bib` files to display publications. The website is modified from this [template](https://github.com/anxndsgn/academic-homepage-template).
 
-![screemshot](public/screenshot.jpg)
 
 ## Features
 
@@ -86,15 +85,6 @@ pnpm run dev
 
 Open http://localhost:3000 in your browser to see the result.
 
-## Deployment
-
-- Sign in to Zeabur and create a new project.
-- Fork this repo.
-- Deploy the project using Git service.
-  For more detailed instructions, refer to the [Zeabur documentation](https://zeabur.com/docs/deploy/github).
-
-[![Deployed on Zeabur](https://zeabur.com/deployed-on-zeabur-dark.svg)](https://zeabur.com?referralCode=anxndsgn&utm_source=anxndsgn&utm_campaign=oss)
-
 ## Contributing
 
 Contributions are welcome! Please open an issue or submit a pull request.
@@ -104,8 +94,7 @@ Contributions are welcome! Please open an issue or submit a pull request.
 This project is licensed under the MIT License. See the LICENSE file for details.
 
 ## Acknowledgements
-
+- [Template](https://github.com/anxndsgn/academic-homepage-template)
 - Next.js
 - Tailwind CSS
 - ShadcnUI
-- Zeabur
