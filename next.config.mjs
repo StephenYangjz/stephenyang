@@ -1,4 +1,4 @@
-const createMDX = require("@next/mdx");
+import createMDX from "@next/mdx";
 
 const isProd = process.env.NODE_ENV === "production";
 
@@ -21,5 +21,4 @@ const nextConfig = {
 };
 
 const withMDX = createMDX();
-
-module.exports = withMDX(nextConfig);
+export default withMDX(nextConfig);
