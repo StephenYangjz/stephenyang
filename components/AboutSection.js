@@ -22,7 +22,7 @@ export default function AboutSection() {
             alt="profile image"
             width={120}
             height={120}
-            className="md:hidden sm:block object-cover aspect-square"
+            className="md:hidden sm:block object-cover aspect-square rounded-[20px]"
           ></Image>
         )}
         <div className="flex flex-col gap-3">
