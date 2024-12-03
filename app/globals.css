@@ -112,3 +112,8 @@ table {
 .title {
   text-wrap: balance;
 }
+
+html {
+  overflow-y: scroll; /* Forces a vertical scrollbar */
+}
+

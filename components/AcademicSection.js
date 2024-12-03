@@ -5,7 +5,7 @@ export default function AcademicSection() {
   return (
     <section className="flex flex-col gap-8">
       <h1 className="text-3xl font-semibold text-neutral-900 dark:text-neutral-100">
-        Academic
+        Academics
       </h1>
 
       {/* Academic Service Section */}
@@ -13,7 +13,7 @@ export default function AcademicSection() {
         <h2 className="text-xl font-medium text-neutral-800 dark:text-neutral-200 flex items-center gap-2">
           <RiBuildingLine size={20} className="text-blue-500" /> Academic Service
         </h2>
-        <ul className="list-disc pl-5 text-neutral-700 dark:text-neutral-400 space-y-1">
+        <ul className="list-disc pl-5 text-neutral-600 dark:text-neutral-300 space-y-1">
           {personalInfo.academicService.map((service, index) => (
             <li key={index}>{service}</li>
           ))}

@@ -92,7 +92,7 @@ function PublicationCard({ title, authors, journal, year, award, links }) {
     //   </div>
     // </div>
 
-    <div className="flex flex-col border border-neutral-200 dark:border-neutral-700 rounded-xl bg-white dark:bg-neutral-800 hover:shadow-sm p-6 gap-2.5 overflow-hidden overflow-x-hidden hover:shadow-lg transition-shadow">
+    <div className="flex flex-col border border-neutral-200 dark:border-neutral-700 rounded-xl bg-white dark:bg-neutral-800 hover:shadow-sm p-6 gap-3 overflow-hidden overflow-x-hidden hover:shadow-lg transition-shadow">
   {/* Title Section */}
   <h2 className="text-lg font-semibold text-neutral-900 dark:text-neutral-100">
     {links.project ? (
