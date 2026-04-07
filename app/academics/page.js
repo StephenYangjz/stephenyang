@@ -1,14 +1,5 @@
-import React from "react";
-import AcademicSection from "@/components/AcademicSection";
-
-export const metadata = {
-  title: "News",
-};
+import { notFound } from "next/navigation";
 
 export default function Page() {
-  return (
-    <main className="md:w-[40rem] w-full m-auto px-8 mt-32 flex flex-col gap-10 mb-20">
-      <AcademicSection />
-    </main>
-  );
+  notFound();
 }

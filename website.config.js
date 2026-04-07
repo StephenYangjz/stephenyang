@@ -2,8 +2,8 @@ export const personalInfo = {
   name: 'Stephen Yang',
   profilePicture: '/profile.jpg', //optional
   role: 'Research Engineer',
-  university: 'Applied Intuition',
-  universityWebsite: 'https://www.appliedintuition.com/',
+  university: 'Google',
+  universityWebsite: 'https://about.google/',
   socialMedia: [
     { name: 'Email', url: 'mailto:stephenyang@berkeley.edu' },
     { name: 'Twitter', url: 'https://x.com/Stepenyang' },
@@ -245,8 +245,8 @@ export const websiteInfo = {
 export const navigations = [
   { name: 'Publications', route: '/publications' },
   // { name: 'Projects', route: '/projects' },
-  { name: "Academics", route: "/academics" },
-  { name: 'CV', route: '/cv' },
+  // { name: "Academics", route: "/academics" },
+  // { name: 'CV', route: '/cv' },
   { name: 'Misc', route: '/misc' },
 
 ];
