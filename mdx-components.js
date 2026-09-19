@@ -1,30 +1,22 @@
+/**
+ * Global MDX mapping. Visual styling lives in `.prose-body` in globals.css,
+ * so these overrides only handle behaviour the CSS cannot: external links
+ * opening safely in a new tab.
+ */
 export function useMDXComponents(components) {
   return {
-    p: (props) => (
-      <p
-        className="text-base text-neutral-600 dark:text-neutral-300"
-        {...props}
-      />
-    ),
-    li: (props) => (
-      <li
-        className="text-base text-neutral-600 dark:text-neutral-300"
-        {...props}
-      />
-    ),
-    strong: (props) => (
-      <strong
-        className="font-semibold text-neutral-900 dark:text-neutral-100"
-        {...props}
-      />
-    ),
-    h1: ({ children }) => <h1 className="text-2xl font-medium">{children}</h1>,
-    a: (props) => (
-      <a
-        className="underline hover:text-neutral-900 dark:hover:text-neutral-50"
-        {...props}
-      />
-    ),
+    a: ({ href = '', ...props }) => {
+      const isExternal = /^https?:/i.test(href);
+      return (
+        <a
+          href={href}
+          {...(isExternal
+            ? { target: '_blank', rel: 'noopener noreferrer' }
+            : {})}
+          {...props}
+        />
+      );
+    },
     ...components,
   };
 }

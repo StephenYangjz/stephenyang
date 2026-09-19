@@ -2,118 +2,792 @@
 @tailwind components;
 @tailwind utilities;
 
-.prose .anchor {
-  @apply absolute invisible no-underline;
+/* ═══════════════════════════════════════════════════════════════════════
+   TOKENS
+   Two themes, tuned independently. Glass in particular cannot be derived
+   from the light values — it needs its own opacity, border and highlight
+   or it turns to mud on a dark ground.
+   ═══════════════════════════════════════════════════════════════════════ */
+@layer base {
+  :root {
+    --paper: #f4f5f8;
+    --paper-raised: #ffffff;
+    --text: #111319;
+    --text-soft: #3d424e;
+    --muted: #6c7280;
+    --rule: rgba(14, 17, 26, 0.1);
+    --rule-strong: rgba(14, 17, 26, 0.17);
 
-  margin-left: -1em;
-  padding-right: 0.5em;
-  width: auto;
-  max-width: 1200px;
-  cursor: pointer;
+    --accent: #0b6bf0;
+    --accent-ink: #0a55be;
+    --accent-soft: rgba(11, 107, 240, 0.1);
+    --award-bg: rgba(193, 134, 12, 0.13);
+    --award-ink: #7c5306;
+
+    --glass-bg: rgba(255, 255, 255, 0.55);
+    --glass-border: rgba(255, 255, 255, 0.78);
+    --glass-hi: rgba(255, 255, 255, 0.95);
+    --glass-hi-2: rgba(255, 255, 255, 0.35);
+    --glass-shadow: 0 6px 24px rgba(16, 22, 44, 0.13),
+      0 1px 2px rgba(16, 22, 44, 0.07);
+    --glass-shadow-lift: 0 12px 34px rgba(16, 22, 44, 0.18),
+      0 1px 2px rgba(16, 22, 44, 0.09);
+    --glass-sat: 200%;
+    --glass-bright: 1.05;
+
+    /* Ambient wash — one hue family only. Colour here is a lighting
+       effect for the glass to refract, not decoration. */
+    --wash-1: #b6c7e8;
+    --wash-2: #ccd5e6;
+    --wash-3: #c2d0e6;
+    --wash-opacity: 0.4;
+    --wash-blur: 90px;
+  }
+
+  .dark {
+    --paper: #0a0b0f;
+    --paper-raised: #111319;
+    --text: #eceef4;
+    --text-soft: #b9becc;
+    --muted: #848a9a;
+    --rule: rgba(255, 255, 255, 0.1);
+    --rule-strong: rgba(255, 255, 255, 0.18);
+
+    --accent: #4f9dff;
+    --accent-ink: #8fc2ff;
+    --accent-soft: rgba(79, 157, 255, 0.14);
+    --award-bg: rgba(240, 190, 80, 0.14);
+    --award-ink: #efc97e;
+
+    --glass-bg: rgba(24, 26, 34, 0.58);
+    --glass-border: rgba(255, 255, 255, 0.13);
+    --glass-hi: rgba(255, 255, 255, 0.18);
+    --glass-hi-2: rgba(255, 255, 255, 0.04);
+    --glass-shadow: 0 10px 34px rgba(0, 0, 0, 0.55),
+      0 1px 2px rgba(0, 0, 0, 0.4);
+    --glass-shadow-lift: 0 16px 44px rgba(0, 0, 0, 0.65),
+      0 1px 2px rgba(0, 0, 0, 0.4);
+    --glass-sat: 175%;
+    --glass-bright: 1;
+
+    --wash-1: #1b2c52;
+    --wash-2: #141d35;
+    --wash-3: #19223d;
+    --wash-opacity: 0.5;
+    --wash-blur: 100px;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    overflow-y: scroll;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background: var(--paper);
+    color: var(--text);
+    font-optical-sizing: auto;
+    letter-spacing: -0.011em;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    transition: background-color 0.45s ease, color 0.45s ease;
+  }
+
+  ::selection {
+    background: var(--accent-soft);
+    color: var(--accent-ink);
+  }
+
+  /* Anchor targets must clear the floating header */
+  [id] {
+    scroll-margin-top: 108px;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
 }
 
-.anchor:hover {
-  @apply visible;
+/* ═══════════════════════════════════════════════════════════════════════
+   LAYOUT
+   ═══════════════════════════════════════════════════════════════════════ */
+@layer components {
+  .shell {
+    width: 100%;
+    max-width: 1180px;
+    margin-inline: auto;
+    padding-inline: clamp(20px, 5vw, 56px);
+  }
+
+  /* A section is a two-column editorial grid: a sticky label rail on the
+     left, content on the right. The rail is what earns the extra width —
+     it keeps you oriented instead of just stretching the measure. */
+  .section-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  @media (min-width: 900px) {
+    .section-grid {
+      grid-template-columns: 186px minmax(0, 1fr);
+      gap: 56px;
+    }
+
+    .section-rail {
+      position: sticky;
+      top: 104px;
+      align-self: start;
+    }
+  }
+
+  .rail-label {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  /* Hairline under the rail label that scrubs 0 → 100% across the section.
+     Driven by the section's own view-timeline, so it is a real readout of
+     how far through the section you are, not an approximation. */
+  .rail-progress {
+    position: relative;
+    margin-top: 10px;
+    height: 2px;
+    border-radius: 2px;
+    background: var(--rule);
+    overflow: hidden;
+  }
+
+  .rail-progress::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: var(--accent);
+    transform-origin: 0 50%;
+    transform: scaleX(0);
+  }
+
+  .rail-count {
+    margin-top: 10px;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
 }
 
-.prose a {
-  @apply underline transition-all decoration-neutral-400 dark:decoration-neutral-600 underline-offset-2 decoration-[0.1em];
+/* ═══════════════════════════════════════════════════════════════════════
+   AMBIENT — the ground the glass refracts
+   ═══════════════════════════════════════════════════════════════════════ */
+.ambient {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+  contain: strict;
 }
 
-.prose *:hover > .anchor {
-  @apply visible;
-}
-
-.prose pre {
-  @apply bg-neutral-50 dark:bg-neutral-900 rounded-lg overflow-x-auto border border-neutral-200 dark:border-neutral-900 py-2 px-3 text-sm;
-}
-
-.prose code {
-  @apply px-1 py-0.5 rounded-lg;
-}
-
-.prose pre code {
-  @apply p-0;
-  border: initial;
-  line-height: 1.5;
-}
-
-.prose code span {
-  @apply font-medium;
-}
-
-.prose img {
-  /* Don't apply styles to next/image */
-  @apply m-0;
-}
-
-.prose p {
-  @apply my-4 text-neutral-600 dark:text-neutral-200;
-}
-
-.prose h1 {
-  @apply text-3xl font-semibold tracking-tight mt-6 mb-2;
-}
-
-.prose h2 {
-  @apply text-xl font-medium tracking-tight mt-6 mb-2;
-}
-
-.prose h3 {
-  @apply text-xl font-medium tracking-tight mt-6 mb-2;
-}
-
-.prose h4 {
-  @apply text-lg font-medium tracking-tight mt-6 mb-2;
-}
-
-.prose strong {
-  @apply font-medium;
-}
-
-.prose ul {
-  @apply list-disc pl-6;
-}
-
-.prose ol {
-  @apply list-decimal pl-6;
-}
-
-.prose > :first-child {
-  /* Override removing top margin, causing layout shift */
-  margin-top: 1.25em !important;
-  margin-bottom: 1.25em !important;
-}
-
-pre::-webkit-scrollbar {
-  display: none;
-}
-
-pre {
-  -ms-overflow-style: none; /* IE and Edge */
-  scrollbar-width: none; /* Firefox */
-}
-
-/* Remove Safari input shadow on mobile */
-input[type="text"],
-input[type="email"] {
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-}
-
-table {
+.ambient span {
+  position: absolute;
   display: block;
-  max-width: fit-content;
-  overflow-x: auto;
+  border-radius: 50%;
+  filter: blur(var(--wash-blur));
+  opacity: var(--wash-opacity);
+  transition: background-color 0.6s ease, opacity 0.6s ease;
+  will-change: transform;
+}
+
+.ambient span:nth-child(1) {
+  width: 54vw;
+  height: 54vw;
+  left: -14vw;
+  top: -18vw;
+  background: var(--wash-1);
+}
+.ambient span:nth-child(2) {
+  width: 44vw;
+  height: 44vw;
+  right: -12vw;
+  top: 26vh;
+  background: var(--wash-2);
+}
+.ambient span:nth-child(3) {
+  width: 48vw;
+  height: 48vw;
+  left: 18vw;
+  top: 72vh;
+  background: var(--wash-3);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   GLASS
+   ═══════════════════════════════════════════════════════════════════════ */
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(22px) saturate(var(--glass-sat))
+    brightness(var(--glass-bright));
+  -webkit-backdrop-filter: blur(22px) saturate(var(--glass-sat))
+    brightness(var(--glass-bright));
+  border: 1px solid var(--glass-border);
+  box-shadow: inset 0 1px 0 var(--glass-hi), inset 0 -1px 0 var(--glass-hi-2),
+    var(--glass-shadow);
+}
+
+/* Specular sheen along the top-left edge — the detail that reads as a
+   physical surface rather than a translucent rectangle. */
+.glass-sheen::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(
+    135deg,
+    var(--glass-hi) 0%,
+    var(--glass-hi-2) 32%,
+    transparent 56%
+  );
+}
+
+.header-pill {
+  transition: box-shadow 0.4s cubic-bezier(0.32, 0.72, 0, 1),
+    background-color 0.45s ease, border-color 0.45s ease;
+}
+
+.is-scrolled .header-pill {
+  box-shadow: inset 0 1px 0 var(--glass-hi), var(--glass-shadow-lift);
+}
+
+/* The name slides into the pill as the hero leaves */
+.pill-name {
+  max-width: 0;
+  opacity: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  transition: max-width 0.5s cubic-bezier(0.32, 0.72, 0, 1),
+    opacity 0.3s ease, margin 0.5s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.is-scrolled .pill-name {
+  max-width: 180px;
+  opacity: 1;
+  margin-inline: 2px 6px;
+}
+
+/* Too tight to be worth it on a phone — the mark and the menu are enough. */
+@media (max-width: 640px) {
+  .is-scrolled .pill-name {
+    max-width: 0;
+    opacity: 0;
+    margin-inline: 0;
+  }
+}
+
+/* Reading progress, drawn inside the pill's own bottom edge */
+.pill-progress {
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  bottom: 3px;
+  height: 1.5px;
+  border-radius: 2px;
+  overflow: hidden;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+
+.is-scrolled .pill-progress {
+  opacity: 1;
+}
+
+.pill-progress::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--accent);
+  transform-origin: 0 50%;
+  transform: scaleX(0);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   TYPE
+   ═══════════════════════════════════════════════════════════════════════ */
+.display {
+  font-size: clamp(2.75rem, 7.5vw, 5.25rem);
+  font-weight: 600;
+  letter-spacing: -0.045em;
+  line-height: 0.98;
+}
+
+.lede {
+  font-size: clamp(1rem, 1.6vw, 1.125rem);
+  line-height: 1.7;
+  color: var(--text-soft);
+}
+
+.prose-body p {
+  margin-bottom: 1.05em;
+  color: var(--text-soft);
+  line-height: 1.72;
+}
+
+.prose-body p:last-child {
+  margin-bottom: 0;
+}
+
+.prose-body a,
+.link-underline {
+  color: var(--text);
+  text-decoration: underline;
+  text-decoration-color: var(--rule-strong);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  transition: text-decoration-color 0.22s ease, color 0.22s ease;
+}
+
+.prose-body a:hover,
+.link-underline:hover {
+  color: var(--accent);
+  text-decoration-color: var(--accent);
+}
+
+.prose-body ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.prose-body li {
+  position: relative;
+  padding-left: 1.1rem;
+  margin-bottom: 0.7em;
+  color: var(--text-soft);
+  line-height: 1.7;
+}
+
+.prose-body li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.72em;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--rule-strong);
+}
+
+.prose-body strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   PIECES
+   ═══════════════════════════════════════════════════════════════════════ */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  font-size: 11.5px;
+  font-weight: 500;
+  letter-spacing: 0.012em;
+  padding: 3px 9px;
+  border-radius: 6px;
+  background: var(--accent-soft);
+  color: var(--accent-ink);
   white-space: nowrap;
 }
 
-.title {
-  text-wrap: balance;
+.chip-award {
+  background: var(--award-bg);
+  color: var(--award-ink);
 }
 
-html {
-  overflow-y: scroll; /* Forces a vertical scrollbar */
+.chip-quiet {
+  background: transparent;
+  color: var(--muted);
+  border: 1px solid var(--rule);
 }
 
+.social-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 13px;
+  font-weight: 450;
+  padding: 7px 12px;
+  border-radius: 10px;
+  color: var(--text-soft);
+  background: var(--glass-bg);
+  border: 1px solid var(--rule);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: transform 0.2s cubic-bezier(0.32, 0.72, 0, 1),
+    border-color 0.2s ease, color 0.2s ease;
+}
+
+.social-btn:hover {
+  transform: translateY(-2px);
+  border-color: var(--rule-strong);
+  color: var(--text);
+}
+
+.nav-link {
+  font-size: 13.5px;
+  font-weight: 450;
+  letter-spacing: -0.006em;
+  color: var(--text-soft);
+  padding: 6px 13px;
+  border-radius: 999px;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.nav-link:hover {
+  background: var(--glass-hi);
+  color: var(--text);
+}
+
+.dark .nav-link:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Publication row: content left, year pinned right. The year column is
+   what makes the wide measure feel deliberate. */
+.pub-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 16px 28px;
+  align-items: start;
+  padding: 22px 0;
+  border-top: 1px solid var(--rule);
+}
+
+.pub-row:first-child {
+  border-top: 0;
+}
+
+.pub-title {
+  font-size: clamp(1rem, 1.5vw, 1.1rem);
+  font-weight: 500;
+  letter-spacing: -0.016em;
+  line-height: 1.38;
+}
+
+.pub-title a {
+  background-image: linear-gradient(var(--accent), var(--accent));
+  background-size: 0% 1px;
+  background-position: 0 100%;
+  background-repeat: no-repeat;
+  padding-bottom: 1px;
+  transition: background-size 0.32s cubic-bezier(0.32, 0.72, 0, 1),
+    color 0.22s ease;
+}
+
+.pub-title a:hover {
+  background-size: 100% 1px;
+  color: var(--accent);
+}
+
+.pub-authors {
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+.pub-authors strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.pub-year {
+  font-size: 13px;
+  color: var(--muted);
+  padding-top: 3px;
+}
+
+.pub-link {
+  font-size: 12.5px;
+  color: var(--muted);
+  border-bottom: 1px solid transparent;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.pub-link:hover {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+.timeline-row {
+  display: grid;
+  grid-template-columns: 108px minmax(0, 1fr);
+  gap: 24px;
+  padding: 15px 0;
+  border-top: 1px solid var(--rule);
+}
+
+.timeline-row:first-child {
+  border-top: 0;
+}
+
+@media (max-width: 560px) {
+  .timeline-row {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+}
+
+.timeline-when {
+  font-size: 12.5px;
+  color: var(--muted);
+  padding-top: 3px;
+}
+
+.news-row {
+  display: grid;
+  grid-template-columns: 76px minmax(0, 1fr);
+  gap: 20px;
+  padding: 10px 0;
+}
+
+@media (max-width: 560px) {
+  .news-row {
+    grid-template-columns: 1fr;
+    gap: 2px;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   SCROLL-DRIVEN MOTION
+   All of this is native CSS on the compositor. The JS fallback below only
+   runs where animation-timeline is unsupported.
+   ═══════════════════════════════════════════════════════════════════════ */
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(22px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes slide-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes draw-x {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes hero-recede {
+  to {
+    opacity: 0.16;
+    transform: translateY(-26px) scale(0.972);
+  }
+}
+
+@keyframes portrait-drift {
+  from {
+    transform: translateY(26px);
+  }
+  to {
+    transform: translateY(-26px);
+  }
+}
+
+@keyframes wash-drift {
+  to {
+    transform: translate3d(0, -14vh, 0) scale(1.14);
+  }
+}
+
+@supports (animation-timeline: view()) {
+  .reveal {
+    animation: rise-in linear both;
+    animation-timeline: view();
+    animation-range: entry 3% cover 26%;
+  }
+
+  /* The year in the gutter arrives just behind its row — a small lead/lag
+     that makes the list feel typeset rather than uniformly faded in. */
+  .reveal-lag {
+    animation: slide-in-left linear both;
+    animation-timeline: view();
+    animation-range: entry 6% cover 32%;
+  }
+
+  .hero-recede {
+    animation: hero-recede linear both;
+    animation-timeline: scroll(root block);
+    animation-range: 0 300px;
+    transform-origin: 0 0;
+  }
+
+  .portrait-drift {
+    animation: portrait-drift linear both;
+    animation-timeline: view();
+    animation-range: cover 0% cover 100%;
+  }
+
+  .pill-progress::after {
+    animation: draw-x linear both;
+    animation-timeline: scroll(root block);
+  }
+
+  /* Section rail readout — scoped to the section element itself */
+  .section-tracked {
+    view-timeline-name: --section;
+    view-timeline-axis: block;
+  }
+
+  .section-tracked .rail-progress::after {
+    animation: draw-x linear both;
+    animation-timeline: --section;
+    animation-range: contain 0% contain 100%;
+  }
+
+  .ambient span {
+    animation: wash-drift linear both;
+    animation-timeline: scroll(root block);
+  }
+
+  .ambient span:nth-child(2) {
+    animation-duration: 1s;
+    animation-delay: 0s;
+  }
+}
+
+/* JS fallback (Safari < 26, older Firefox) */
+.no-sda .reveal,
+.no-sda .reveal-lag {
+  opacity: 0;
+  transform: translateY(22px);
+  transition: opacity 0.7s cubic-bezier(0.22, 0.8, 0.3, 1),
+    transform 0.7s cubic-bezier(0.22, 0.8, 0.3, 1);
+}
+
+.no-sda .reveal-lag {
+  transform: translateX(-10px);
+}
+
+.no-sda .reveal.in-view,
+.no-sda .reveal-lag.in-view {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .no-sda .reveal,
+  .no-sda .reveal-lag {
+    opacity: 1;
+    transform: none;
+  }
+
+  .pill-progress::after,
+  .rail-progress::after {
+    transform: scaleX(1);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   MDX defaults
+   ═══════════════════════════════════════════════════════════════════════ */
+.prose-body pre {
+  background: var(--paper-raised);
+  border: 1px solid var(--rule);
+  border-radius: 12px;
+  padding: 12px 14px;
+  overflow-x: auto;
+  font-size: 13px;
+}
+
+.prose-body pre::-webkit-scrollbar {
+  display: none;
+}
+
+.prose-body code {
+  font-size: 0.9em;
+}
+
+.prose-body img {
+  border-radius: 14px;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   News list — the MDX stays a plain bullet list, so the date/body split is
+   done here. A hanging indent rather than a grid: each <li> contains inline
+   links, and every inline element in a grid container becomes its own grid
+   item, which throws the columns out.
+   ═══════════════════════════════════════════════════════════════════════ */
+.news-list li {
+  padding-left: 92px;
+  text-indent: -92px;
+  margin-bottom: 0;
+  padding-block: 9px;
+  line-height: 1.65;
+}
+
+.news-list li::before {
+  display: none;
+}
+
+.news-list li > strong:first-child {
+  display: inline-block;
+  width: 92px;
+  text-indent: 0;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.01em;
+  vertical-align: baseline;
+}
+
+@media (max-width: 560px) {
+  .news-list li {
+    padding-left: 0;
+    text-indent: 0;
+  }
+
+  .news-list li > strong:first-child {
+    display: block;
+    width: auto;
+    margin-bottom: 2px;
+  }
+}

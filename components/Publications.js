@@ -1,206 +1,165 @@
-import React from "react";
-import { personalInfo } from "@/website.config";
-import { CustomMDX } from "@/components/mdx";
-import bibtexParse from "bibtex-parse-js";
-import { RiGlobeLine, RiFilePdfLine, RiCodeLine } from "react-icons/ri";
-import { BiBookAlt } from "react-icons/bi"; // Corrected arXiv icon
+import bibtexParse from 'bibtex-parse-js';
 
-function authorProcess(authorsStr, personalInfo) {
-  const authors = authorsStr.split("and");
+/** Names that should render bold — the bib uses the legal name. */
+const SELF = ['jiezhi yang', 'stephen yang', 'jiezhi stephen yang'];
+const SELF_DISPLAY = 'Jiezhi (Stephen) Yang';
 
-  const boldedAuthors = authors.map((author) => {
-    author = author.trim().split(", ").reverse().join(" ").trim();
+/** Trailing tokens that mark a suffix rather than a given name. */
+const SUFFIXES = new Set(['inc.', 'inc', 'llc', 'ltd', 'ltd.', 'jr.', 'jr', 'sr.', 'sr', 'ii', 'iii', 'iv', 'phd', 'ph.d.']);
 
-    if (author === personalInfo) {
-      return `**${personalInfo}**`;
-    }
+const clean = (value) => (value || '').replace(/[{}]/g, '').trim();
 
-    return author;
-  });
-
-  return boldedAuthors.join(", ");
+/** bibtex-parse-js preserves the source casing of field names. */
+function tag(entry, name) {
+  const tags = entry.entryTags || {};
+  const key = Object.keys(tags).find(
+    (k) => k.toLowerCase() === name.toLowerCase()
+  );
+  return key ? clean(tags[key]) : null;
 }
 
-function PublicationCard({ title, authors, journal, year, award, links }) {
+function parseAuthors(raw) {
+  return (raw || '')
+    .split(/\s+and\s+/i)
+    .map((author) => {
+      const name = clean(author);
+      // "Last, First" -> "First Last", but only for a genuine inversion.
+      // A trailing suffix ("Qualcomm Technologies, Inc.") must not be flipped.
+      const parts = name.split(',').map((p) => p.trim()).filter(Boolean);
+      const normalised =
+        parts.length === 2 && !SUFFIXES.has(parts[1].toLowerCase())
+          ? `${parts[1]} ${parts[0]}`
+          : name;
+      const isSelf = SELF.includes(
+        normalised.toLowerCase().replace(/[().]/g, '').replace(/\s+/g, ' ')
+      );
+      return { name: isSelf ? SELF_DISPLAY : normalised, isSelf };
+    })
+    .filter((a) => a.name);
+}
+
+const LINK_ORDER = ['project', 'pdf', 'arxiv', 'code', 'patent'];
+const LINK_LABEL = {
+  project: 'Project',
+  pdf: 'PDF',
+  arxiv: 'arXiv',
+  code: 'Code',
+  patent: 'Patent',
+};
+
+function toRecord(entry) {
+  const links = LINK_ORDER.map((key) => [key, tag(entry, key)]).filter(
+    ([, url]) => url
+  );
+
+  return {
+    key: entry.citationKey,
+    title: clean(tag(entry, 'title')),
+    authors: parseAuthors(tag(entry, 'author')),
+    venue:
+      tag(entry, 'venue') || tag(entry, 'journal') || tag(entry, 'booktitle'),
+    year: tag(entry, 'year'),
+    award: tag(entry, 'award'),
+    kind: (tag(entry, 'kind') || 'paper').toLowerCase(),
+    links,
+  };
+}
+
+function PublicationRow({ item }) {
+  const primary =
+    item.links.find(([key]) => key === 'project') ||
+    item.links.find(([key]) => key === 'arxiv') ||
+    item.links.find(([key]) => key === 'pdf');
+
   return (
-    // <div className="flex flex-col border border-neutral-200 dark:border-neutral-700 rounded-xl bg-white dark:bg-neutral-800 hover:shadow-sm p-6 gap-2 overflow-hidden overflow-x-hidden">
-    //   {/* Title Section */}
-    //   <h2 className="text-lg font-semibold text-neutral-900 dark:text-neutral-100">
-    //     {links.project ? (
-    //       <a href={links.project} className="underline hover:text-blue-500">
-    //         {title}
-    //       </a>
-    //     ) : (
-    //       title
-    //     )}
-    //   </h2>
+    <article className="pub-row">
+      <div className="min-w-0 reveal">
+        <h3 className="pub-title">
+          {primary ? (
+            <a href={primary[1]} target="_blank" rel="noopener noreferrer">
+              {item.title}
+            </a>
+          ) : (
+            item.title
+          )}
+        </h3>
 
-    //   {/* Authors Section */}
-    //   <div className="text-neutral-600 dark:text-neutral-300 font-light">
-    //     <CustomMDX source={authors} />
-    //   </div>
+        {item.authors.length > 0 && (
+          <p className="pub-authors mt-1.5">
+            {item.authors.map((author, index) => (
+              <span key={`${author.name}-${index}`}>
+                {author.isSelf ? <strong>{author.name}</strong> : author.name}
+                {index < item.authors.length - 1 ? ', ' : ''}
+              </span>
+            ))}
+          </p>
+        )}
 
-    //   {/* Details Section */}
-    //   <div className="text-sm text-neutral-600 dark:text-neutral-300">
-    //     <span className="mr-2 italic">{journal}</span>
-    //     <span className="mr-2">{year}</span>
-    //     {award && <span className="font-bold">{award}</span>}
-    //   </div>
+        <div className="mt-3 flex flex-wrap items-center gap-2">
+          {item.venue && <span className="chip">{item.venue}</span>}
+          {item.award && (
+            <span className="chip chip-award">{item.award}</span>
+          )}
 
-    //   {/* Action Buttons Section */}
-    //   <div className="flex flex-wrap gap-2">
-    //     {links.project && (
-    //       <a
-    //         href={links.project}
-    //         target="_blank"
-    //         rel="noopener noreferrer"
-    //         className="inline-flex items-center gap-2 px-3 py-1 text-sm font-medium text-neutral-700 dark:text-neutral-300 bg-neutral-100 dark:bg-neutral-700 rounded-lg hover:bg-neutral-200 dark:hover:bg-neutral-600"
-    //       >
-    //         <RiGlobeLine size={16} /> Project Page
-    //       </a>
-    //     )}
-    //     {links.pdf && (
-    //       <a
-    //         href={links.pdf}
-    //         target="_blank"
-    //         rel="noopener noreferrer"
-    //         className="inline-flex items-center gap-2 px-3 py-1 text-sm font-medium text-neutral-700 dark:text-neutral-300 bg-neutral-100 dark:bg-neutral-700 rounded-lg hover:bg-neutral-200 dark:hover:bg-neutral-600"
-    //       >
-    //         <RiFilePdfLine size={16} /> PDF
-    //       </a>
-    //     )}
-    //     {links.arxiv && (
-    //       <a
-    //         href={links.arxiv}
-    //         target="_blank"
-    //         rel="noopener noreferrer"
-    //         className="inline-flex items-center gap-2 px-3 py-1 text-sm font-medium text-neutral-700 dark:text-neutral-300 bg-neutral-100 dark:bg-neutral-700 rounded-lg hover:bg-neutral-200 dark:hover:bg-neutral-600"
-    //       >
-    //         <BiBookAlt size={16} /> arXiv
-    //       </a>
-    //     )}
-    //     {links.code && (
-    //       <a
-    //         href={links.code}
-    //         target="_blank"
-    //         rel="noopener noreferrer"
-    //         className="inline-flex items-center gap-2 px-3 py-1 text-sm font-medium text-neutral-700 dark:text-neutral-300 bg-neutral-100 dark:bg-neutral-700 rounded-lg hover:bg-neutral-200 dark:hover:bg-neutral-600"
-    //       >
-    //         <RiCodeLine size={16} /> Code
-    //       </a>
-    //     )}
-    //   </div>
-    // </div>
+          {item.links.length > 0 && (
+            <span className="flex flex-wrap items-center gap-2 ml-1">
+              {item.links.map(([key, url], index) => (
+                <span key={key} className="flex items-center gap-2">
+                  {index > 0 && (
+                    <span style={{ color: 'var(--rule-strong)' }}>·</span>
+                  )}
+                  <a
+                    href={url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="pub-link"
+                  >
+                    {LINK_LABEL[key]}
+                  </a>
+                </span>
+              ))}
+            </span>
+          )}
+        </div>
+      </div>
 
-    <div className="flex flex-col border border-neutral-200 dark:border-neutral-700 rounded-xl bg-white dark:bg-neutral-800 hover:shadow-sm p-6 gap-3 overflow-hidden overflow-x-hidden hover:shadow-lg transition-shadow">
-  {/* Title Section */}
-  <h2 className="text-lg font-semibold text-neutral-900 dark:text-neutral-100">
-    {links.project ? (
-      <a href={links.project} className="underline hover:text-blue-500">
-        {title}
-      </a>
-    ) : (
-      title
-    )}
-  </h2>
-
-  {/* Authors Section */}
-  <div className="text-sm text-neutral-600 dark:text-neutral-300 font-light">
-    <CustomMDX source={authors} />
-  </div>
-
-  {/* Details Section */}
-  <div className="text-sm text-neutral-600 dark:text-neutral-300">
-    <span className="mr-2 italic">{journal}</span>
-    <span className="mr-2">{year}</span>
-    {award && <span className="font-bold">{award}</span>}
-  </div>
-
-  {/* Action Buttons Section */}
-  <div className="flex flex-wrap gap-2">
-    {links.project && (
-      <a
-        href={links.project}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="inline-flex items-center gap-2 px-3 py-1 text-sm font-medium text-neutral-700 dark:text-neutral-300 bg-neutral-100 dark:bg-neutral-700 rounded-lg hover:bg-neutral-200 dark:hover:bg-neutral-600 transition-shadow"
-      >
-        <RiGlobeLine size={16} /> Project Page
-      </a>
-    )}
-    {links.pdf && (
-      <a
-        href={links.pdf}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="inline-flex items-center gap-2 px-3 py-1 text-sm font-medium text-neutral-700 dark:text-neutral-300 bg-neutral-100 dark:bg-neutral-700 rounded-lg hover:bg-neutral-200 dark:hover:bg-neutral-600 transition-shadow"
-      >
-        <RiFilePdfLine size={16} /> PDF
-      </a>
-    )}
-    {links.arxiv && (
-      <a
-        href={links.arxiv}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="inline-flex items-center gap-2 px-3 py-1 text-sm font-medium text-neutral-700 dark:text-neutral-300 bg-neutral-100 dark:bg-neutral-700 rounded-lg hover:bg-neutral-200 dark:hover:bg-neutral-600 transition-shadow"
-      >
-        <BiBookAlt size={16} /> arXiv
-      </a>
-    )}
-    {links.code && (
-      <a
-        href={links.code}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="inline-flex items-center gap-2 px-3 py-1 text-sm font-medium text-neutral-700 dark:text-neutral-300 bg-neutral-100 dark:bg-neutral-700 rounded-lg hover:bg-neutral-200 dark:hover:bg-neutral-600 transition-shadow"
-      >
-        <RiCodeLine size={16} /> Code
-      </a>
-    )}
-  </div>
-</div>
-
-
+      <div className="pub-year tabular reveal-lag">{item.year}</div>
+    </article>
   );
 }
 
-
 export default function Publications({ bibtex }) {
-  const parsed = bibtexParse.toJSON(bibtex);
+  const entries = bibtexParse.toJSON(bibtex).map(toRecord);
+
+  const papers = entries.filter((item) => item.kind === 'paper');
+  const appendix = entries.filter((item) => item.kind !== 'paper');
 
   return (
-    <section className="grid gap-5 transition-all h-auto">
-      {parsed.map((item, index) => {
-        const processedAuthors = authorProcess(
-          item.entryTags?.author || "",
-          personalInfo.name
-        );
+    <div>
+      <div>
+        {papers.map((item) => (
+          <PublicationRow key={item.key} item={item} />
+        ))}
+      </div>
 
-        // Generate links from bibtex fields
-        const links = {
-          project: item.entryTags?.project || null,
-          pdf: item.entryTags?.pdf || null,
-          arxiv: item.entryTags?.arxiv || null,
-          code: item.entryTags?.code || null,
-        };
-
-        return (
-          <PublicationCard
-            key={index} // Using index as fallback if title is not unique
-            title={(item.entryTags?.title || "").replace(/{|}/g, "")}
-            authors={processedAuthors}
-            journal={
-              item.entryTags?.journal?.replace(/{|}/g, "") ||
-              item.entryTags?.booktitle?.replace(/{|}/g, "") ||
-              "N/A"
-            }
-            year={item.entryTags?.year || "N/A"}
-            award={item.entryTags?.award || null}
-            links={links}
-          />
-        );
-      })}
-    </section>
+      {appendix.length > 0 && (
+        <div className="mt-12">
+          <h3
+            className="rail-label reveal"
+            style={{ marginBottom: '2px' }}
+          >
+            Patents &amp; Other
+          </h3>
+          <div
+            className="mt-4 pt-1"
+            style={{ borderTop: '1px solid var(--rule)' }}
+          >
+            {appendix.map((item) => (
+              <PublicationRow key={item.key} item={item} />
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
   );
 }

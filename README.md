@@ -1,100 +1,71 @@
-# Stephen Yang's Homepage
+# Stephen Yang — Homepage
 
-This project is an academic homepage built with Next.js, Tailwind CSS, and ShadcnUI. The design is minimalistic and modern, providing a clean and professional look for academic portfolios. It supports deployment to Github Pages and can directly parse `.bib` files to display publications. The website is modified from this [template](https://github.com/anxndsgn/academic-homepage-template).
+Personal academic homepage. Next.js (App Router) + Tailwind, statically exported to GitHub Pages.
 
+Live at [stephenjyang.com](https://stephenjyang.com).
 
-## Features
+## Design
 
-- **Minimalistic Design**: Clean and modern interface to showcase academic work.
-- **Markdown Support**: Write website content using markdown files.
-- **Dark Mode**: Supports dark mode for a comfortable viewing experience.
-- **Responsive Design**: Fully responsive and mobile-friendly.
-- **Bib File Parsing**: Directly parse and display publications from `.bib` files.
+A single wide editorial column with a sticky label rail, and a liquid-glass floating header.
 
-## Customization
+**Scroll-driven motion.** Everything continuous is native CSS scroll-driven animation
+(`animation-timeline: scroll()` / `view()`), which runs on the compositor and scrubs
+backwards when you scroll up:
 
-### Structure
+| Effect | Where | Timeline |
+| --- | --- | --- |
+| Reading progress inside the header pill | `.pill-progress` | `scroll(root)` |
+| Hero recedes and hands off to the pill | `.hero-recede` | `scroll(root)`, `0 → 300px` |
+| Section rail progress hairline | `.rail-progress` | named `--section` view-timeline |
+| Row reveals, with the year lagging the row | `.reveal` / `.reveal-lag` | `view()` |
+| Portrait parallax | `.portrait-drift` | `view()` |
+| Ambient wash drift | `.ambient span` | `scroll(root)` |
 
-Your data is divided into three parts:
+`components/ScrollBoot.js` adds `.no-sda` where `animation-timeline` is unsupported
+(Safari < 26, older Firefox) and swaps in an IntersectionObserver + transition fallback.
+It also owns the one genuinely discrete bit of state — whether the page has been scrolled,
+which drives the pill morph.
 
-- `public` folder: Stores your images and CV files.
-- `data` folder: Stores your MDX files and `.bib` files.
-- `website.config.js`: Contains your personal information and social media links.
+Both themes are tuned independently. Glass values in particular are not derived from the
+light palette: opacity, border and highlight all need separate values on a dark ground.
 
-### MDX
+## Editing content
 
-We use `.mdx` files to write content, which is an extension of markdown files. You can use markdown syntax to write your content.
+| What | Where |
+| --- | --- |
+| Name, role, socials, experience, education, honors, talks, service | `website.config.js` |
+| Bio, news, miscellaneous | `data/home/*.mdx` |
+| Publications | `data/bib/Publications.bib` |
+| Images, CV PDF | `public/` |
+| Design tokens | `:root` and `.dark` in `app/globals.css` |
 
-### Project frontmatter
+### Publications
 
-MDX files in the `data/projects` directory need to include frontmatter at the top in the following format:
+`data/bib/Publications.bib` is parsed at build time and rendered in file order.
+Beyond standard BibTeX fields:
 
-```
----
+- `venue` — display string for the venue; wins over `journal`/`booktitle`. Once a preprint
+  is accepted, set this to the conference and it supersedes the arXiv listing.
+- `award` — rendered as a highlighted badge.
+- `kind` — `patent` or `other` moves the entry into the "Patents & Other" block at the end.
+- `project`, `pdf`, `arxiv`, `code`, `patent` — link buttons. The title links to the first
+  of project / arXiv / PDF that is present.
 
-title: "FibeRobo"
-
-description: "Fabricating 4D Fiber Interfaces by Continuous Drawing of Temperature Tunable Liquid Crystal Elastomers"
-
-date: "2023-01-01"
-
-image: "/project1.jpg"
-
----
-```
-
-The image can be stored in the `public` folder.
-
-## Bib Files
-
-Place your .bib file in the `data/bib` directory. The application will automatically parse the file and display your publications. Make sure to name the `.bib` file as `Publications.bib` or `SelectedPublications.bib` for correct parsing.
-
-And if your paper is awarded, you can add`award={Best Paper Award}` or `award={Hornorable Mention}`to your bibtex.
+Author names matching `SELF` in `components/Publications.js` render bold.
 
 ## Development
 
-### Prerequisites
-
-- Node.js (version 14.x or higher)
-- pnpm
-
-### Installation
-
-1. **Clone the repository**
-
-   ```bash
-   git clone https://github.com/anxndsgn/academic-homepage-template.git
-   cd academic-homepage-template
-   ```
-
-2. **Install dependencies**
-
-   Using pnpm:
-
-   ```bash
-   pnpm i
-   ```
-
-### Development
-
-To start the development server, run:
+Requires Node 18+.
 
 ```bash
-pnpm run dev
+npm install
+npm run dev     # http://localhost:3000
+npm run build   # static export to out/
 ```
 
-Open http://localhost:3000 in your browser to see the result.
+Deployment is handled by `.github/workflows/nextjs.yml` on push.
 
-## Contributing
+## Credits
 
-Contributions are welcome! Please open an issue or submit a pull request.
-
-## License
-
-This project is licensed under the MIT License. See the LICENSE file for details.
-
-## Acknowledgements
-- [Template](https://github.com/anxndsgn/academic-homepage-template)
-- Next.js
-- Tailwind CSS
-- ShadcnUI
+Originally based on [academic-homepage-template](https://github.com/anxndsgn/academic-homepage-template);
+the design has since been rewritten. MIT licensed — see `LICENSE`.

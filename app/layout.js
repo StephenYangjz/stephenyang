@@ -1,44 +1,62 @@
-import { Inter, JetBrains_Mono, EB_Garamond } from 'next/font/google';
-import { fontStyle } from '@/website.config';
+import { Inter } from 'next/font/google';
 import './globals.css';
-import { websiteInfo } from '@/website.config';
+import { websiteInfo, personalInfo } from '@/website.config';
 import Header from '@/components/Header';
+import Footer from '@/components/Footer';
+import Ambient from '@/components/Ambient';
+import ScrollBoot from '@/components/ScrollBoot';
 import { ThemeProvider } from '@/components/ThemeProvider';
 
 const inter = Inter({
   subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-sans',
 });
-
-const mono = JetBrains_Mono({
-  subsets: ['latin'],
-});
-
-const serif = EB_Garamond({
-  subsets: ['latin'],
-});
-
-const font = {
-  sans: inter,
-  serif: serif,
-  mono: mono,
-}[fontStyle];
 
 export const metadata = {
-  title: websiteInfo.title,
+  metadataBase: new URL(websiteInfo.url),
+  title: {
+    default: `${personalInfo.name} — ${personalInfo.role}, ${personalInfo.university}`,
+    template: `%s · ${personalInfo.name}`,
+  },
   description: websiteInfo.description,
+  openGraph: {
+    title: personalInfo.fullName,
+    description: websiteInfo.description,
+    url: websiteInfo.url,
+    siteName: personalInfo.name,
+    images: [{ url: websiteInfo.teaserImage }],
+    type: 'profile',
+  },
+  twitter: {
+    card: 'summary',
+    title: personalInfo.fullName,
+    description: websiteInfo.description,
+  },
+};
+
+export const viewport = {
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#f4f5f8' },
+    { media: '(prefers-color-scheme: dark)', color: '#0a0b0f' },
+  ],
 };
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
-      <body className={`${font.className} bg-neutral-50 dark:bg-neutral-800`}>
+    <html lang="en" suppressHydrationWarning className={inter.variable}>
+      <body className={inter.className}>
         <ThemeProvider
           attribute="class"
-          defaultTheme="light"
+          defaultTheme="system"
+          enableSystem
           disableTransitionOnChange
         >
+          <Ambient />
+          <ScrollBoot />
           <Header />
-          {children}
+          <div className="relative z-10">{children}</div>
+          <Footer />
         </ThemeProvider>
       </body>
     </html>

@@ -1,136 +1,79 @@
 export const personalInfo = {
   name: 'Stephen Yang',
-  profilePicture: '/profile.jpg', //optional
-  role: 'Research Engineer',
-  university: 'Google',
-  universityWebsite: 'https://about.google/',
+  fullName: 'Stephen Jiezhi Yang',
+  profilePicture: '/profile.jpg',
+  role: 'Research Scientist',
+  university: 'Wayve',
+  universityWebsite: 'https://wayve.ai/',
+  location: 'London, UK',
+
+  // One line, used for the hero sub-head and the page description.
+  tagline: '3D foundation models and world models for embodied agents.',
+
   socialMedia: [
     { name: 'Email', url: 'mailto:stephenyang@berkeley.edu' },
-    { name: 'Twitter', url: 'https://x.com/Stepenyang' },
     {
-      name: 'GitHub',
-      url: 'https://github.com/StephenYangjz',
+      name: 'Google Scholar',
+      url: 'https://scholar.google.com/citations?user=BzyVxVUAAAAJ&hl=en',
     },
+    { name: 'GitHub', url: 'https://github.com/StephenYangjz' },
     { name: 'LinkedIn', url: 'https://www.linkedin.com/in/stephenyangjz/' },
-    // { name: 'ORCID', url: 'https://orcid' },
-    { name: 'Google Scholar', url: 'https://scholar.google.com/citations?user=BzyVxVUAAAAJ&hl=en' },
+    { name: 'Twitter', url: 'https://x.com/Stepenyang' },
   ],
 
   academicService: [
-    "Reviewer for ICLR 2025",
-    "Reviewer for CVPR 2025 (Projected)",
-  ],
-  teaching: [
-    {
-      title: "CS182: Deep Learning",
-      term: "Spring",
-      year: 2023,
-    },
-    {
-      title: "CS188: Introduction to AI",
-      term: "Summer",
-      year: 2022,
-    },
-    {
-      title: "CS61B: Data Structures",
-      term: "Spring",
-      year: 2022,
-    },
-  ],
-  coursework: [
-    {
-      title: "Deep Learning",
-      number: "UC Berkeley CS182",
-    },
-    {
-      title: "Computer Vision",
-      number: "UC Berkeley CS194 & CS280",
-    },
-  
-    {
-      title: "ML For Inverse Graphipcs",
-      number: "MIT 6.S980",
-    },
-    {
-      title: "Large Language Models",
-      number: "MIT 6.S988",
-    },
-    {
-      title: "Embodied Intelligence",
-      number: "6.S953",
-    },
-    {
-      title: "Natual Language Processing",
-      number: "6.8610",
-    },
-    {
-      title: "Geometric Machine Learning",
-      number: "AM220",
-    },
-    {
-      title: "Advanced Computer Networks",
-      number: "CS243",
-    },
-    {
-      title: "Machine Learning",
-      number: "UC Berkeley CS189",
-    },
-    {
-      title: "Computer Graphics",
-      number: "UC Berkeley CS184",
-    },
-    {
-      title: "Optimizations",
-      number: "UC Berkeley EECS127",
-    },
-    {
-      title: "Introduction to AI",
-      number: "UC Berkeley EECS188",
-    },
-    {
-      title: "Algoritms",
-      number: "UC Berkeley CS170",
-    },
-    {
-      title: "Data Structures",
-      number: "UC Berkeley CS61B",
-    },
+    'Reviewer, CVPR 2025 & 2026',
+    'Reviewer, ICLR 2025',
+    'Reviewer, ICCV 2025',
   ],
 
   talks: [
     {
-      title: "World Representations to Spatial Intelligence",
-      venue: "Analog Devices",
-      date: "Oct. 2024",
+      title: 'Diving in CARFF (ECCV 2024)',
+      venue: 'Harvard Computational Robotics Group',
+      date: 'Nov 2024',
     },
     {
-      title: "Diving in CARFF (ECCV 2024)",
-      venue: "Harvard Computational Robotics Group",
-      date: "Nov. 2024",
+      title: 'World Representations to Spatial Intelligence',
+      venue: 'Analog Devices',
+      date: 'Oct 2024',
     },
+  ],
+
+  teaching: [
+    { title: 'CS182: Deep Learning', term: 'Spring', year: 2023 },
+    { title: 'CS188: Introduction to AI', term: 'Summer', year: 2022 },
+    { title: 'CS61B: Data Structures', term: 'Spring', year: 2022 },
   ],
 
   experience: [
     {
+      position: 'Research Scientist',
+      company: 'Wayve',
+      location: 'London, UK',
+      startDate: '2026',
+      endDate: null,
+      responsibilities: ['End-to-end driving foundation models.'],
+    },
+    {
       position: 'Research Engineer',
-      company: 'Applied Intuition',
+      company: 'Google XR',
       location: 'Mountain View, CA',
-      startDate: '2025',
-      endDate: null, // Use null for "Present"
+      startDate: '2026',
+      endDate: '2026',
       responsibilities: [
-        'Having fun!',
+        '3D foundation models for streaming reconstruction.',
       ],
     },
     {
-      position: 'Research Assistant',
-      company: 'Harvard University',
-      location: 'Cambridge, MA',
-      startDate: '2023',
-      endDate: '2024', // Use null for "Present"
+      position: 'Research Engineer',
+      company: 'Applied Intuition',
+      location: 'Mountain View, CA',
+      startDate: '2024',
+      endDate: '2026',
       responsibilities: [
-        'Pose-free, online, feedforward 3D reconstruction.',
-        'Diffusion policy, robotics projects.',
-        'Zero-shot 3D human modeling.',
+        'Feed-forward 3D reconstruction and driving world models.',
+        'Four papers at CVPR and ECCV 2026.',
       ],
     },
     {
@@ -138,81 +81,72 @@ export const personalInfo = {
       company: 'Qualcomm AI Research',
       location: 'Santa Clara, CA',
       startDate: '2024',
-      endDate: '2024', // Ongoing job
+      endDate: '2024',
       responsibilities: [
         'Deep learning for new sensor perception systems.',
-        'US Patent filed.',
-        'Paper published to MEMS 2025.'
+        'US patent filed.',
       ],
     },
-
     {
       position: 'Research Assistant',
-      company: 'Berkeley Artificial Intelligence Research',
+      company: 'Harvard University',
+      location: 'Cambridge, MA',
+      startDate: '2023',
+      endDate: '2024',
+      responsibilities: [
+        'Pose-free, online, feed-forward 3D reconstruction.',
+        'Diffusion policy and robotics projects.',
+      ],
+    },
+    {
+      position: 'Research Assistant',
+      company: 'Berkeley AI Research',
       location: 'Berkeley, CA',
       startDate: '2022',
-      endDate: '2023', // Ongoing job
+      endDate: '2023',
       responsibilities: [
         '3D scene forecasting for driving.',
         'Diffusion and NeRF projects.',
-        'Two top-tier conference papers.'
       ],
     },
-  
     {
       position: 'Research Intern',
-      company: 'Robert Bosch',
+      company: 'Robert Bosch Research',
       location: null,
       startDate: '2022',
-      endDate: '2022', // Ongoing job
+      endDate: '2022',
       responsibilities: [
-        'Developed perception algorithms and visualization for infrastructure-based autonomous-driving research.',
+        'Perception algorithms for infrastructure-based autonomous driving.',
       ],
     },
-
-    {
-      position: 'Co-president',
-      company: 'Berkeley China Summit',
-      location: 'Berkeley, CA',
-      startDate: '2022',
-      endDate: '2022', // Ongoing job
-      responsibilities: [
-        'Led a team to put together conferences discussing tech, science, and others.',
-      ],
-    },
-
   ],
+
   education: [
     {
       degree: 'S.M.',
-      field: 'CSE',
+      field: 'Computational Science & Engineering',
       institution: 'Harvard University',
       institutionWebsite: 'https://www.harvard.edu/',
       startYear: '2023',
       endYear: '2025',
+      note: 'Cross-registered at MIT',
     },
     {
       degree: 'B.A.',
-      field: 'CS & Cognitive Science',
+      field: 'Computer Science & Cognitive Science',
       institution: 'UC Berkeley',
       institutionWebsite: 'https://www.berkeley.edu/',
       startYear: '2019',
       endYear: '2023',
-    }
+      note: 'EECS Honors Program, High Distinction',
+    },
   ],
-  cvUrl: '/Resume_StephenYang.pdf', 
-  honors: [
 
-    {
-      title: 'EECS Honors Program',
-      year: '2023',
-      institution: 'UC Berkeley',
-    },
-    {
-      title: 'High Distinction',
-      year: '2023',
-      institution: 'UC Berkeley',
-    },
+  cvUrl: '/Resume_StephenYang.pdf',
+
+  honors: [
+    { title: 'EECS Honors Program', year: '2023', institution: 'UC Berkeley' },
+    { title: 'High Distinction', year: '2023', institution: 'UC Berkeley' },
     {
       title: 'Sky Lab Research Fellowship',
       year: '2023',
@@ -221,41 +155,29 @@ export const personalInfo = {
     {
       title: 'Honors Society',
       year: '2022',
-      institution: 'Upsilon Pi Epsilon Berkeley Chapter',
+      institution: 'Upsilon Pi Epsilon, Berkeley Chapter',
     },
     {
       title: 'RISELab Research Fellowship',
       year: '2022',
       institution: 'UC Berkeley',
     },
-    {
-      title: 'Valedictorian',
-      year: '2019',
-      institution: 'Southlands Schools',
-    },
+    { title: 'Valedictorian', year: '2019', institution: 'Southlands Schools' },
   ],
 };
 
 export const websiteInfo = {
   title: personalInfo.name,
-  description: 'HCI researcher',
-  teaserImage: "/teaser.jpg",
+  description: `${personalInfo.fullName} — ${personalInfo.role} at ${personalInfo.university}. ${personalInfo.tagline}`,
+  url: 'https://stephenjyang.com',
+  teaserImage: '/profile.jpg',
 };
 
 export const navigations = [
-  { name: 'Publications', route: '/publications' },
-  // { name: 'Projects', route: '/projects' },
-  // { name: "Academics", route: "/academics" },
-  // { name: 'CV', route: '/cv' },
+  { name: 'Publications', route: '/#publications' },
+  { name: 'Experience', route: '/#experience' },
   { name: 'Misc', route: '/misc' },
-
 ];
 
-export const homepageSection = {
-  AboutSection: true,
-  NewsSection: true,
-  // SelectedPublicationsSection: true,
-  // ProjectSection: true,
-};
 
 export const fontStyle = 'sans'; // "sans" | "serif" | "mono"

@@ -1,24 +1,47 @@
-import AboutSection from "@/components/AboutSection";
-import NewsSection from "@/components/NewsSection";
-import ProjectSection from "@/components/ProjectSection";
-import PublicationsSection from "@/components/SelectedPublicationsSection";
-import bibtex from "@/data/bib/Publications.bib";
-import { homepageSection } from "@/website.config";
+import Hero from '@/components/Hero';
+import Section from '@/components/Section';
+import Publications from '@/components/Publications';
+import {
+  ExperienceList,
+  EducationList,
+  HonorsList,
+  ServiceAndTalks,
+} from '@/components/Timeline';
+import NewsMd from '@/data/home/News.mdx';
+import bibtex from '@/data/bib/Publications.bib';
 
 export default function Page() {
   return (
-    <main className="md:w-[40rem] m-auto px-8 mt-32 flex flex-col gap-10 mb-20">
-      {homepageSection.AboutSection && <AboutSection />}
-      {homepageSection.NewsSection && <NewsSection />}
-      {homepageSection.SelectedPublicationsSection && (
-        <PublicationsSection bibtex={bibtex} />
-      )}
-      {homepageSection.ProjectSection && (
-        <div className="flex flex-col gap-3">
-          <h1 className="text-3xl font-semibold">Projects</h1>
-          <ProjectSection />
-        </div>
-      )}
+    <main className="shell pb-28">
+      <Hero />
+
+      <div className="mt-24 flex flex-col gap-24 md:mt-32 md:gap-32">
+        <Section id="publications" label="Publications">
+          <Publications bibtex={bibtex} />
+        </Section>
+
+        <Section id="news" label="News">
+          <div className="prose-body news-list">
+            <NewsMd />
+          </div>
+        </Section>
+
+        <Section id="experience" label="Experience">
+          <ExperienceList />
+        </Section>
+
+        <Section id="education" label="Education">
+          <EducationList />
+        </Section>
+
+        <Section id="honors" label="Honors">
+          <HonorsList />
+        </Section>
+
+        <Section id="service" label="Service & Talks">
+          <ServiceAndTalks />
+        </Section>
+      </div>
     </main>
   );
 }
