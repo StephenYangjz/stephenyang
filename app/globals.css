@@ -267,30 +267,63 @@
   box-shadow: inset 0 1px 0 var(--glass-hi), var(--glass-shadow-lift);
 }
 
-/* The name slides into the pill as the hero leaves */
+/* The name reveals as the hero leaves.
+   This is scrubbed by the scroll timeline rather than toggled by a class at a
+   fixed threshold — a class toggle restarts the transition every time you
+   cross the boundary, which is what made it flash. */
 .pill-name {
+  display: inline-block;
   max-width: 0;
   opacity: 0;
   overflow: hidden;
   white-space: nowrap;
-  transition: max-width 0.5s cubic-bezier(0.32, 0.72, 0, 1),
-    opacity 0.3s ease, margin 0.5s cubic-bezier(0.32, 0.72, 0, 1);
+  will-change: max-width, opacity;
 }
 
-.is-scrolled .pill-name {
-  max-width: 180px;
-  opacity: 1;
-  margin-inline: 2px 6px;
-}
-
-/* Too tight to be worth it on a phone — the mark and the menu are enough. */
-@media (max-width: 640px) {
-  .is-scrolled .pill-name {
+@keyframes pill-name-in {
+  from {
     max-width: 0;
     opacity: 0;
     margin-inline: 0;
   }
+  to {
+    max-width: 190px;
+    opacity: 1;
+    margin-inline: 2px 6px;
+  }
 }
+
+@supports (animation-timeline: scroll()) {
+  .pill-name {
+    animation: pill-name-in linear both;
+    animation-timeline: scroll(root block);
+    animation-range: 120px 300px;
+  }
+}
+
+/* Class-driven fallback only where scroll timelines are unavailable */
+@supports not (animation-timeline: scroll()) {
+  .pill-name {
+    transition: max-width 0.45s cubic-bezier(0.32, 0.72, 0, 1),
+      opacity 0.3s ease, margin 0.45s cubic-bezier(0.32, 0.72, 0, 1);
+  }
+
+  .is-scrolled .pill-name {
+    max-width: 190px;
+    opacity: 1;
+    margin-inline: 2px 6px;
+  }
+}
+
+@media (max-width: 640px) {
+  .pill-name {
+    animation: none !important;
+    max-width: 0 !important;
+    opacity: 0 !important;
+    margin-inline: 0 !important;
+  }
+}
+
 
 /* ═══════════════════════════════════════════════════════════════════════
    TYPE
@@ -607,13 +640,94 @@
 
 /* ═══════════════════════════════════════════════════════════════════════
    SCROLL-DRIVEN MOTION
-   All of this is native CSS on the compositor. The JS fallback below only
-   runs where animation-timeline is unsupported.
+
+   Two mechanisms:
+     1. Pinned stages — a tall track with a `position: sticky` stage inside.
+        The page keeps scrolling while the stage holds, and the scroll
+        distance drives the animation. This is what reads as "Apple".
+     2. Scrubbed reveals on view() timelines for ordinary content.
+
+   Amplitudes here are deliberately large. The previous pass was tuned so
+   conservatively that it was invisible in motion.
    ═══════════════════════════════════════════════════════════════════════ */
+
+/* ── pinned stage scaffolding ──────────────────────────────────────── */
+.pin-track {
+  position: relative;
+}
+
+.pin-stage {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  display: grid;
+  align-content: center;
+  overflow: hidden;
+}
+
+/* Each track owns a timeline its children can address by name. */
+.pin-track {
+  view-timeline-name: --pin;
+  view-timeline-axis: block;
+}
+
+/* ── keyframes ─────────────────────────────────────────────────────── */
+
+/* Hero dolly: the name pushes toward the viewer and dissolves, rather than
+   simply fading. Scale plus blur is what sells it as camera movement. */
+@keyframes dolly-out {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+    filter: blur(0px);
+  }
+  60% {
+    opacity: 0.55;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.42);
+    filter: blur(14px);
+  }
+}
+
+@keyframes dolly-in {
+  from {
+    opacity: 0;
+    transform: scale(0.82) translateY(40px);
+    filter: blur(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: blur(0);
+  }
+}
+
+/* Cross-fading panels inside one pinned stage */
+@keyframes panel-cycle {
+  0% {
+    opacity: 0;
+    transform: translateY(56px) scale(0.93);
+    filter: blur(8px);
+  }
+  16%,
+  70% {
+    opacity: 1;
+    transform: none;
+    filter: blur(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-44px) scale(1.06);
+    filter: blur(8px);
+  }
+}
+
 @keyframes rise-in {
   from {
     opacity: 0;
-    transform: translateY(22px);
+    transform: translateY(46px) scale(0.975);
   }
   to {
     opacity: 1;
@@ -624,7 +738,7 @@
 @keyframes slide-in-left {
   from {
     opacity: 0;
-    transform: translateX(-10px);
+    transform: translateX(-26px);
   }
   to {
     opacity: 1;
@@ -641,66 +755,87 @@
   }
 }
 
-@keyframes hero-recede {
+@keyframes drift-y {
+  from {
+    transform: translateY(60px);
+  }
   to {
-    opacity: 0.16;
-    transform: translateY(-26px) scale(0.972);
+    transform: translateY(-60px);
   }
 }
 
-@keyframes portrait-drift {
+@keyframes photo-pan {
   from {
-    transform: translateY(26px);
+    transform: scale(1.22) translateY(5%);
   }
   to {
-    transform: translateY(-26px);
+    transform: scale(1.22) translateY(-5%);
   }
 }
 
 @keyframes wash-drift {
   to {
-    transform: translate3d(0, -14vh, 0) scale(1.14);
+    transform: translate3d(0, -26vh, 0) scale(1.28);
   }
 }
 
+/* 100% here is the rail's own width, which is wider than the viewport, so
+   `100vw - 100%` is exactly the overflow: it lands the rail's right edge on
+   the viewport's right edge. Applying this to a wrapper instead would
+   resolve the percentage against the wrapper and under-pan. */
+@keyframes pan-x {
+  to {
+    transform: translate3d(calc(100vw - 100%), 0, 0);
+  }
+}
+
+/* ── bindings ──────────────────────────────────────────────────────── */
 @supports (animation-timeline: view()) {
   .reveal {
     animation: rise-in linear both;
     animation-timeline: view();
-    animation-range: entry 3% cover 26%;
+    animation-range: entry 2% cover 32%;
   }
 
-  /* The year in the gutter arrives just behind its row — a small lead/lag
-     that makes the list feel typeset rather than uniformly faded in. */
   .reveal-lag {
     animation: slide-in-left linear both;
     animation-timeline: view();
-    animation-range: entry 6% cover 32%;
+    animation-range: entry 6% cover 40%;
   }
 
-  .hero-recede {
-    animation: hero-recede linear both;
-    animation-timeline: scroll(root block);
-    animation-range: 0 300px;
-    transform-origin: 0 0;
+  .hero-dolly {
+    animation: dolly-out linear both;
+    animation-timeline: --pin;
+    animation-range: contain 0% contain 100%;
+  }
+
+  .hero-reveal {
+    animation: dolly-in linear both;
+    animation-timeline: view();
+    animation-range: entry 0% cover 34%;
+  }
+
+  .panel-cycle {
+    animation: panel-cycle linear both;
+    animation-timeline: --pin;
+  }
+
+  .rail-progress::after {
+    animation: draw-x linear both;
+    animation-timeline: --section;
+    animation-range: contain 0% contain 100%;
   }
 
   .portrait-drift {
-    animation: portrait-drift linear both;
+    animation: drift-y linear both;
     animation-timeline: view();
     animation-range: cover 0% cover 100%;
   }
 
-  /* Section rail readout — scoped to the section element itself */
-  .section-tracked {
-    view-timeline-name: --section;
-    view-timeline-axis: block;
-  }
-
-  .section-tracked .rail-progress::after {
-    animation: draw-x linear both;
-    animation-timeline: --section;
-    animation-range: contain 0% contain 100%;
+  .photo-img {
+    animation: photo-pan linear both;
+    animation-timeline: view();
+    animation-range: cover 0% cover 100%;
   }
 
   .ambient span {
@@ -708,28 +843,59 @@
     animation-timeline: scroll(root block);
   }
 
-  .ambient span:nth-child(2) {
-    animation-duration: 1s;
-    animation-delay: 0s;
+  .pan-x {
+    animation: pan-x linear both;
+    animation-timeline: --pin;
+    animation-range: contain 0% contain 100%;
   }
 }
 
-/* JS fallback (Safari < 26, older Firefox) */
+/* ── JS fallback ───────────────────────────────────────────────────────
+   Covers every effect above, not just the reveals. ScrollBoot writes a
+   0→1 progress value onto each element and these read it, so the two
+   paths stay visually equivalent.
+   ──────────────────────────────────────────────────────────────────── */
 .no-sda .reveal,
-.no-sda .reveal-lag {
+.no-sda .reveal-lag,
+.no-sda .hero-reveal {
   opacity: 0;
-  transform: translateY(22px);
-  transition: opacity 0.7s cubic-bezier(0.22, 0.8, 0.3, 1),
-    transform 0.7s cubic-bezier(0.22, 0.8, 0.3, 1);
+  transform: translateY(46px);
+  transition: opacity 0.75s cubic-bezier(0.22, 0.8, 0.3, 1),
+    transform 0.75s cubic-bezier(0.22, 0.8, 0.3, 1);
 }
 
 .no-sda .reveal-lag {
-  transform: translateX(-10px);
+  transform: translateX(-26px);
 }
 
 .no-sda .reveal.in-view,
-.no-sda .reveal-lag.in-view {
+.no-sda .reveal-lag.in-view,
+.no-sda .hero-reveal.in-view {
   opacity: 1;
+  transform: none;
+}
+
+.no-sda .hero-dolly {
+  opacity: calc(1 - var(--p, 0));
+  transform: scale(calc(1 + var(--p, 0) * 0.42));
+  filter: blur(calc(var(--p, 0) * 14px));
+}
+
+.no-sda .panel-cycle {
+  opacity: var(--panel-o, 0);
+  transform: translateY(calc((1 - var(--panel-o, 0)) * 40px));
+}
+
+.no-sda .rail-progress::after {
+  transform: scaleX(var(--p, 0));
+}
+
+.no-sda .pan-x {
+  transform: translate3d(calc((100vw - 100%) * var(--p, 0)), 0, 0);
+}
+
+.no-sda .portrait-drift,
+.no-sda .photo-img {
   transform: none;
 }
 
@@ -743,16 +909,30 @@
   *::after {
     animation: none !important;
     transition-duration: 0.01ms !important;
+    filter: none !important;
   }
 
-  .no-sda .reveal,
-  .no-sda .reveal-lag {
-    opacity: 1;
-    transform: none;
+  .reveal,
+  .reveal-lag,
+  .hero-reveal,
+  .hero-dolly,
+  .panel-cycle {
+    opacity: 1 !important;
+    transform: none !important;
   }
 
   .rail-progress::after {
     transform: scaleX(1);
+  }
+
+  /* A pinned stage with no motion is just a stuck screen — release it. */
+  .pin-track {
+    height: auto !important;
+  }
+
+  .pin-stage {
+    position: static;
+    height: auto;
   }
 }
 
@@ -977,4 +1157,272 @@
     animation-timeline: view();
     animation-range: cover 0% cover 100%;
   }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   PINNED PANELS — selected work
+   Panels stack on top of each other inside one held stage and cross-fade
+   across thirds of the track's scroll range.
+   ═══════════════════════════════════════════════════════════════════════ */
+.panel-stack {
+  position: relative;
+  min-height: 62svh;
+}
+
+.panel-cycle {
+  grid-area: 1 / 1;
+  will-change: opacity, transform, filter;
+}
+
+.panel-stack > .panel-cycle {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* The first panel is already up when the stage pins, and the last holds
+   until it releases — otherwise the stage is empty at both ends. */
+@keyframes panel-first {
+  0%,
+  70% {
+    opacity: 1;
+    transform: none;
+    filter: blur(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-44px) scale(1.06);
+    filter: blur(8px);
+  }
+}
+
+@keyframes panel-last {
+  0% {
+    opacity: 0;
+    transform: translateY(56px) scale(0.93);
+    filter: blur(8px);
+  }
+  16%,
+  100% {
+    opacity: 1;
+    transform: none;
+    filter: blur(0);
+  }
+}
+
+@supports (animation-timeline: view()) {
+  /* .panel-dots is always the final child, so the last panel is -2 */
+  .panel-stack > .panel-cycle:first-child {
+    animation-name: panel-first;
+  }
+
+  .panel-stack > .panel-cycle:nth-last-child(2) {
+    animation-name: panel-last;
+  }
+
+  .panel-stack > .panel-cycle:nth-child(1) {
+    animation-range: contain 0% contain 36%;
+  }
+  .panel-stack > .panel-cycle:nth-child(2) {
+    animation-range: contain 32% contain 68%;
+  }
+  .panel-stack > .panel-cycle:nth-child(3) {
+    animation-range: contain 64% contain 100%;
+  }
+}
+
+.panel-index {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  color: var(--accent);
+}
+
+.panel-venue {
+  margin-top: 18px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.panel-title {
+  margin-top: 14px;
+  font-size: clamp(1.9rem, 4.6vw, 3.4rem);
+  font-weight: 600;
+  letter-spacing: -0.042em;
+  line-height: 1.04;
+  max-width: 20ch;
+}
+
+.panel-sub {
+  margin-top: 16px;
+  font-size: clamp(0.95rem, 1.5vw, 1.1rem);
+  line-height: 1.6;
+  color: var(--text-soft);
+  max-width: 54ch;
+}
+
+.panel-authors {
+  margin-top: 14px;
+  font-size: 13.5px;
+  color: var(--muted);
+  max-width: 62ch;
+}
+
+/* Dots marking which panel is showing */
+.panel-dots {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  display: flex;
+  gap: 7px;
+}
+
+.panel-dot {
+  width: 22px;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--rule-strong);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   HORIZONTAL PINNED GALLERY
+   ═══════════════════════════════════════════════════════════════════════ */
+.pan-rail {
+  display: flex;
+  gap: 18px;
+  padding-inline: clamp(20px, 5vw, 56px);
+  width: max-content;
+  will-change: transform;
+}
+
+.pan-card {
+  position: relative;
+  flex: none;
+  width: clamp(240px, 34vw, 420px);
+  aspect-ratio: 4 / 5;
+  border-radius: 18px;
+  overflow: hidden;
+  border: 1px solid var(--rule);
+  background: var(--paper-raised);
+}
+
+.pan-card .photo-img {
+  object-fit: cover;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   PAGE LINK CARDS
+   ═══════════════════════════════════════════════════════════════════════ */
+.page-links {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+}
+
+@media (min-width: 720px) {
+  .page-links {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.page-link {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 190px;
+  padding: 24px;
+  border-radius: 20px;
+  border: 1px solid var(--rule);
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px) saturate(150%);
+  -webkit-backdrop-filter: blur(16px) saturate(150%);
+  overflow: hidden;
+  transition: transform 0.45s cubic-bezier(0.32, 0.72, 0, 1),
+    border-color 0.3s ease, box-shadow 0.45s ease;
+}
+
+.page-link:hover {
+  transform: translateY(-4px);
+  border-color: var(--rule-strong);
+  box-shadow: var(--glass-shadow-lift);
+}
+
+.page-link-kicker {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.page-link-title {
+  margin-top: 10px;
+  font-size: clamp(1.3rem, 2.4vw, 1.75rem);
+  font-weight: 600;
+  letter-spacing: -0.032em;
+  line-height: 1.1;
+}
+
+.page-link-note {
+  margin-top: 8px;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--text-soft);
+}
+
+.page-link-go {
+  margin-top: 20px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--accent);
+  transition: gap 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.page-link:hover .page-link-go {
+  gap: 11px;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   PAGE HEADERS — each page gets a real masthead rather than a bare label
+   ═══════════════════════════════════════════════════════════════════════ */
+.masthead {
+  padding-top: 148px;
+  padding-bottom: 12px;
+}
+
+.masthead-kicker {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.masthead-title {
+  margin-top: 14px;
+  font-size: clamp(2.4rem, 6vw, 4rem);
+  font-weight: 600;
+  letter-spacing: -0.045em;
+  line-height: 1;
+}
+
+.masthead-note {
+  margin-top: 18px;
+  font-size: clamp(0.98rem, 1.5vw, 1.08rem);
+  line-height: 1.65;
+  color: var(--text-soft);
+  max-width: 58ch;
+}
+
+.masthead-rule {
+  margin-top: 44px;
+  height: 1px;
+  background: var(--rule);
 }

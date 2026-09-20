@@ -62,14 +62,6 @@ export default function Header() {
                 {item.name}
               </Link>
             ))}
-            <a
-              href={personalInfo.cvUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="nav-link"
-            >
-              CV
-            </a>
           </div>
 
           <button
@@ -122,14 +114,6 @@ export default function Header() {
                 {item.name}
               </Link>
             ))}
-            <a
-              href={personalInfo.cvUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-2xl font-medium tracking-[-0.03em]"
-            >
-              CV
-            </a>
           </div>
         </div>
       )}

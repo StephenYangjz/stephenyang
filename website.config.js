@@ -149,6 +149,15 @@ export const personalInfo = {
   ],
 };
 
+// Citation keys from data/bib/Publications.bib, shown as the pinned
+// cross-fading panels on the homepage. Three works best; more than three
+// makes the pinned section too long to scroll through.
+export const featuredPublications = [
+  'xie2026raynova',
+  'liu2026mem3r',
+  'yang2024carff',
+];
+
 /* ───────────────────────────────────────────────────────────────────────
    The personal side. Photography renders on the homepage; reading and
    notes render on /misc.
@@ -251,10 +260,9 @@ export const websiteInfo = {
 };
 
 export const navigations = [
-  { name: 'Publications', route: '/#publications' },
-  { name: 'Experience', route: '/#experience' },
-  { name: 'Photos', route: '/#photography' },
-  { name: 'Misc', route: '/misc' },
+  { name: 'Publications', route: '/publications' },
+  { name: 'CV', route: '/cv' },
+  { name: 'Personal', route: '/personal' },
 ];
 
 
