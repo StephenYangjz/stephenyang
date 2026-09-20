@@ -320,21 +320,30 @@ export const glanceFacts = (info) => [
 ];
 
 /* ───────────────────────────────────────────────────────────────────────
-   VISITOR MAP — optional, third party, off by default.
+   VISITOR MAP — optional, third party.
 
-   Leave `src` empty and nothing renders. To switch it on:
-     1. Create a map at clustrmaps.com (free) for stephenjyang.com
-     2. Choose the *image* embed, not the JavaScript one
-     3. Paste its image URL into `src` and the page it links to into `href`
+   Set `script` to '' and nothing renders, and nothing is downloaded.
 
-   Two things to know. The provider geolocates visitors by IP, which is
-   personal data under GDPR — city-level display and a line in the footer
-   are the usual mitigation. And the map only counts visits once it is live,
-   so it will sit empty for a while.
+   ClustrMaps and RevolverMaps both went dark (2026 and 2024), taking their
+   users' visitor history with them. MapMyVisitors is the surviving one; it
+   is reasonable to assume it will go the same way eventually. The component
+   renders nothing if the script is removed, so that failure is quiet.
+
+   It only offers a script embed, so this does run third-party code on the
+   page — loaded lazily, once the footer comes near the viewport. It also
+   geolocates visitors by IP, which is personal data under GDPR.
    ─────────────────────────────────────────────────────────────────────── */
+// Footer visitor globe. Off by default: MapMyVisitors serves the script fine,
+// but the data call it makes (globe_call_home.js) returns an HTML page instead
+// of JSONP, so the globe renders as an empty circle. That is server-side on
+// their end — it reproduces on a bare page with no site CSS, and the response
+// is identical for a localhost and a real-domain referer.
+//
+// Flip `enabled` to true to try it again; nothing else needs to change.
 export const visitorMap = {
-  src: '',
-  href: '',
+  enabled: false,
+  script:
+    'https://mapmyvisitors.com/globe.js?d=XEOKPiAofs5Lu9LvxyW4dQeLklnM5xF6pYJkwdsGw7M',
   label: 'Visitors',
 };
 
