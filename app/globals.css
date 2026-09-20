@@ -292,32 +292,6 @@
   }
 }
 
-/* Reading progress, drawn inside the pill's own bottom edge */
-.pill-progress {
-  position: absolute;
-  left: 10px;
-  right: 10px;
-  bottom: 3px;
-  height: 1.5px;
-  border-radius: 2px;
-  overflow: hidden;
-  opacity: 0;
-  transition: opacity 0.35s ease;
-}
-
-.is-scrolled .pill-progress {
-  opacity: 1;
-}
-
-.pill-progress::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: var(--accent);
-  transform-origin: 0 50%;
-  transform: scaleX(0);
-}
-
 /* ═══════════════════════════════════════════════════════════════════════
    TYPE
    ═══════════════════════════════════════════════════════════════════════ */
@@ -529,29 +503,92 @@
   border-bottom-color: var(--accent);
 }
 
-.timeline-row {
+/* Experience / Education — two columns of compact entries. Short text in a
+   full-width row reads as an empty page; this fills the measure instead. */
+.entry-grid {
   display: grid;
-  grid-template-columns: 108px minmax(0, 1fr);
-  gap: 24px;
-  padding: 15px 0;
-  border-top: 1px solid var(--rule);
+  grid-template-columns: 1fr;
+  column-gap: 44px;
 }
 
-.timeline-row:first-child {
-  border-top: 0;
-}
-
-@media (max-width: 560px) {
-  .timeline-row {
-    grid-template-columns: 1fr;
-    gap: 4px;
+@media (min-width: 640px) {
+  .entry-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
-.timeline-when {
+.entry {
+  padding: 16px 0 18px;
+  border-top: 1px solid var(--rule);
+}
+
+.entry-when {
+  display: block;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.07em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+.entry-title {
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: -0.014em;
+  line-height: 1.35;
+}
+
+.entry-meta {
+  margin-top: 2px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.entry-detail {
+  margin-top: 7px;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--text-soft);
+}
+
+/* Honors are one-liners, so they get exactly one line each. */
+.honor-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  column-gap: 44px;
+}
+
+@media (min-width: 640px) {
+  .honor-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.honor {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 10px;
+  padding: 11px 0;
+  border-top: 1px solid var(--rule);
+}
+
+.honor-year {
+  flex: none;
+  width: 34px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.honor-title {
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: -0.012em;
+}
+
+.honor-where {
   font-size: 12.5px;
   color: var(--muted);
-  padding-top: 3px;
 }
 
 .news-row {
@@ -654,11 +691,6 @@
     animation-range: cover 0% cover 100%;
   }
 
-  .pill-progress::after {
-    animation: draw-x linear both;
-    animation-timeline: scroll(root block);
-  }
-
   /* Section rail readout — scoped to the section element itself */
   .section-tracked {
     view-timeline-name: --section;
@@ -719,7 +751,6 @@
     transform: none;
   }
 
-  .pill-progress::after,
   .rail-progress::after {
     transform: scaleX(1);
   }
@@ -789,5 +820,161 @@
     display: block;
     width: auto;
     margin-bottom: 2px;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   PHOTOGRAPHY — mosaic
+   Tile shapes come from grid spans, not from the images' own aspect ratios,
+   so rows stay flush whatever you drop in. Frames crop; images pan inside
+   them on their own view-timeline.
+   ═══════════════════════════════════════════════════════════════════════ */
+.photo-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-auto-rows: clamp(92px, 26vw, 140px);
+  gap: 10px;
+}
+
+@media (min-width: 720px) {
+  .photo-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-auto-rows: clamp(110px, 12vw, 152px);
+    gap: 12px;
+  }
+}
+
+.photo {
+  position: relative;
+  margin: 0;
+  grid-column: span 1;
+  grid-row: span 1;
+}
+
+/* Lead frame is the anchor of the mosaic in both layouts */
+.photo-1 {
+  grid-column: span 2;
+  grid-row: span 2;
+}
+
+@media (min-width: 720px) {
+  .photo-2,
+  .photo-5,
+  .photo-6 {
+    grid-column: span 2;
+  }
+}
+
+.photo-frame {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 14px;
+  border: 1px solid var(--rule);
+  background: var(--paper-raised);
+}
+
+.photo-img {
+  object-fit: cover;
+  will-change: transform;
+  transform: scale(1.14);
+  transition: filter 0.4s ease;
+}
+
+.photo:hover .photo-img {
+  filter: saturate(1.08) brightness(1.02);
+}
+
+.photo-cap {
+  position: absolute;
+  left: 10px;
+  bottom: 10px;
+  display: inline-flex;
+  align-items: center;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  color: var(--text);
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  box-shadow: inset 0 1px 0 var(--glass-hi);
+  opacity: 0;
+  transform: translateY(5px);
+  transition: opacity 0.28s ease, transform 0.28s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.photo:hover .photo-cap,
+.photo:focus-within .photo-cap {
+  opacity: 1;
+  transform: none;
+}
+
+/* No hover to reveal them on touch, so just show them */
+@media (hover: none) {
+  .photo-cap {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   NOTES
+   ═══════════════════════════════════════════════════════════════════════ */
+.note-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+}
+
+@media (min-width: 720px) {
+  .note-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.note {
+  margin: 0;
+  padding: 20px 22px;
+  border-radius: 16px;
+  border: 1px solid var(--rule);
+  background: var(--glass-bg);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+.note-text {
+  font-size: 14.5px;
+  line-height: 1.62;
+  color: var(--text-soft);
+}
+
+.note-date {
+  display: block;
+  margin-top: 12px;
+  font-size: 11.5px;
+  font-style: normal;
+  letter-spacing: 0.07em;
+  color: var(--muted);
+}
+
+@keyframes photo-pan {
+  from {
+    transform: scale(1.14) translateY(2.6%);
+  }
+  to {
+    transform: scale(1.14) translateY(-2.6%);
+  }
+}
+
+@supports (animation-timeline: view()) {
+  .photo-img {
+    animation: photo-pan linear both;
+    animation-timeline: view();
+    animation-range: cover 0% cover 100%;
   }
 }

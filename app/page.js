@@ -5,8 +5,8 @@ import {
   ExperienceList,
   EducationList,
   HonorsList,
-  ServiceAndTalks,
 } from '@/components/Timeline';
+import { PhotographyGrid } from '@/components/Personal';
 import NewsMd from '@/data/home/News.mdx';
 import bibtex from '@/data/bib/Publications.bib';
 
@@ -38,8 +38,8 @@ export default function Page() {
           <HonorsList />
         </Section>
 
-        <Section id="service" label="Service & Talks">
-          <ServiceAndTalks />
+        <Section id="photography" label="Photography">
+          <PhotographyGrid />
         </Section>
       </div>
     </main>

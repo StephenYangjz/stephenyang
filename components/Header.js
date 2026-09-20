@@ -94,8 +94,6 @@ export default function Header() {
           >
             {menuOpen ? <RiCloseLine size={16} /> : <RiMenuLine size={16} />}
           </button>
-
-          <span className="pill-progress" aria-hidden="true" />
         </nav>
       </header>
 

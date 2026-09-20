@@ -14,12 +14,12 @@ backwards when you scroll up:
 
 | Effect | Where | Timeline |
 | --- | --- | --- |
-| Reading progress inside the header pill | `.pill-progress` | `scroll(root)` |
 | Hero recedes and hands off to the pill | `.hero-recede` | `scroll(root)`, `0 → 300px` |
 | Section rail progress hairline | `.rail-progress` | named `--section` view-timeline |
 | Row reveals, with the year lagging the row | `.reveal` / `.reveal-lag` | `view()` |
 | Portrait parallax | `.portrait-drift` | `view()` |
 | Ambient wash drift | `.ambient span` | `scroll(root)` |
+| Photos panning inside their frames | `.photo-img` | `view()` |
 
 `components/ScrollBoot.js` adds `.no-sda` where `animation-timeline` is unsupported
 (Safari < 26, older Firefox) and swaps in an IntersectionObserver + transition fallback.
@@ -36,6 +36,8 @@ light palette: opacity, border and highlight all need separate values on a dark 
 | Name, role, socials, experience, education, honors, talks, service | `website.config.js` |
 | Bio, news, miscellaneous | `data/home/*.mdx` |
 | Publications | `data/bib/Publications.bib` |
+| Photography | `photography` in `website.config.js` + files in `public/photos/` |
+| Reading list, notes | `reading` / `notes` in `website.config.js` |
 | Images, CV PDF | `public/` |
 | Design tokens | `:root` and `.dark` in `app/globals.css` |
 
@@ -52,6 +54,21 @@ Beyond standard BibTeX fields:
   of project / arXiv / PDF that is present.
 
 Author names matching `SELF` in `components/Publications.js` render bold.
+
+### Photography
+
+Drop images in `public/photos/` and point the `photography` entries in
+`website.config.js` at them. Tile shapes come from CSS grid spans rather than
+the images' own aspect ratios, so any shape works and the rows stay flush —
+the frames crop, and each image pans inside its frame on its own view-timeline.
+
+The **first entry is the large tile** in the mosaic, so lead with your strongest
+frame. Six entries fill the grid exactly; fewer is fine, more keeps tiling in
+the same rhythm. Captions reveal on hover, and are always visible on touch.
+
+The repo ships six labelled SVG placeholders — replace them and delete the
+originals. `reading` and `notes` ship as placeholder text too; setting either
+array to `[]` hides that section.
 
 ## Development
 

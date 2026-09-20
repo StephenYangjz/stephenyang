@@ -21,24 +21,7 @@ export const personalInfo = {
     { name: 'Twitter', url: 'https://x.com/Stepenyang' },
   ],
 
-  academicService: [
-    'Reviewer, CVPR 2025 & 2026',
-    'Reviewer, ICLR 2025',
-    'Reviewer, ICCV 2025',
-  ],
 
-  talks: [
-    {
-      title: 'Diving in CARFF (ECCV 2024)',
-      venue: 'Harvard Computational Robotics Group',
-      date: 'Nov 2024',
-    },
-    {
-      title: 'World Representations to Spatial Intelligence',
-      venue: 'Analog Devices',
-      date: 'Oct 2024',
-    },
-  ],
 
   teaching: [
     { title: 'CS182: Deep Learning', term: 'Spring', year: 2023 },
@@ -166,6 +149,100 @@ export const personalInfo = {
   ],
 };
 
+/* ───────────────────────────────────────────────────────────────────────
+   The personal side. Photography renders on the homepage; reading and
+   notes render on /misc.
+
+   PHOTOGRAPHY — drop files in `public/photos/` and point `src` at them.
+   The first entry is the large tile in the mosaic, so lead with your
+   strongest frame. Six entries fill the grid exactly; fewer is fine, more
+   will keep tiling in the same rhythm.
+
+   READING and NOTES below are placeholder text — replace with your own.
+   ─────────────────────────────────────────────────────────────────────── */
+export const photography = [
+  {
+    src: '/photos/placeholder-01.svg',
+    caption: 'Replace with your strongest frame',
+    place: 'Qingdao',
+    year: '2023',
+  },
+  {
+    src: '/photos/placeholder-02.svg',
+    caption: 'Aerial work',
+    place: 'Yellow Sea',
+    year: '2023',
+  },
+  {
+    src: '/photos/placeholder-03.svg',
+    caption: 'Caption goes here',
+    place: 'Cambridge',
+    year: '2024',
+  },
+  {
+    src: '/photos/placeholder-04.svg',
+    caption: 'Caption goes here',
+    place: 'Berkeley',
+    year: '2023',
+  },
+  {
+    src: '/photos/placeholder-05.svg',
+    caption: 'Caption goes here',
+    place: 'London',
+    year: '2026',
+  },
+  {
+    src: '/photos/placeholder-06.svg',
+    caption: 'Caption goes here',
+    place: 'Mountain View',
+    year: '2025',
+  },
+];
+
+// Where the full set lives, if anywhere. Set to null to hide the link.
+export const photographyLink = {
+  label: 'More on Bilibili',
+  url: 'https://www.bilibili.com/video/BV154411C7Z8/#reply66991918',
+};
+
+export const reading = [
+  {
+    title: 'Replace me',
+    author: 'Author Name',
+    note: 'One line on why it stuck with you.',
+  },
+  {
+    title: 'Replace me',
+    author: 'Author Name',
+    note: 'Keep these short — a sentence each is plenty.',
+  },
+  {
+    title: 'Replace me',
+    author: 'Author Name',
+    note: 'Three to six books reads better than twenty.',
+  },
+  {
+    title: 'Replace me',
+    author: 'Author Name',
+    note: 'Delete any you do not need; the grid reflows.',
+  },
+];
+
+export const notes = [
+  {
+    text: 'A short thought worth keeping. Two or three sentences at most — these are pull quotes, not posts.',
+    date: '2026',
+  },
+  {
+    text: 'Replace these with things you actually think. Half-formed is fine; that is the point of the section.',
+    date: '2026',
+  },
+  {
+    text: 'Delete the whole array to hide this section entirely.',
+    date: '2025',
+  },
+];
+
 export const websiteInfo = {
   title: personalInfo.name,
   description: `${personalInfo.fullName} — ${personalInfo.role} at ${personalInfo.university}. ${personalInfo.tagline}`,
@@ -176,6 +253,7 @@ export const websiteInfo = {
 export const navigations = [
   { name: 'Publications', route: '/#publications' },
   { name: 'Experience', route: '/#experience' },
+  { name: 'Photos', route: '/#photography' },
   { name: 'Misc', route: '/misc' },
 ];
 
