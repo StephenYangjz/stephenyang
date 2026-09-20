@@ -233,30 +233,16 @@ export const reading = [
     // A line from the book itself. Worth checking the wording against your
     // own copy before this goes public.
     quote: 'You are not your mind.',
-    note: "Tolle's actual claim is narrower than the self-help shelf around it suggests: that the voice narrating your life is not the same thing as you, and that a great deal of suffering is the interest paid on confusing the two. What stayed with me is that he treats this as a problem of attention rather than of belief — you do not argue the mind into silence, you just stop accepting its commentary as testimony. I remain unconvinced by the metaphysics and fairly convinced by the practice, which may be the only honest way to read it.",
+    note: "Tolle's actual claim is narrower than the shelf around it suggests: the voice narrating your life is not the same thing as you, and much of what we call suffering is the interest paid on confusing the two. The mind is very good at presenting its own commentary as perception, and most of what I have learned about thinking clearly has really been learning to notice that gap — a thought arriving does not make it a finding. He treats this as a problem of attention rather than of belief, which is why the practice survives even when the metaphysics does not. Meaning, read this way, is less something discovered than something maintained: it decays if you stop attending to it, which is an oddly practical conclusion for a question that sounds so grand.",
   },
   {
     title: 'The Let Them Theory',
     author: 'Mel Robbins',
     quote: 'Let them. Then let me.',
-    note: "Two words carrying the weight of the Stoic dichotomy of control. The useful half is not the first one but the second: once you stop spending attention on what other people are going to do anyway, you notice how little of it you had been spending on what you actually choose. Less original than it presents itself as, and lighter than the idea deserves — but the reframe survives its own packaging, which is more than most books of this kind manage.",
+    note: "Two words carrying the weight of the Stoic dichotomy of control. We are reliably wrong about how much is ours to begin with — almost none of it reaches other people, nearly all of it sits in where attention goes next, and most unhappiness I can account for comes from having those two figures swapped. The useful half is not the first word but the second: once you stop spending attention on what other people were going to do anyway, you notice how little of it you had been spending on what you actually choose. Less original than it presents itself as, and lighter than the idea deserves — but the reframe survives its own packaging.",
   },
 ];
 
-export const notes = [
-  {
-    text: 'The mind is very good at presenting its own commentary as perception. Most of what I have learned about thinking clearly has really been learning to notice that gap — a thought arriving does not make it a finding.',
-    date: '2026',
-  },
-  {
-    text: 'We are reliably wrong about how much is ours to control. Almost none of it reaches other people; nearly all of it is in where attention goes next. Most unhappiness I can account for comes from having those two figures swapped.',
-    date: '2026',
-  },
-  {
-    text: 'Meaning seems less like something discovered or invented than something maintained. It decays if you stop attending to it — an oddly practical conclusion for a question that sounds so grand.',
-    date: '2025',
-  },
-];
 
 
 /* ───────────────────────────────────────────────────────────────────────

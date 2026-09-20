@@ -1,4 +1,4 @@
-import { reading, notes } from '@/website.config';
+import { reading } from '@/website.config';
 
 export function ReadingList() {
   if (!reading?.length) return null;
@@ -20,21 +20,6 @@ export function ReadingList() {
             </blockquote>
           )}
         </article>
-      ))}
-    </div>
-  );
-}
-
-export function NotesList() {
-  if (!notes?.length) return null;
-
-  return (
-    <div className="note-grid">
-      {notes.map((note, index) => (
-        <blockquote key={index} className="note reveal">
-          <p className="note-text">{note.text}</p>
-          {note.date && <cite className="note-date tabular">{note.date}</cite>}
-        </blockquote>
       ))}
     </div>
   );
