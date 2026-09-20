@@ -160,6 +160,18 @@ export const personalInfo = {
 
    READING and NOTES below are placeholder text — replace with your own.
    ─────────────────────────────────────────────────────────────────────── */
+// The full-bleed photograph at the top of /personal. Kept separate from the
+// gallery so the lead can be chosen for impact rather than being whichever
+// frame happens to sit first in the list.
+export const leadPhoto = {
+  src: '/photos/bixby-night.jpg',
+  caption: 'Bixby Bridge',
+  place: 'Big Sur, California',
+  year: '2024',
+  width: 2000,
+  height: 1333,
+};
+
 export const photography = [
   {
     src: '/photos/skogafoss.webp',

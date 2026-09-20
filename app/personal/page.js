@@ -1,6 +1,5 @@
-import Image from 'next/image';
 import Masthead from '@/components/Masthead';
-import { photography } from '@/website.config';
+import LeadPhoto from '@/components/LeadPhoto';
 import NextPage from '@/components/NextPage';
 import Section from '@/components/Section';
 import PannedGallery from '@/components/PannedGallery';
@@ -23,28 +22,7 @@ export default function Page() {
         />
       </div>
 
-      {photography?.[0] && (
-        <div className="bleed mt-12">
-          <div className="lead-frame">
-            <Image
-              src={photography[0].src}
-              alt={photography[0].caption || ''}
-              fill
-              priority
-              sizes="100vw"
-              className="lead-img"
-            />
-          </div>
-          <div className="lead-caption">
-            <h2>{photography[0].caption}</h2>
-            <p>
-              {photography[0].place}
-              {photography[0].place && photography[0].year ? ' · ' : ''}
-              {photography[0].year}
-            </p>
-          </div>
-        </div>
-      )}
+      <LeadPhoto />
 
       <PannedGallery />
 
