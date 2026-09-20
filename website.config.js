@@ -269,7 +269,7 @@ export const websiteInfo = {
 };
 
 export const navigations = [
-  { name: 'Publications', route: '/publications' },
+  { name: 'Research', route: '/publications' },
   { name: 'CV', route: '/cv' },
   { name: 'Personal', route: '/personal' },
 ];

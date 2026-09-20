@@ -4,7 +4,7 @@ import Publications from '@/components/Publications';
 import bibtex from '@/data/bib/Publications.bib';
 
 export const metadata = {
-  title: 'Publications',
+  title: 'Research',
   description: 'Papers, patents, and other work by Stephen Jiezhi Yang.',
 };
 
@@ -13,8 +13,8 @@ export default function Page() {
     <main className="shell pb-32">
       <Masthead
         kicker="Research"
-        title="Publications"
-        note="Work on 3D foundation models, feed-forward reconstruction, and world models for driving. Preprints are listed at their accepted venue once a venue exists."
+        title="Research"
+        note="Geometric foundation models, world models, among others. Preprints are listed at their accepted venue once one exists."
       />
       <Publications bibtex={bibtex} />
 

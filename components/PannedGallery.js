@@ -1,6 +1,5 @@
 import Image from 'next/image';
-import { photography, photographyLink } from '@/website.config';
-import { RiArrowRightUpLine } from '@remixicon/react';
+import { photography } from '@/website.config';
 
 /**
  * Vertical scroll mapped to horizontal travel, inside a pinned stage. The
@@ -19,16 +18,6 @@ export default function PannedGallery() {
             <span className="gallery-count">
               {String(photography.length).padStart(2, '0')} frames · scroll →
             </span>
-            {photographyLink && (
-              <a
-                href={photographyLink.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="pub-link"
-              >
-                {photographyLink.label}
-              </a>
-            )}
           </div>
         </div>
 

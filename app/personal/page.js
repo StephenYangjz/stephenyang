@@ -20,12 +20,11 @@ export default function Page() {
         <PannedGallery />
 
         <div className="shell flex flex-col gap-24 pb-32 md:gap-28">
-          <Section id="reading" label="Reading">
+          <Section id="reading" label="Reading & notes">
             <ReadingList />
-          </Section>
-
-          <Section id="notes" label="Notes">
-            <NotesList />
+            <div className="mt-14">
+              <NotesList />
+            </div>
           </Section>
 
           <Section id="misc" label="Elsewhere">

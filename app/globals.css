@@ -1278,10 +1278,11 @@
   gap: 20px;
   width: max-content;
   will-change: transform;
-  /* Must start at the shell's content edge, not the viewport's. The shell is
-     centred at max-width 1180px, so on a wide window a raw viewport inset
-     left the first card far to the left of the section label above it. */
-  padding-inline: max(
+  /* The first frame runs to the page edge so the strip reads as bleeding
+     off-screen; only the trailing side is inset, so the last frame still
+     lands inside the content column. */
+  padding-left: 0;
+  padding-right: max(
     calc((100vw - 1180px) / 2 + var(--shell-pad)),
     var(--shell-pad)
   );
