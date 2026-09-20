@@ -7,11 +7,12 @@ import { RiArrowRightLine } from '@remixicon/react';
 
 import { readingOrder as ORDER } from '@/website.config';
 
-// The bar fills over the last half-screen of scrolling, with a floor for
-// short windows. A fixed 280px was far too little on a large display: you
-// cross it in a blink and the bar looks like it never filled at all.
-const TAIL_RATIO = 0.5;
-const TAIL_MIN = 260;
+// The fill spans the card's own approach: from the moment it appears at the
+// foot of the window to the moment the page runs out. Anything measured from
+// the end of the document instead puts most of the fill below the fold, where
+// it cannot be seen — which is what made the bar look like it never moved, or
+// like it started already half full.
+const MIN_RANGE = 180; // px, so a card already in view still has a visible fill
 const GESTURE_GAP = 130; // wheel silence that separates one gesture from the next
 const COMMIT = 40; // px within the committing gesture, so a stray tick is not one
 const SLACK = 6; // tolerance on "at the end", for fractional scroll heights
@@ -58,6 +59,7 @@ export default function NextPage() {
   const [progress, setProgress] = useState(0);
   const [ready, setReady] = useState(false);
   const navigated = useRef(false);
+  const card = useRef(null);
 
   const current = normalise(pathname);
   const index = ORDER.findIndex((entry) => entry.href === current);
@@ -75,7 +77,7 @@ export default function NextPage() {
     const read = () => {
       const el = scroller();
       const max = el.scrollHeight - el.clientHeight;
-      return { max, y: el.scrollTop };
+      return { el, max, y: el.scrollTop };
     };
 
     const atEnd = () => {
@@ -86,23 +88,29 @@ export default function NextPage() {
     let raf = 0;
     const frame = () => {
       raf = 0;
-      const { max, y } = read();
+      const { el, max, y } = read();
       // A page too short to scroll gets no bar and no scroll-to-advance.
       if (max <= 0) {
         setProgress(0);
         setReady(false);
         return;
       }
-      const tail = Math.min(
-        Math.max(TAIL_MIN, Math.round(window.innerHeight * TAIL_RATIO)),
-        max
-      );
+      // Where the card sits in the document, and therefore the scroll
+      // position at which it first touches the bottom of the window.
+      const node = card.current;
+      const cardTop = node ? node.getBoundingClientRect().top + y : max;
+      const appears = cardTop - el.clientHeight;
+      // Never later than MIN_RANGE before the end, so a card that is already
+      // on screen still gets a fill you can watch rather than a jump.
+      const start = Math.max(0, Math.min(appears, max - MIN_RANGE));
+      const range = Math.max(1, max - start);
+
       // Pinned to exactly 1 at the end rather than left to arithmetic. Scroll
-      // heights are fractional, so the ratio lands at 0.98 while atEnd() is
-      // already true, which would leave a bar just short of full sitting next
-      // to a label still asking you to keep scrolling.
+      // heights are fractional, so the ratio lands just short while atEnd() is
+      // already true, which would leave a bar not quite full sitting next to a
+      // label already asking you to scroll again.
       const end = y >= max - SLACK;
-      const p = end ? 1 : clamp01((y - (max - tail)) / tail);
+      const p = end ? 1 : clamp01((y - start) / range);
       setProgress(p);
       setReady(end);
     };
@@ -155,7 +163,12 @@ export default function NextPage() {
 
   return (
     <section className="next-page">
-      <Link href={next.href} className="next-card reveal" data-ready={ready}>
+      <Link
+        ref={card}
+        href={next.href}
+        className="next-card reveal"
+        data-ready={ready}
+      >
         <span className="page-link-kicker">Next · {next.kicker}</span>
         <span className="next-title">{next.label}</span>
         <span className="page-link-go">
