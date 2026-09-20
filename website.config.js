@@ -237,8 +237,7 @@ export const reading = [
   {
     title: 'The Let Them Theory',
     author: 'Mel Robbins',
-    quote:
-      'Two simple words — Let Them — will free you from the burden of trying to manage other people.',
+    quote: 'You will never be able to control what is happening around you.',
     note: "Two words carrying the weight of the Stoic dichotomy of control. We are reliably wrong about how much is ours to begin with — almost none of it reaches other people, nearly all of it sits in where attention goes next, and most unhappiness I can account for comes from having those two figures swapped. The useful half is not the first word but the second: once you stop spending attention on what other people were going to do anyway, you notice how little of it you had been spending on what you actually choose. Less original than it presents itself as, and lighter than the idea deserves — but the reframe survives its own packaging.",
   },
 ];

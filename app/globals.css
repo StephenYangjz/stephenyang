@@ -2367,7 +2367,7 @@
 
 @media (min-width: 900px) {
   .book {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 300px);
+    grid-template-columns: minmax(0, 1fr) minmax(0, 320px);
   }
 }
 
@@ -2392,25 +2392,38 @@
   max-width: 64ch;
 }
 
-/* The book's own words, set apart from the reflection beside them */
+/* The book's own words, set as a centred pull quote rather than a second
+   column of body copy. A narrow left-ruled block made them read as a
+   sidebar note and wrapped them raggedly; centred, balanced and vertically
+   aligned against the reflection, they read as a quotation. */
 .book-quote {
   margin: 0;
-  align-self: start;
-  padding-left: 20px;
-  border-left: 2px solid var(--rule-strong);
+  align-self: center;
+  text-align: center;
+  padding: 0 4px;
+  border: 0;
+}
+
+.book-quote::before {
+  content: "\201C";
+  display: block;
+  font-size: 46px;
+  line-height: 0.7;
+  color: var(--rule-strong);
+  margin-bottom: 14px;
 }
 
 .book-quote p {
-  font-size: 17px;
-  line-height: 1.55;
-  letter-spacing: -0.014em;
+  font-size: 19px;
+  line-height: 1.48;
+  letter-spacing: -0.02em;
   color: var(--text);
   text-wrap: balance;
 }
 
 .book-quote cite {
   display: block;
-  margin-top: 10px;
+  margin-top: 16px;
   font-size: 12.5px;
   font-style: normal;
   letter-spacing: 0.04em;
