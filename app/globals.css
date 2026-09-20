@@ -1814,7 +1814,7 @@
      window height instead of growing with it. 78px is the header offset the
      stage already sits below. A plain svh value could not go much taller
      without the heading colliding with the frames on short windows. */
-  height: min(86svh, calc(100svh - 78px - 88px));
+  height: min(86svh, calc(100svh - 78px - 112px));
   min-height: 300px;
   transition: transform 0.6s cubic-bezier(0.32, 0.72, 0, 1);
 }
