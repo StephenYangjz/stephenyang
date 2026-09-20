@@ -119,7 +119,7 @@ export default function ScrollBoot() {
       );
 
       document
-        .querySelectorAll('.reveal, .reveal-lag, .hero-reveal, .bio-reveal > p')
+        .querySelectorAll('.reveal, .reveal-lag, .hero-reveal, .bio-reveal > p, .bio-reveal li')
         .forEach((el) => observer.observe(el));
     }
 

@@ -1431,27 +1431,39 @@
    BIO — paragraphs arrive one at a time as you read down
    ═══════════════════════════════════════════════════════════════════════ */
 @supports (animation-timeline: view()) {
-  .bio-reveal > p {
+  .bio-reveal > p,
+  .bio-reveal li {
     animation: rise-in linear both;
     animation-timeline: view();
-    animation-range: entry 12% cover 36%;
+    /* Tied to `entry` rather than `cover`: each line finishes arriving as it
+       clears the bottom edge, so they unveil one at a time on the way down
+       instead of the whole block resolving at once. */
+    animation-range: entry 0% entry 92%;
   }
 }
 
-.no-sda .bio-reveal > p {
+/* Extra air so consecutive lines cross the viewport edge at distinct moments */
+.bio-reveal > p {
+  margin-bottom: 1.5em;
+}
+
+.no-sda .bio-reveal > p,
+.no-sda .bio-reveal li {
   opacity: 0;
   transform: translateY(28px);
   transition: opacity 0.7s cubic-bezier(0.22, 0.8, 0.3, 1),
     transform 0.7s cubic-bezier(0.22, 0.8, 0.3, 1);
 }
 
-.no-sda .bio-reveal > p.in-view {
+.no-sda .bio-reveal > p.in-view,
+.no-sda .bio-reveal li.in-view {
   opacity: 1;
   transform: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .bio-reveal > p {
+  .bio-reveal > p,
+  .bio-reveal li {
     opacity: 1 !important;
     transform: none !important;
   }
