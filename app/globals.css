@@ -1814,7 +1814,7 @@
      window height instead of growing with it. 78px is the header offset the
      stage already sits below. A plain svh value could not go much taller
      without the heading colliding with the frames on short windows. */
-  height: min(86svh, calc(100svh - 78px - 68px));
+  height: min(86svh, calc(100svh - 78px - 88px));
   min-height: 300px;
   transition: transform 0.6s cubic-bezier(0.32, 0.72, 0, 1);
 }
@@ -2191,7 +2191,28 @@
 .content-sheet {
   position: relative;
   z-index: 1;
-  background: var(--paper);
+  /* Opaque, because it has to hide the photograph behind it — which also
+     hid the fixed .ambient layer the other pages sit on, so this page read
+     as flat by comparison. The same wash is painted into the sheet's own
+     background, attached to the viewport so it lines up with the real
+     ambient above and below the sheet. */
+  background-color: var(--paper);
+  background-image: radial-gradient(
+      60vw 60vw at 13% 4%,
+      color-mix(in srgb, var(--wash-1) calc(var(--wash-opacity) * 100%), transparent),
+      transparent 62%
+    ),
+    radial-gradient(
+      50vw 50vw at 92% 38%,
+      color-mix(in srgb, var(--wash-2) calc(var(--wash-opacity) * 100%), transparent),
+      transparent 62%
+    ),
+    radial-gradient(
+      56vw 56vw at 38% 94%,
+      color-mix(in srgb, var(--wash-3) calc(var(--wash-opacity) * 100%), transparent),
+      transparent 62%
+    );
+  background-attachment: fixed, fixed, fixed;
   border-radius: var(--r-sheet) var(--r-sheet) 0 0;
   /* Matches .pin-track's margin-bottom so the gallery has the same air
      above it as below it. */
@@ -2221,4 +2242,11 @@
   left: 0;
   right: 0;
   padding-inline: var(--shell-pad);
+}
+
+
+@supports not (color: color-mix(in srgb, red 50%, transparent)) {
+  .content-sheet {
+    background-image: none;
+  }
 }
