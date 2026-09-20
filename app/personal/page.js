@@ -1,5 +1,4 @@
-import Masthead from '@/components/Masthead';
-import LeadPhoto from '@/components/LeadPhoto';
+import PersonalHero from '@/components/PersonalHero';
 import NextPage from '@/components/NextPage';
 import Section from '@/components/Section';
 import PannedGallery from '@/components/PannedGallery';
@@ -13,36 +12,31 @@ export const metadata = {
 
 export default function Page() {
   return (
-    <main className="pb-32">
-      <div className="shell">
-        <Masthead
-          kicker="Off the clock"
-          title="Personal"
-          note="Photography, things worth reading, and thoughts that have not gone anywhere yet."
-        />
+    <main>
+      <PersonalHero />
+
+      {/* Rides up over the photograph — the photo is never faded out */}
+      <div className="content-sheet">
+        <PannedGallery />
+
+        <div className="shell flex flex-col gap-24 pb-32 md:gap-28">
+          <Section id="reading" label="Reading">
+            <ReadingList />
+          </Section>
+
+          <Section id="notes" label="Notes">
+            <NotesList />
+          </Section>
+
+          <Section id="misc" label="Elsewhere">
+            <div className="prose-body max-w-[64ch]">
+              <MiscellaneousMd />
+            </div>
+          </Section>
+
+          <NextPage />
+        </div>
       </div>
-
-      <LeadPhoto />
-
-      <PannedGallery />
-
-      <div className="shell mt-24 flex flex-col gap-24 md:gap-28">
-        <Section id="reading" label="Reading">
-          <ReadingList />
-        </Section>
-
-        <Section id="notes" label="Notes">
-          <NotesList />
-        </Section>
-
-        <Section id="misc" label="Elsewhere">
-          <div className="prose-body max-w-[64ch]">
-            <MiscellaneousMd />
-          </div>
-        </Section>
-      </div>
-
-      <NextPage />
     </main>
   );
 }
