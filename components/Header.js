@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { useTheme } from 'next-themes';
 import {
@@ -37,6 +37,34 @@ export default function Header() {
     };
   }, [menuOpen]);
 
+  const barRef = useRef(null);
+
+  // Write the pointer position onto the bar so the glass can catch the light
+  // where the cursor is. Coalesced into a frame — mousemove fires far more
+  // often than the compositor can use.
+  useEffect(() => {
+    const bar = barRef.current;
+    if (!bar) return;
+    if (!window.matchMedia('(hover: hover)').matches) return;
+
+    let frame = 0;
+    const onMove = (event) => {
+      if (frame) return;
+      frame = requestAnimationFrame(() => {
+        frame = 0;
+        const rect = bar.getBoundingClientRect();
+        bar.style.setProperty('--mx', `${event.clientX - rect.left}px`);
+        bar.style.setProperty('--my', `${event.clientY - rect.top}px`);
+      });
+    };
+
+    bar.addEventListener('mousemove', onMove);
+    return () => {
+      bar.removeEventListener('mousemove', onMove);
+      if (frame) cancelAnimationFrame(frame);
+    };
+  }, []);
+
   const isDark = resolvedTheme === 'dark';
 
   const isActive = (route) => {
@@ -49,6 +77,7 @@ export default function Header() {
     <>
       <header className="header-shell">
         <nav
+          ref={barRef}
           className="header-bar glass glass-sheen pointer-events-auto"
           aria-label="Primary"
         >

@@ -1949,26 +1949,59 @@
   position: absolute;
   left: 0;
   right: 0;
-  height: clamp(70px, 13svh, 150px);
+  height: clamp(130px, 24svh, 280px);
   z-index: 2;
   pointer-events: none;
 }
 
+/* A plain two-stop linear fade reads as a grey haze across a dark
+   photograph: the ramp is linear in alpha, so its midpoint is a flat 50%
+   veil of paper sitting over the image, and the eye reads that band as
+   dirt rather than as a transition. These stops approximate an ease-out
+   curve — most of the opacity is spent in the first third, and the tail
+   thins slowly — so there is no midpoint to notice. The fades are also
+   roughly twice as deep, which gives the curve room to work. */
 .lead::before {
   top: 0;
-  background: linear-gradient(to bottom, var(--paper), transparent);
+  background: linear-gradient(
+    to bottom,
+    var(--paper) 0%,
+    color-mix(in srgb, var(--paper) 88%, transparent) 22%,
+    color-mix(in srgb, var(--paper) 62%, transparent) 42%,
+    color-mix(in srgb, var(--paper) 34%, transparent) 62%,
+    color-mix(in srgb, var(--paper) 13%, transparent) 80%,
+    transparent 100%
+  );
 }
 
 .lead::after {
   bottom: 0;
-  background: linear-gradient(to top, var(--paper), transparent);
+  background: linear-gradient(
+    to top,
+    var(--paper) 0%,
+    color-mix(in srgb, var(--paper) 88%, transparent) 22%,
+    color-mix(in srgb, var(--paper) 62%, transparent) 42%,
+    color-mix(in srgb, var(--paper) 34%, transparent) 62%,
+    color-mix(in srgb, var(--paper) 13%, transparent) 80%,
+    transparent 100%
+  );
+}
+
+/* Browsers without color-mix still get a usable, if plainer, fade */
+@supports not (color: color-mix(in srgb, red 50%, transparent)) {
+  .lead::before {
+    background: linear-gradient(to bottom, var(--paper), transparent);
+  }
+  .lead::after {
+    background: linear-gradient(to top, var(--paper), transparent);
+  }
 }
 
 .lead-caption {
   position: absolute;
   left: var(--shell-pad);
   right: var(--shell-pad);
-  bottom: clamp(56px, 11svh, 120px);
+  bottom: clamp(96px, 19svh, 240px);
   z-index: 3;
   max-width: 1180px;
   margin-inline: auto;
@@ -2041,6 +2074,7 @@
 }
 
 .header-bar {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 12px;
@@ -2054,16 +2088,59 @@
     background-color 0.45s ease, border-color 0.45s ease;
 }
 
+/* The specular sheen is an absolutely-positioned pseudo-element, so it
+   paints above any static content. The brand sits at the top-left, exactly
+   where the gradient is at 95% white — it was being washed out by its own
+   glass. Lift the real content above both decorative layers. */
+.header-bar > * {
+  position: relative;
+  z-index: 2;
+}
+
+/* Cursor-tracked specular highlight — the glass catches the light where the
+   pointer is. --mx/--my are written by Header on mousemove. */
+.header-bar::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(
+    220px circle at var(--mx, 50%) var(--my, 50%),
+    var(--glass-hi),
+    var(--glass-hi-2) 38%,
+    transparent 68%
+  );
+  opacity: 0;
+  transition: opacity 0.45s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.header-bar:hover::after {
+  opacity: 1;
+}
+
+@media (hover: none) {
+  .header-bar::after {
+    display: none;
+  }
+}
+
 .is-scrolled .header-bar {
   box-shadow: inset 0 1px 0 var(--glass-hi), var(--glass-shadow-lift);
 }
 
 .header-brand {
-  font-size: 14px;
+  font-size: 14.5px;
   font-weight: 600;
-  letter-spacing: -0.022em;
+  letter-spacing: -0.024em;
   color: var(--text);
   white-space: nowrap;
+  transition: opacity 0.2s ease;
+}
+
+.header-brand:hover {
+  opacity: 0.72;
 }
 
 /* Push the controls to the far end of the wide bar */
