@@ -2442,61 +2442,59 @@
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
-   VISITOR MAP — a band of continents dissolving into the foot of the page
+   VISITOR MAP — a thumbnail in the bottom corner, under the colophon rule
 
-   Masked at every edge rather than framed. Two reasons: the generated PNG
-   has a zoom control burned into its bottom-left corner that no parameter
-   removes, and a hard rectangle of map above the colophon reads as an
-   advertisement. Fading it out on all sides makes it read as a watermark
-   the page happens to be sitting on.
+   It was a full-width band across the foot of the page and that gave it far
+   more weight than it has earned: it is a novelty, not content. Now it sits
+   below the rule at the right, roughly the width of the line of text above
+   it, so it reads as a mark in the corner rather than a section.
 
-   Held well back at rest — it is the least important thing here — and
-   brought up on hover, since it is also a link.
+   Masked at the edges rather than framed, so it settles into the page
+   instead of sitting in a box. The left ramp holds fully transparent for
+   its first 6%: that strip is open ocean, and it is also where the image's
+   built-in zoom control sits, which no parameter removes and which shows as
+   a smudge under a plain ramp.
    ═══════════════════════════════════════════════════════════════════════ */
 .visitor-map {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 10px;
-  margin-bottom: 30px;
+  justify-content: flex-end;
+  gap: 9px;
+  margin-top: 14px;
 }
 
 .visitor-map-frame {
   display: block;
-  width: 100%;
-  max-width: 660px;
-  opacity: 0.55;
+  width: 168px;
+  flex: none;
+  opacity: 0.5;
   transition: opacity 0.45s ease;
-  /* Feathered on all four edges; the corners need the two axes multiplied
-     together, which is what compositing the second layer with intersect
-     does. The left ramp holds fully transparent for its first 6% rather
-     than starting to climb immediately — that strip is open ocean, and it
-     is also where the image's built-in zoom control sits. A plain ramp
-     left the control showing as a faint smudge. */
+  /* Feathered on all four edges. The corners need the two axes multiplied
+     together, which is what compositing the layers with intersect does. */
   -webkit-mask-image: linear-gradient(
       to right,
       transparent 0%,
       transparent 6%,
-      #000 24%,
-      #000 82%,
+      #000 22%,
+      #000 84%,
       transparent 100%
     ),
-    linear-gradient(to bottom, transparent, #000 22%, #000 74%, transparent);
+    linear-gradient(to bottom, transparent, #000 18%, #000 78%, transparent);
   mask-image: linear-gradient(
       to right,
       transparent 0%,
       transparent 6%,
-      #000 24%,
-      #000 82%,
+      #000 22%,
+      #000 84%,
       transparent 100%
     ),
-    linear-gradient(to bottom, transparent, #000 22%, #000 74%, transparent);
+    linear-gradient(to bottom, transparent, #000 18%, #000 78%, transparent);
   -webkit-mask-composite: source-in;
   mask-composite: intersect;
 }
 
 .visitor-map-frame:hover {
-  opacity: 0.85;
+  opacity: 0.8;
 }
 
 .visitor-map-frame img {
@@ -2505,16 +2503,22 @@
   height: auto;
 }
 
+/* Beside the map rather than beneath it — stacked, the caption was taller
+   than the thing it captions. */
 .visitor-map-label {
-  font-size: 10.5px;
+  font-size: 9.5px;
   font-weight: 600;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.13em;
   text-transform: uppercase;
   color: var(--muted);
-  opacity: 0.7;
-  /* Pulled up under the faded lower edge of the map so the label and the
-     continents read as one object rather than a caption below a picture. */
-  margin-top: -18px;
+  opacity: 0.55;
+  white-space: nowrap;
+}
+
+@media (max-width: 560px) {
+  .visitor-map {
+    justify-content: flex-start;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

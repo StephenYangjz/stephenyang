@@ -5,7 +5,6 @@ export default function Footer() {
   return (
     <footer className="relative z-10 pb-16">
       <div className="shell">
-        <VisitorMap />
         <div
           className="flex flex-wrap items-center justify-between gap-4 pt-8 text-[12.5px]"
           style={{ borderTop: '1px solid var(--rule)', color: 'var(--muted)' }}
@@ -17,6 +16,7 @@ export default function Footer() {
             {personalInfo.location} · Built with Next.js, deployed on GitHub Pages
           </span>
         </div>
+        <VisitorMap />
       </div>
     </footer>
   );

@@ -38,6 +38,7 @@ export default function VisitorMap() {
 
   return (
     <div className="visitor-map">
+      <span className="visitor-map-label">{visitorMap.label}</span>
       <a
         href={visitorMap.href}
         target="_blank"
@@ -50,7 +51,6 @@ export default function VisitorMap() {
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={src} alt="World map of recent visitors" />
       </a>
-      <span className="visitor-map-label">{visitorMap.label}</span>
     </div>
   );
 }

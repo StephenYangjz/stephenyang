@@ -350,8 +350,8 @@ export const visitorMap = {
   enabled: true,
   href: 'https://mapmyvisitors.com/web/1c8cn',
   label: 'Visitors',
-  light: 'https://mapmyvisitors.com/map.png?d=yMi8GeyXCIVG4js4eQOb-sOwDTaIaUncwULQtGRFoKA&cl=c8c8cf&co=f5f5f7&ct=71717a&t=n&w=760',
-  dark: 'https://mapmyvisitors.com/map.png?d=yMi8GeyXCIVG4js4eQOb-sOwDTaIaUncwULQtGRFoKA&cl=33333c&co=0c0c0e&ct=8a8a93&t=n&w=760',
+  light: 'https://mapmyvisitors.com/map.png?d=yMi8GeyXCIVG4js4eQOb-sOwDTaIaUncwULQtGRFoKA&cl=c8c8cf&co=f5f5f7&ct=71717a&t=n&w=400',
+  dark: 'https://mapmyvisitors.com/map.png?d=yMi8GeyXCIVG4js4eQOb-sOwDTaIaUncwULQtGRFoKA&cl=33333c&co=0c0c0e&ct=8a8a93&t=n&w=400',
 };
 
 export const websiteInfo = {
