@@ -7,10 +7,11 @@ import { RiArrowRightLine } from '@remixicon/react';
 
 import { readingOrder as ORDER } from '@/website.config';
 
-const MIN_RANGE = 180; // shortest fill, so it is never an instant jump
-const MAX_RANGE = 600; // longest fill, so it cannot complete before the card shows
-const GESTURE_GAP = 130; // wheel silence that separates one gesture from the next
-const COMMIT = 40; // px within the committing gesture, so a stray tick is not one
+const NEED = 460; // px of pressure that advances the page
+const LEAK = 1400; // px per second that pressure drains away
+const SETTLE = 150; // ms at the end before anything is counted at all
+const RISE = 6; // px of increase that marks fresh input rather than momentum
+const STALLS = 3; // repeated unmoved wheels that prove where the end is
 const SLACK = 6; // tolerance on "at the end", for fractional scroll positions
 
 const clamp01 = (n) => (n < 0 ? 0 : n > 1 ? 1 : n);
@@ -22,32 +23,40 @@ function normalise(path) {
 }
 
 /**
- * Scroll to the end of the page, then scroll once more to go to the next one.
+ * Reach the end of the page, keep scrolling, and the page turns.
  *
- * The end of the page is *learned*, not calculated. Every previous version
- * asked the document where its bottom was — scrollHeight minus clientHeight —
- * and on a real browser that number can be wrong, or merely stale: this site
- * sets scroll-behavior: smooth on the root, which in Chrome animates wheel
- * scrolling, so scrollTop lags a long way behind your fingers. When the number
- * overstates the reachable extent, the page is visibly bottomed out and
- * springing back while the code still believes there is further to go. Nothing
- * advances, the bar never completes, and pushing harder changes nothing —
- * which is exactly the reported symptom.
+ * The bar measures *pressure*: how hard you are currently pushing against the
+ * end. Scrolling down adds to it, and it drains continuously at LEAK, so it
+ * rises while you push and falls back when you stop. That is the same shape
+ * as the rubber band you can feel under your fingers, which is the point —
+ * the bar should describe the thing you are already doing.
  *
- * So instead: if two downward wheel events in a row see the same scroll
- * position, the page did not move, and that position is the end. This is the
- * same evidence a reader has — the page stopped — so the code and the reader
- * can no longer disagree. It re-learns whenever the document changes height.
+ * Every earlier version drew the bar from scroll position instead, across
+ * some stretch of page before the end. That could not work. You cross those
+ * last few hundred pixels during the flick that brings you there, in a couple
+ * of hundred milliseconds, so the bar was always already full by the time you
+ * looked at the card. Pressure starts at nought when you arrive, no matter
+ * how you arrived.
  *
- * The bar fills across the card's approach into view, bounded at both ends.
- * MIN_RANGE stops it being an instant jump. MAX_RANGE stops it starting so
- * early that it is already full by the time the card appears, which is what
- * happens on a tall window where the card is on screen for most of the page.
+ * Momentum is told apart from intent by its shape rather than by its size.
+ * A flick's wheel deltas only ever decay — that is what momentum is — while
+ * anything you do with your fingers starts from nothing and rises. So
+ * pressure accumulates only once a delta has come in larger than the one
+ * before it. A flick, however hard, never produces that; the first push after
+ * it always does, because it begins from rest. Leak alone was not enough:
+ * a hard flick delivers well over a thousand pixels of tail and simply
+ * outpaced it.
  *
- * Advancing is one rule with no memory: a gesture counts only if its first
- * wheel event happened at the end. Momentum cannot satisfy it, because the
- * flick that carries you there began further up and its tail is the same
- * gesture. Nothing persists between gestures, so nothing can be left stranded.
+ * There is deliberately no gesture bookkeeping. The rule used to be that a
+ * gesture counted only if it began at the end, which needed a gap in wheel
+ * events to spot — and if you simply kept pushing, that gap never came and
+ * the state stayed stuck on "still arriving" indefinitely.
+ *
+ * The end of the page is observed rather than calculated: STALLS downward
+ * wheels in a row that leave scrollTop unmoved mean the page will not go
+ * further, whatever scrollHeight claims. Several in a row, not one, because
+ * scroll-behavior: smooth makes Chrome animate wheel scrolling and scrollTop
+ * can briefly repeat mid-page.
  */
 export default function NextPage() {
   const router = useRouter();
@@ -55,7 +64,6 @@ export default function NextPage() {
   const [progress, setProgress] = useState(0);
   const [ready, setReady] = useState(false);
   const navigated = useRef(false);
-  const card = useRef(null);
 
   const current = normalise(pathname);
   const index = ORDER.findIndex((entry) => entry.href === current);
@@ -67,70 +75,73 @@ export default function NextPage() {
     const scroller = () =>
       document.scrollingElement || document.documentElement;
 
-    // The end of the page, as observed. Null until the page refuses to move.
-    let endY = null;
+    let endY = null; // the end of the page, as observed
     let lastHeight = 0;
     let lastWheelY = null;
-    let stalled = false;
-
-    const limitOf = (el, max) =>
-      endY != null ? Math.min(endY, max) : max;
+    let stalls = 0;
 
     const atEnd = () => {
       const el = scroller();
       const max = el.scrollHeight - el.clientHeight;
       if (max <= 0) return false;
-      return el.scrollTop >= limitOf(el, max) - SLACK;
+      const limit = endY != null ? Math.min(endY, max) : max;
+      return el.scrollTop >= limit - SLACK;
     };
 
+    let pressure = 0;
+    let arrivedAt = null; // when we reached the end
+    let prevDelta = Infinity; // so the first event at the end is never a rise
+    let pushing = false; // has fresh input been seen since arriving?
     let raf = 0;
-    const frame = () => {
-      raf = 0;
-      const el = scroller();
-      const y = el.scrollTop;
-      const max = el.scrollHeight - el.clientHeight;
+    let lastT = 0;
 
-      // The document changed shape; whatever we learned about its end is void.
-      if (el.scrollHeight !== lastHeight) {
-        lastHeight = el.scrollHeight;
-        endY = null;
-        lastWheelY = null;
-        stalled = false;
+    const tick = (t) => {
+      const dt = lastT ? Math.min(0.05, (t - lastT) / 1000) : 0;
+      lastT = t;
+
+      const here = atEnd();
+      if (!here) {
+        pressure = 0;
+        arrivedAt = null;
+        prevDelta = Infinity;
+        pushing = false;
+      } else if (arrivedAt === null) {
+        arrivedAt = t;
       }
 
-      if (max <= 0) {
-        setProgress(0);
-        setReady(false);
+      pressure = Math.max(0, pressure - LEAK * dt);
+      setProgress(clamp01(pressure / NEED));
+      setReady(here);
+
+      if (pressure >= NEED && !navigated.current) {
+        navigated.current = true;
+        router.push(next.href);
+        raf = 0;
         return;
       }
 
-      const limit = limitOf(el, max);
-      const node = card.current;
-      const appears = node
-        ? node.getBoundingClientRect().top + y - el.clientHeight
-        : limit - MAX_RANGE;
+      // Keep running while there is anything to animate or watch for.
+      raf = here || pressure > 0 ? requestAnimationFrame(tick) : 0;
+    };
 
-      // Start filling when the card appears, but never earlier than MAX_RANGE
-      // before the end, and never later than MIN_RANGE before it.
-      const start = Math.max(
-        0,
-        Math.min(limit - MIN_RANGE, Math.max(appears, limit - MAX_RANGE))
-      );
-      const range = Math.max(1, limit - start);
-
-      const end = y >= limit - SLACK;
-      setProgress(end ? 1 : clamp01((y - start) / range));
-      setReady(end);
+    const run = () => {
+      if (!raf) {
+        lastT = 0;
+        raf = requestAnimationFrame(tick);
+      }
     };
 
     const onScroll = () => {
-      if (!raf) raf = requestAnimationFrame(frame);
+      const el = scroller();
+      if (el.scrollHeight !== lastHeight) {
+        // The document changed shape; what we learned about its end is void.
+        lastHeight = el.scrollHeight;
+        endY = null;
+        lastWheelY = null;
+        stalls = 0;
+      }
+      run();
     };
-
-    // Per-gesture state only; nothing here outlives the gesture it describes.
-    let lastWheel = 0;
-    let counts = false;
-    let pushed = 0;
 
     const onWheel = (event) => {
       if (navigated.current || event.deltaY <= 0) return;
@@ -138,39 +149,44 @@ export default function NextPage() {
       const el = scroller();
       const y = el.scrollTop;
 
-      // Wheel events fire before the scroll is applied, so this reads the
-      // position the previous event produced. Two in a row at the same place
-      // means the page would not move: that is the end, whatever the
-      // document's own arithmetic claims.
-      stalled = lastWheelY !== null && y <= lastWheelY + 0.5;
+      // Wheel events fire before the scroll is applied, so this reads what the
+      // previous event produced. Repeatedly unmoved means the page will not go
+      // any further, and that is the end.
+      if (lastWheelY !== null && y <= lastWheelY + 0.5) {
+        stalls += 1;
+        if (stalls >= STALLS) endY = y;
+      } else {
+        stalls = 0;
+      }
       lastWheelY = y;
-      if (stalled) {
-        endY = y;
-        onScroll(); // the bar's idea of the end just changed
+
+      if (!atEnd()) {
+        run();
+        return;
       }
 
+      // Ignore the first moments at the end: that is where a flick's momentum
+      // is strongest, and it is not you deciding anything.
       const now = performance.now();
-      if (now - lastWheel > GESTURE_GAP) {
-        // A new gesture counts only if it began at the end. The tail of an
-        // arriving flick cannot: it is the same gesture, with no gap.
-        counts = atEnd();
-        pushed = 0;
+      if (arrivedAt !== null && now - arrivedAt < SETTLE) {
+        run();
+        return;
       }
-      lastWheel = now;
 
-      if (!counts || !atEnd()) return;
+      // Momentum decays, always. A finger does not: it starts from rest and
+      // rises. One rise is enough to know the difference.
+      const delta = event.deltaY;
+      if (delta > prevDelta + RISE) pushing = true;
+      prevDelta = delta;
 
-      pushed += event.deltaY;
-      if (pushed >= COMMIT) {
-        navigated.current = true;
-        router.push(next.href);
-      }
+      if (pushing) pressure += delta;
+      run();
     };
 
-    frame();
     window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('resize', onScroll);
     window.addEventListener('wheel', onWheel, { passive: true });
+    onScroll();
     return () => {
       window.removeEventListener('scroll', onScroll);
       window.removeEventListener('resize', onScroll);
@@ -183,16 +199,11 @@ export default function NextPage() {
 
   return (
     <section className="next-page">
-      <Link
-        ref={card}
-        href={next.href}
-        className="next-card reveal"
-        data-ready={ready}
-      >
+      <Link href={next.href} className="next-card reveal" data-ready={ready}>
         <span className="page-link-kicker">Next · {next.kicker}</span>
         <span className="next-title">{next.label}</span>
         <span className="page-link-go">
-          {ready ? 'Scroll again, or click' : 'Keep scrolling, or click'}{' '}
+          {ready ? 'Keep scrolling to continue' : 'Keep scrolling, or click'}{' '}
           <RiArrowRightLine size={14} />
         </span>
         <span className="next-bar" aria-hidden="true">
