@@ -7,11 +7,10 @@ import { RiArrowRightLine } from '@remixicon/react';
 
 import { readingOrder as ORDER } from '@/website.config';
 
-// A single gesture never advances, however far it carries. Once it has died
-// out at the bottom, the next one does, immediately.
-const ARM_IDLE = 170; // wheel silence that marks the end of the gesture you arrived on
-const NUDGE = 60; // px in the new gesture — enough that a stray tick is not a push
-const DECAY = 400; // a lone tick that goes nowhere unwinds
+const PULL = 420; // px of overscroll that fills the bar
+const ARRIVAL_CAP = 0.55; // how far the gesture you arrived on may fill it
+const GESTURE_GAP = 110; // wheel silence that marks the end of a gesture
+const MAX_STEP = 90; // ceiling on one event, so the bar sweeps rather than jumps
 
 function normalise(path) {
   if (!path) return '/';
@@ -20,24 +19,27 @@ function normalise(path) {
 }
 
 /**
- * At the bottom of the page, one more scroll moves to the next page.
+ * At the bottom of the page, scrolling on fills a bar and then moves to the
+ * next page.
  *
- * The rule is about gestures, not distance: a single gesture never advances,
- * however far it carries, and the one after it advances immediately. That is
- * what stops the page turning by accident, because the thing that used to
- * turn it was momentum — a trackpad flick keeps delivering wheel events long
- * after the page has stopped against the bottom, so the gesture that brought
- * you to the end carried you off it.
+ * The difficulty is momentum. A trackpad flick keeps delivering wheel events
+ * long after the page has stopped against the bottom, so if every event
+ * counts, the gesture that brought you to the end carries you off it. The
+ * previous fix was to ignore input until the wheel fell silent, which did
+ * work, but it meant the bar sat dead at nought while you were already
+ * pushing — the arrival read as unresponsive precisely because it was.
  *
- * Separating the two is a matter of listening for the silence between them.
- * While at the bottom, wheel input is ignored until it has been quiet for
- * ARM_IDLE; every event pushes that timer back, so it cannot elapse mid-flick,
- * and momentum events arrive far closer together than that. Once it does
- * elapse, the gesture is over and anything further is a fresh one.
+ * So the gesture you arrive on is not ignored; it is capped. It fills the bar
+ * to ARRIVAL_CAP and stops there, which gives immediate feedback and makes
+ * plain that something is happening, while no amount of momentum can finish
+ * the job. The cap lifts once the wheel has been quiet for GESTURE_GAP —
+ * momentum events arrive an order of magnitude closer together than that, so
+ * it can only elapse between gestures, never inside one.
  *
- * NUDGE is only there so that a stray tick or a jittery wheel is not mistaken
- * for a gesture; it is a fraction of any real scroll, and unwinds on its own.
- * Scrolling up, or leaving the bottom, resets everything.
+ * Progress does not time out. Once the bar is part-filled it stays that way,
+ * so coming back to it a minute later still only costs the remainder. It
+ * clears when you scroll up or leave the bottom, which are the two things
+ * that actually mean you did not want to go.
  *
  * The link is always clickable, and the whole behaviour is disabled under
  * prefers-reduced-motion.
@@ -57,53 +59,45 @@ export default function NextPage() {
     if (!next) return;
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
-    let decay;
-    let armIdle;
-    let armed = false;
+    let gapTimer;
+    // False while the gesture that brought us to the bottom is still running.
+    let gestureEnded = false;
 
     const atBottom = () =>
       window.innerHeight + window.scrollY >=
       document.documentElement.scrollHeight - 2;
 
     const reset = () => {
+      clearTimeout(gapTimer);
+      gestureEnded = false;
       pulled.current = 0;
       setProgress(0);
-    };
-
-    const disarm = () => {
-      armed = false;
-      clearTimeout(armIdle);
-      clearTimeout(decay);
-      reset();
     };
 
     const onWheel = (event) => {
       if (navigated.current) return;
 
-      // Scrolling up, or no longer pinned to the bottom: start over.
+      // Scrolling up, or no longer pinned to the bottom: you did not mean it.
       if (event.deltaY <= 0 || !atBottom()) {
-        disarm();
+        reset();
         return;
       }
 
-      if (!armed) {
-        // Wait for the wheel to fall silent before counting anything. Every
-        // event pushes this timer back, so it can only fire once the flick
-        // that delivered you here has fully decayed.
-        clearTimeout(armIdle);
-        armIdle = setTimeout(() => {
-          armed = atBottom();
-        }, ARM_IDLE);
-        return;
-      }
+      // Every event pushes this back, so it only fires in the gap between one
+      // gesture and the next — never inside a single flick's momentum tail.
+      clearTimeout(gapTimer);
+      gapTimer = setTimeout(() => {
+        gestureEnded = true;
+      }, GESTURE_GAP);
 
-      pulled.current = Math.min(NUDGE, pulled.current + event.deltaY);
-      setProgress(pulled.current / NUDGE);
+      const ceiling = gestureEnded ? PULL : PULL * ARRIVAL_CAP;
+      pulled.current = Math.min(
+        ceiling,
+        pulled.current + Math.min(event.deltaY, MAX_STEP)
+      );
+      setProgress(pulled.current / PULL);
 
-      clearTimeout(decay);
-      decay = setTimeout(reset, DECAY);
-
-      if (pulled.current >= NUDGE) {
+      if (pulled.current >= PULL) {
         navigated.current = true;
         router.push(next.href);
       }
@@ -112,8 +106,7 @@ export default function NextPage() {
     window.addEventListener('wheel', onWheel, { passive: true });
     return () => {
       window.removeEventListener('wheel', onWheel);
-      clearTimeout(decay);
-      clearTimeout(armIdle);
+      clearTimeout(gapTimer);
     };
   }, [next, router]);
 
@@ -125,7 +118,7 @@ export default function NextPage() {
         <span className="page-link-kicker">Next · {next.kicker}</span>
         <span className="next-title">{next.label}</span>
         <span className="page-link-go">
-          Scroll again, or click <RiArrowRightLine size={14} />
+          Keep scrolling, or click <RiArrowRightLine size={14} />
         </span>
         <span className="next-bar" aria-hidden="true">
           <span
