@@ -4,13 +4,15 @@ export function ReadingList() {
   if (!reading?.length) return null;
 
   return (
-    <div className="entry-grid">
+    <div>
       {reading.map((book, index) => (
-        <div key={`${book.title}-${index}`} className="entry reveal">
-          <h3 className="entry-title">{book.title}</h3>
-          <p className="entry-meta">{book.author}</p>
-          {book.note && <p className="entry-detail">{book.note}</p>}
-        </div>
+        <article key={`${book.title}-${index}`} className="book reveal">
+          <div className="book-meta">
+            <h3 className="book-title">{book.title}</h3>
+            <p className="book-author">{book.author}</p>
+          </div>
+          {book.note && <p className="book-note">{book.note}</p>}
+        </article>
       ))}
     </div>
   );

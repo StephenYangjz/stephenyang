@@ -228,38 +228,28 @@ export const photography = [
 
 export const reading = [
   {
-    title: 'Replace me',
-    author: 'Author Name',
-    note: 'One line on why it stuck with you.',
+    title: 'The Power of Now',
+    author: 'Eckhart Tolle',
+    note: "Tolle's actual claim is narrower than the self-help shelf around it suggests: that the voice narrating your life is not the same thing as you, and that a great deal of suffering is the interest paid on confusing the two. What stayed with me is that he treats this as a problem of attention rather than of belief — you do not argue the mind into silence, you just stop accepting its commentary as testimony. I remain unconvinced by the metaphysics and fairly convinced by the practice, which may be the only honest way to read it.",
   },
   {
-    title: 'Replace me',
-    author: 'Author Name',
-    note: 'Keep these short — a sentence each is plenty.',
-  },
-  {
-    title: 'Replace me',
-    author: 'Author Name',
-    note: 'Three to six books reads better than twenty.',
-  },
-  {
-    title: 'Replace me',
-    author: 'Author Name',
-    note: 'Delete any you do not need; the grid reflows.',
+    title: 'The Let Them Theory',
+    author: 'Mel Robbins',
+    note: "Two words carrying the weight of the Stoic dichotomy of control. The useful half is not \u201Clet them\u201D but the \u201Clet me\u201D that follows it: once you stop spending attention on what other people are going to do anyway, you notice how little of it you had been spending on what you actually choose. Less original than it presents itself as, and lighter than the idea deserves — but the reframe survives its own packaging, which is more than most books of this kind manage.",
   },
 ];
 
 export const notes = [
   {
-    text: 'A short thought worth keeping. Two or three sentences at most — these are pull quotes, not posts.',
+    text: 'The mind is very good at presenting its own commentary as perception. Most of what I have learned about thinking clearly has really been learning to notice that gap — a thought arriving does not make it a finding.',
     date: '2026',
   },
   {
-    text: 'Replace these with things you actually think. Half-formed is fine; that is the point of the section.',
+    text: 'We are reliably wrong about how much is ours to control. Almost none of it reaches other people; nearly all of it is in where attention goes next. Most unhappiness I can account for comes from having those two figures swapped.',
     date: '2026',
   },
   {
-    text: 'Delete the whole array to hide this section entirely.',
+    text: 'Meaning seems less like something discovered or invented than something maintained. It decays if you stop attending to it — an oddly practical conclusion for a question that sounds so grand.',
     date: '2025',
   },
 ];
