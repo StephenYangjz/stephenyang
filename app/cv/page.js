@@ -21,13 +21,14 @@ export default function Page() {
         kicker={pages.cv.kicker}
         title={pages.cv.title}
         note={`Currently ${personalInfo.role.toLowerCase()} at ${personalInfo.university}.`}
+        rule={false}
       />
 
       <a
         href={personalInfo.cvUrl}
         target="_blank"
         rel="noopener noreferrer"
-        className="social-btn -mt-6 mb-16"
+        className="social-btn mt-8 mb-20"
       >
         <RiArrowRightUpLine size={14} />
         {pages.cv.downloadLabel}
