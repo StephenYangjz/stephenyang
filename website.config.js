@@ -33,7 +33,7 @@ export const personalInfo = {
     },
     { name: 'GitHub', url: 'https://github.com/StephenYangjz' },
     { name: 'LinkedIn', url: 'https://www.linkedin.com/in/stephenyangjz/' },
-    { name: 'Twitter', url: 'https://x.com/Stepenyang' },
+    { name: 'X', url: 'https://x.com/Stepenyang' },
   ],
 
 

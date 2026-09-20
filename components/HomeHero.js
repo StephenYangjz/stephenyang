@@ -13,7 +13,7 @@ const ICON = {
   Email: RiMailLine,
   GitHub: RiGithubFill,
   LinkedIn: RiLinkedinBoxFill,
-  Twitter: RiTwitterXLine,
+  X: RiTwitterXLine,
   'Google Scholar': RiGraduationCapLine,
 };
 
