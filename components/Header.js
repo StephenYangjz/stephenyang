@@ -4,7 +4,12 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { useTheme } from 'next-themes';
-import { RiMenuLine, RiCloseLine, RiSunLine, RiMoonLine } from '@remixicon/react';
+import {
+  RiMenuLine,
+  RiCloseLine,
+  RiSunLine,
+  RiMoonLine,
+} from '@remixicon/react';
 import { personalInfo, navigations } from '@/website.config';
 
 function initials(name) {
@@ -16,20 +21,24 @@ function initials(name) {
     .toUpperCase();
 }
 
+/** Trailing slashes differ between dev and the exported build. */
+function normalise(path) {
+  if (!path) return '/';
+  const trimmed = path.replace(/\/+$/, '');
+  return trimmed === '' ? '/' : trimmed;
+}
+
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const { resolvedTheme, setTheme } = useTheme();
   const pathname = usePathname();
 
-  // The homepage hero carries the name, so the pill starts as a monogram and
-  // reveals it on scroll. Every other page has no such hero — show it outright
-  // rather than making the identity depend on scrolling.
-  const isHome = pathname === '/';
+  const current = normalise(pathname);
+  const isHome = current === '/';
 
   useEffect(() => setMounted(true), []);
 
-  // Lock the page while the mobile sheet is open
   useEffect(() => {
     document.body.style.overflow = menuOpen ? 'hidden' : '';
     return () => {
@@ -39,66 +48,77 @@ export default function Header() {
 
   const isDark = resolvedTheme === 'dark';
 
+  const isActive = (route) => {
+    const target = normalise(route.split('#')[0]);
+    if (target === '/') return isHome;
+    return current === target || current.startsWith(`${target}/`);
+  };
+
   return (
     <>
-      <header className="fixed inset-x-0 top-3 z-50 flex justify-center px-4 pointer-events-none">
+      <header className="header-shell">
         <nav
-          className="header-pill glass glass-sheen pointer-events-auto relative flex items-center gap-1 rounded-full p-[7px] pl-2 overflow-hidden"
+          className="header-bar glass glass-sheen pointer-events-auto"
           aria-label="Primary"
         >
           <Link
             href="/"
-            className="nav-link !px-3 font-semibold tracking-[-0.02em] text-[13.5px] whitespace-nowrap"
-            style={{ color: 'var(--text)' }}
+            className="header-brand"
+            aria-current={isHome ? 'page' : undefined}
           >
             {isHome ? initials(personalInfo.name) : personalInfo.name}
           </Link>
 
-          {/* On the homepage only, the full name slides in as the hero recedes */}
           {isHome && (
-            <span
-              className="pill-name text-[13.5px] font-semibold tracking-[-0.022em]"
-              style={{ color: 'var(--text)' }}
-              aria-hidden="true"
-            >
+            <span className="pill-name header-brand-full" aria-hidden="true">
               {personalInfo.name}
             </span>
           )}
 
-          <div className="hidden sm:flex items-center gap-[2px]">
-            {navigations.map((item) => (
-              <Link key={item.name} href={item.route} className="nav-link">
-                {item.name}
-              </Link>
-            ))}
+          <div className="header-actions">
+            <div className="hidden sm:flex items-center gap-1">
+              {navigations.map((item) => {
+                const active = isActive(item.route);
+                return (
+                  <Link
+                    key={item.name}
+                    href={item.route}
+                    className="nav-link"
+                    data-active={active ? 'true' : undefined}
+                    aria-current={active ? 'page' : undefined}
+                  >
+                    {item.name}
+                  </Link>
+                );
+              })}
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setTheme(isDark ? 'light' : 'dark')}
+              className="nav-link nav-icon"
+              aria-label={`Switch to ${isDark ? 'light' : 'dark'} theme`}
+            >
+              {mounted && isDark ? (
+                <RiMoonLine size={15} />
+              ) : (
+                <RiSunLine size={15} />
+              )}
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setMenuOpen((open) => !open)}
+              className="nav-link nav-icon sm:hidden"
+              aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+              aria-expanded={menuOpen}
+            >
+              {menuOpen ? <RiCloseLine size={16} /> : <RiMenuLine size={16} />}
+            </button>
           </div>
-
-          <button
-            type="button"
-            onClick={() => setTheme(isDark ? 'light' : 'dark')}
-            className="nav-link !px-0 grid h-[30px] w-[30px] place-items-center rounded-full"
-            aria-label={`Switch to ${isDark ? 'light' : 'dark'} theme`}
-          >
-            {mounted && isDark ? (
-              <RiMoonLine size={15} />
-            ) : (
-              <RiSunLine size={15} />
-            )}
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setMenuOpen((open) => !open)}
-            className="nav-link !px-0 grid h-[30px] w-[30px] place-items-center rounded-full sm:hidden"
-            aria-label={menuOpen ? 'Close menu' : 'Open menu'}
-            aria-expanded={menuOpen}
-          >
-            {menuOpen ? <RiCloseLine size={16} /> : <RiMenuLine size={16} />}
-          </button>
         </nav>
       </header>
 
-      {/* Mobile sheet */}
       {menuOpen && (
         <div
           className="fixed inset-0 z-40 sm:hidden"
@@ -118,6 +138,10 @@ export default function Header() {
                 key={item.name}
                 href={item.route}
                 className="text-2xl font-medium tracking-[-0.03em]"
+                data-active={isActive(item.route) ? 'true' : undefined}
+                style={
+                  isActive(item.route) ? { color: 'var(--accent)' } : undefined
+                }
                 onClick={() => setMenuOpen(false)}
               >
                 {item.name}

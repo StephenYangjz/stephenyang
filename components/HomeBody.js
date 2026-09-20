@@ -20,10 +20,10 @@ const ELSEWHERE = [
 
 function Glance() {
   return (
-    <div className="glass glass-sheen relative overflow-hidden rounded-[22px] p-6">
+    <div className="glass glass-sheen relative rounded-[22px] p-5">
       <p className="block-label">At a glance</p>
 
-      <dl className="mt-5 flex flex-col gap-4">
+      <dl className="mt-4 flex flex-col gap-3">
         {FACTS.map(([label, value]) => (
           <div key={label}>
             <dt className="glance-key">{label}</dt>
@@ -32,7 +32,7 @@ function Glance() {
         ))}
       </dl>
 
-      <div className="mt-6 flex flex-wrap gap-2">
+      <div className="mt-5 flex flex-wrap gap-2">
         <a
           href={personalInfo.cvUrl}
           target="_blank"
