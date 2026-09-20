@@ -230,12 +230,16 @@ export const reading = [
   {
     title: 'The Power of Now',
     author: 'Eckhart Tolle',
+    // A line from the book itself. Worth checking the wording against your
+    // own copy before this goes public.
+    quote: 'You are not your mind.',
     note: "Tolle's actual claim is narrower than the self-help shelf around it suggests: that the voice narrating your life is not the same thing as you, and that a great deal of suffering is the interest paid on confusing the two. What stayed with me is that he treats this as a problem of attention rather than of belief — you do not argue the mind into silence, you just stop accepting its commentary as testimony. I remain unconvinced by the metaphysics and fairly convinced by the practice, which may be the only honest way to read it.",
   },
   {
     title: 'The Let Them Theory',
     author: 'Mel Robbins',
-    note: "Two words carrying the weight of the Stoic dichotomy of control. The useful half is not \u201Clet them\u201D but the \u201Clet me\u201D that follows it: once you stop spending attention on what other people are going to do anyway, you notice how little of it you had been spending on what you actually choose. Less original than it presents itself as, and lighter than the idea deserves — but the reframe survives its own packaging, which is more than most books of this kind manage.",
+    quote: 'Let them. Then let me.',
+    note: "Two words carrying the weight of the Stoic dichotomy of control. The useful half is not the first one but the second: once you stop spending attention on what other people are going to do anyway, you notice how little of it you had been spending on what you actually choose. Less original than it presents itself as, and lighter than the idea deserves — but the reframe survives its own packaging, which is more than most books of this kind manage.",
   },
 ];
 
