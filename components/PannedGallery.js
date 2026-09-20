@@ -21,7 +21,9 @@ export default function PannedGallery() {
           </div>
         </div>
 
-        <div className="mt-5">
+        {/* No top margin: the heading is positioned out of flow, so any
+            margin here only shifts the rail off centre. */}
+        <div>
           <div className="pan-rail pan-x">
             {photography.map((photo) => (
               <figure key={photo.src} className="pan-card">

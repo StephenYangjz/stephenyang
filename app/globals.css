@@ -635,19 +635,18 @@
      top of the sheet and the label at exactly the moment the sheet arrives.
      A sticky `top` only takes effect once the stage actually sticks, so the
      content can start flush and still clear the header when pinned. */
-  top: 88px;
-  height: calc(100svh - 88px);
+  top: 78px;
+  height: calc(100svh - 78px);
   display: grid;
   /* The rail is intentionally wider than the viewport. Without an explicit
      minmax(0, 1fr) the grid column sizes to it and drags every other child
      — the section heading included — off to the right. */
   grid-template-columns: minmax(0, 1fr);
-  /* Centred. Top-aligning dumped the whole leftover height below the rail —
-     measured 37px above the frames against 92px below — and pinned the label
-     hard against the stage's top edge. Centring was wrong *before* only
-     because the stage was a full 100svh with padding on top of it; now that
-     the header clearance lives in the sticky offset the leftover is small,
-     so splitting it gives an even margin at both ends. */
+  /* Centres the rail, and only the rail. Centring the whole block — label,
+     gap, frames — added the label's height on top of the margin above the
+     photos while the margin below stayed as-is: 92px above against 46px
+     below, a 2:1 split. The label is taken out of flow (below) so the
+     frames sit optically centred in the stage. */
   align-content: center;
   overflow: hidden;
 }
@@ -2211,5 +2210,10 @@
 
 /* The gallery heading shares the rail's margin rather than the text column's */
 .gallery-head {
+  /* Out of flow so it does not bias the stage's centring — see .pin-stage. */
+  position: absolute;
+  top: 24px;
+  left: 0;
+  right: 0;
   padding-inline: var(--shell-pad);
 }
