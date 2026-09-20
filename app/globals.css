@@ -2256,81 +2256,59 @@
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
-   ROUTE TRANSITION — sideways, behind a band of glass
+   ROUTE TRANSITION — the content drifts in, nothing is laid over it
 
-   --dir is 1 moving forward through the nav order and -1 going back, so the
-   page enters from the side you came from.
+   --dir is 1 moving forward through the nav order and -1 going back, so a
+   page arrives from the side you came from.
 
-   Both animations fill `backwards`, never `both`: a transform or filter
-   left on the wrapper would make it the containing block for every
-   position: fixed descendant — the At a glance card, the scroll cue — and
-   quietly break them once the animation ended.
+   The sections are animated individually with a short stagger rather than
+   the whole page sliding as one slab, which is what makes it read as
+   elements settling into place.
+
+   Fills `backwards`, never `both`: a transform left on these elements would
+   make them the containing block for any position: fixed descendant — the
+   At a glance card, the scroll cue — and break them once the animation
+   ended.
    ═══════════════════════════════════════════════════════════════════════ */
-@keyframes route-in {
+@keyframes drift-in {
   from {
     opacity: 0;
-    transform: translate3d(calc(var(--dir, 1) * 7%), 0, 0);
-    filter: blur(14px);
+    transform: translate3d(calc(var(--dir, 1) * 44px), 0, 0);
   }
 }
 
-.route-shift {
-  animation: route-in 0.78s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+.route-shift main > * {
+  animation: drift-in 0.74s cubic-bezier(0.16, 1, 0.3, 1) backwards;
 }
 
-/* A pane of glass crossing the viewport, frosting whatever it passes over */
-@keyframes route-sweep {
-  0% {
-    opacity: 0;
-    transform: translate3d(calc(var(--dir, 1) * -128%), 0, 0) skewX(-8deg);
+  .route-shift main > *:nth-child(1) {
+    animation-delay: 0.000s;
   }
-  18% {
-    opacity: 1;
+  .route-shift main > *:nth-child(2) {
+    animation-delay: 0.065s;
   }
-  72% {
-    opacity: 1;
+  .route-shift main > *:nth-child(3) {
+    animation-delay: 0.130s;
   }
-  100% {
-    opacity: 0;
-    transform: translate3d(calc(var(--dir, 1) * 128%), 0, 0) skewX(-8deg);
+  .route-shift main > *:nth-child(4) {
+    animation-delay: 0.195s;
   }
-}
-
-.route-sweep {
-  position: fixed;
-  top: -12vh;
-  bottom: -12vh;
-  left: -46vw;
-  width: 92vw;
-  z-index: 60;
-  pointer-events: none;
-  /* The animation fills `backwards`, so once it finishes the element reverts
-     to *this* rule — it is not held at the last keyframe. Without an opacity
-     of 0 here the band parked at left: -46vw and sat over the left half of
-     the screen permanently. */
-  opacity: 0;
-  background: linear-gradient(
-    100deg,
-    transparent 0%,
-    var(--glass-hi-2) 26%,
-    var(--glass-bg) 50%,
-    var(--glass-hi-2) 74%,
-    transparent 100%
-  );
-  backdrop-filter: blur(16px) saturate(150%);
-  -webkit-backdrop-filter: blur(16px) saturate(150%);
-  animation: route-sweep 0.86s cubic-bezier(0.32, 0.72, 0, 1) backwards;
-  will-change: transform, opacity;
-}
+  .route-shift main > *:nth-child(5) {
+    animation-delay: 0.260s;
+  }
+  .route-shift main > *:nth-child(6) {
+    animation-delay: 0.325s;
+  }
+  .route-shift main > *:nth-child(7) {
+    animation-delay: 0.390s;
+  }
+  .route-shift main > *:nth-child(8) {
+    animation-delay: 0.455s;
+  }
 
 @media (prefers-reduced-motion: reduce) {
-  .route-shift,
-  .route-sweep {
+  .route-shift main > * {
     animation: none;
-  }
-
-  .route-sweep {
-    display: none;
   }
 }
 

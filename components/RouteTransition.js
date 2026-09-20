@@ -11,7 +11,7 @@ function normalise(path) {
 }
 
 /**
- * Slides each page in sideways behind a sweeping band of glass.
+ * Drifts each page's elements in sideways as it mounts.
  *
  * Direction comes from the nav order, so moving to a later page enters from
  * the right and going back enters from the left — the site reads as a strip
@@ -21,6 +21,11 @@ function normalise(path) {
  * animations. No navigation interception and no promise timing: this cannot
  * silently fail the way the View Transitions version did, which Chrome skips
  * outright whenever the document is hidden.
+ *
+ * The movement belongs to the content itself — the sections drift in with a
+ * short stagger. An earlier version swept a band of glass across the
+ * viewport on top of everything, which read as an effect laid over the page
+ * rather than the page arriving.
  */
 export default function RouteTransition({ children }) {
   const pathname = usePathname();
@@ -46,23 +51,8 @@ export default function RouteTransition({ children }) {
   const dir = from === null || a < 0 || b < 0 || b >= a ? 1 : -1;
 
   return (
-    <>
-      {/* Sibling, not a child: the sliding wrapper carries a transform, and
-          a position: fixed element inside it would be positioned against
-          the wrapper instead of the viewport. */}
-      <span
-        key={`${current}-sweep`}
-        className="route-sweep"
-        style={{ '--dir': dir }}
-        aria-hidden="true"
-      />
-      <div
-        key={current}
-        className="route-shift"
-        style={{ '--dir': dir }}
-      >
-        {children}
-      </div>
-    </>
+    <div key={current} className="route-shift" style={{ '--dir': dir }}>
+      {children}
+    </div>
   );
 }
