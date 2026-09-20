@@ -7,7 +7,11 @@ import { RiArrowRightLine } from '@remixicon/react';
 
 import { readingOrder as ORDER } from '@/website.config';
 
-const PULL = 520; // px of continued scrolling at the bottom before advancing
+// Tuned so that advancing is something you do, not something that happens.
+const PULL = 800; // px of deliberate overscroll before advancing
+const ARM_IDLE = 260; // wheel silence that marks the end of the flick you arrived on
+const DECAY = 650; // stop pushing and the bar unwinds
+const MAX_STEP = 90; // ceiling on one event, so a single jolt cannot fill the bar
 
 function normalise(path) {
   if (!path) return '/';
@@ -17,9 +21,20 @@ function normalise(path) {
 
 /**
  * Once you reach the bottom, continuing to scroll fills a progress bar and
- * then moves to the next page. It only ever responds to deliberate extra
- * scrolling past the end, shows exactly how far along you are, and unwinds
- * the moment you stop or scroll back — so it never navigates by surprise.
+ * then moves to the next page.
+ *
+ * The thing that makes this feel like a trap is momentum. A trackpad flick
+ * keeps firing wheel events long after the page has stopped at the bottom,
+ * so counting every event means the same gesture that brought you to the end
+ * carries you off it. Hence arming: while at the bottom, wheel input is
+ * ignored until it has fallen silent for a moment. That silence is the end
+ * of the flick you arrived on, and only what comes after it counts.
+ *
+ * Beyond that, a single event contributes at most MAX_STEP, so one jolt from
+ * a mouse wheel or a jumpy driver cannot fill the bar on its own; the bar
+ * unwinds if you stop pushing; and scrolling up, or leaving the bottom at
+ * all, disarms and resets it.
+ *
  * The link is always clickable, and the whole behaviour is disabled under
  * prefers-reduced-motion.
  */
@@ -39,30 +54,53 @@ export default function NextPage() {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
     let decay;
+    let armIdle;
+    let armed = false;
 
     const atBottom = () =>
       window.innerHeight + window.scrollY >=
       document.documentElement.scrollHeight - 2;
 
+    const reset = () => {
+      pulled.current = 0;
+      setProgress(0);
+    };
+
+    const disarm = () => {
+      armed = false;
+      clearTimeout(armIdle);
+      clearTimeout(decay);
+      reset();
+    };
+
     const onWheel = (event) => {
       if (navigated.current) return;
 
-      if (event.deltaY <= 0) {
-        pulled.current = 0;
-        setProgress(0);
+      // Scrolling up, or no longer pinned to the bottom: start over.
+      if (event.deltaY <= 0 || !atBottom()) {
+        disarm();
         return;
       }
 
-      if (!atBottom()) return;
+      if (!armed) {
+        // Wait for the wheel to fall silent before counting anything. Every
+        // event pushes this timer back, so it can only fire once the flick
+        // that delivered you here has fully decayed.
+        clearTimeout(armIdle);
+        armIdle = setTimeout(() => {
+          armed = atBottom();
+        }, ARM_IDLE);
+        return;
+      }
 
-      pulled.current = Math.min(PULL, pulled.current + event.deltaY);
+      pulled.current = Math.min(
+        PULL,
+        pulled.current + Math.min(event.deltaY, MAX_STEP)
+      );
       setProgress(pulled.current / PULL);
 
       clearTimeout(decay);
-      decay = setTimeout(() => {
-        pulled.current = 0;
-        setProgress(0);
-      }, 700);
+      decay = setTimeout(reset, DECAY);
 
       if (pulled.current >= PULL) {
         navigated.current = true;
@@ -74,6 +112,7 @@ export default function NextPage() {
     return () => {
       window.removeEventListener('wheel', onWheel);
       clearTimeout(decay);
+      clearTimeout(armIdle);
     };
   }, [next, router]);
 
