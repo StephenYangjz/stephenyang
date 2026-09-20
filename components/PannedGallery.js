@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import { photography } from '@/website.config';
+import { photography, pages } from '@/website.config';
 
 /**
  * Vertical scroll mapped to horizontal travel, inside a pinned stage. The
@@ -12,9 +12,9 @@ export default function PannedGallery() {
   return (
     <section className="pin-track" style={{ height: '340svh' }}>
       <div className="pin-stage">
-        <div className="shell w-full">
+        <div className="gallery-head">
           <div className="gallery-lead">
-            <span className="rail-label">Photography</span>
+            <span className="rail-label">{pages.personal.photographyLabel}</span>
             <span className="gallery-count">
               {String(photography.length).padStart(2, '0')} frames · scroll →
             </span>

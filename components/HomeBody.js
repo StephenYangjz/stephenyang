@@ -2,26 +2,17 @@ import Link from 'next/link';
 import LineReveal from '@/components/LineReveal';
 import AboutMd from '@/data/home/About.mdx';
 import NewsMd from '@/data/home/News.mdx';
-import { personalInfo } from '@/website.config';
+import { personalInfo, pages, glanceFacts } from '@/website.config';
 import { RiArrowRightUpLine, RiArrowRightLine } from '@remixicon/react';
 
-const FACTS = [
-  ['Role', `${personalInfo.role}, ${personalInfo.university}`],
-  ['Based in', personalInfo.location],
-  ['Focus', personalInfo.tagline],
-  ['Previously', 'Google XR · Applied Intuition · Harvard · BAIR'],
-];
+const FACTS = glanceFacts(personalInfo);
 
-const ELSEWHERE = [
-  ['Publications', 'Papers, patents, and other work', '/publications'],
-  ['CV', 'Experience, education, and honors', '/cv'],
-  ['Personal', 'Photography, reading, and notes', '/personal'],
-];
+const ELSEWHERE = pages.home.elsewhere;
 
 function Glance() {
   return (
     <div className="glass glass-sheen glance-card relative p-5">
-      <p className="block-label">At a glance</p>
+      <p className="block-label">{pages.home.aboutLabel}</p>
 
       <dl className="mt-4 flex flex-col gap-3">
         {FACTS.map(([label, value]) => (
@@ -74,7 +65,7 @@ export default function HomeBody() {
           </div>
 
           <div id="news" className="mt-24">
-            <p className="block-label seq-line">News</p>
+            <p className="block-label seq-line">{pages.home.newsLabel}</p>
             <div className="news-list prose-body mt-6">
               <NewsMd />
             </div>
@@ -82,7 +73,7 @@ export default function HomeBody() {
         </LineReveal>
 
         <div id="more" className="mt-24">
-          <p className="block-label reveal">Elsewhere</p>
+          <p className="block-label reveal">{pages.home.elsewhereLabel}</p>
           <div className="mt-6 flex flex-col">
             {ELSEWHERE.map(([title, note, href]) => (
               <Link key={href} href={href} className="elsewhere-row reveal">

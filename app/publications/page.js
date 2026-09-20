@@ -1,20 +1,21 @@
 import Masthead from '@/components/Masthead';
 import NextPage from '@/components/NextPage';
 import Publications from '@/components/Publications';
+import { pages } from '@/website.config';
 import bibtex from '@/data/bib/Publications.bib';
 
 export const metadata = {
-  title: 'Research',
-  description: 'Papers, patents, and other work by Stephen Jiezhi Yang.',
+  title: pages.research.title,
+  description: pages.research.note,
 };
 
 export default function Page() {
   return (
     <main className="shell pb-32">
       <Masthead
-        kicker="Research"
-        title="Research"
-        note="Geometric foundation models, world models, among others. Preprints are listed at their accepted venue once one exists."
+        kicker={pages.research.kicker}
+        title={pages.research.title}
+        note={pages.research.note}
       />
       <Publications bibtex={bibtex} />
 

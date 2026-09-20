@@ -1,3 +1,18 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   SITE CONTENT — everything you are likely to want to edit lives here.
+
+   This file:   name, role, links, experience, education, honors,
+                photography, reading, notes, and every page's headings.
+   data/home/About.mdx          your bio (prose, supports links)
+   data/home/News.mdx           the news list
+   data/home/Miscellaneous.mdx  the personal bullet points
+   data/bib/Publications.bib    papers and patents (BibTeX)
+   public/                      images, photos/, and the CV PDF
+
+   Nothing else contains user-facing text. After editing, run
+   `npm run dev` to preview or `npm run build` to produce out/.
+   ═══════════════════════════════════════════════════════════════════════ */
+
 export const personalInfo = {
   name: 'Stephen Yang',
   fullName: 'Stephen Jiezhi Yang',
@@ -259,6 +274,66 @@ export const notes = [
     text: 'Delete the whole array to hide this section entirely.',
     date: '2025',
   },
+];
+
+
+/* ───────────────────────────────────────────────────────────────────────
+   PAGE HEADINGS AND SECTION LABELS
+   Every visible heading on the site. Section labels are the small
+   uppercase words in the left rail.
+   ─────────────────────────────────────────────────────────────────────── */
+export const pages = {
+  home: {
+    aboutLabel: 'At a glance',
+    newsLabel: 'News',
+    elsewhereLabel: 'Elsewhere',
+    // Cards at the foot of the homepage
+    elsewhere: [
+      ['Research', 'Papers, patents, and other work', '/publications'],
+      ['CV', 'Experience, education, and honors', '/cv'],
+      ['Personal', 'Photography, reading, and notes', '/personal'],
+    ],
+  },
+
+  research: {
+    kicker: 'Research',
+    title: 'Research',
+    note: 'Geometric foundation models, world models, among others. Preprints are listed at their accepted venue once one exists.',
+  },
+
+  cv: {
+    kicker: 'Background',
+    title: 'CV',
+    downloadLabel: 'Download CV (PDF)',
+    experienceLabel: 'Experience',
+    educationLabel: 'Education',
+    honorsLabel: 'Honors',
+  },
+
+  personal: {
+    kicker: 'Off the clock',
+    title: 'Personal',
+    note: 'Photography, things worth reading, and thoughts that have not gone anywhere yet.',
+    photographyLabel: 'Photography',
+    readingLabel: 'Reading & notes',
+    elsewhereLabel: 'Elsewhere',
+  },
+};
+
+/* Order the "keep scrolling" links follow at the foot of each page. */
+export const readingOrder = [
+  { href: '/', label: 'Home', kicker: 'Start' },
+  { href: '/publications', label: 'Research', kicker: 'Research' },
+  { href: '/cv', label: 'CV', kicker: 'Background' },
+  { href: '/personal', label: 'Personal', kicker: 'Off the clock' },
+];
+
+/* The four facts in the "At a glance" card. */
+export const glanceFacts = (info) => [
+  ['Role', `${info.role}, ${info.university}`],
+  ['Based in', info.location],
+  ['Focus', info.tagline],
+  ['Previously', 'Google XR · Applied Intuition · Harvard · BAIR'],
 ];
 
 export const websiteInfo = {

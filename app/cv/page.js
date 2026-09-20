@@ -6,11 +6,11 @@ import {
   EducationList,
   HonorsList,
 } from '@/components/Timeline';
-import { personalInfo } from '@/website.config';
+import { personalInfo, pages } from '@/website.config';
 import { RiArrowRightUpLine } from '@remixicon/react';
 
 export const metadata = {
-  title: 'CV',
+  title: pages.cv.title,
   description: 'Experience, education, and honors.',
 };
 
@@ -18,8 +18,8 @@ export default function Page() {
   return (
     <main className="shell pb-32">
       <Masthead
-        kicker="Background"
-        title="CV"
+        kicker={pages.cv.kicker}
+        title={pages.cv.title}
         note={`Currently ${personalInfo.role.toLowerCase()} at ${personalInfo.university}.`}
       />
 
@@ -30,19 +30,19 @@ export default function Page() {
         className="social-btn -mt-6 mb-16"
       >
         <RiArrowRightUpLine size={14} />
-        Download CV (PDF)
+        {pages.cv.downloadLabel}
       </a>
 
       <div className="flex flex-col gap-24 md:gap-28">
-        <Section id="experience" label="Experience">
+        <Section id="experience" label={pages.cv.experienceLabel}>
           <ExperienceList />
         </Section>
 
-        <Section id="education" label="Education">
+        <Section id="education" label={pages.cv.educationLabel}>
           <EducationList />
         </Section>
 
-        <Section id="honors" label="Honors">
+        <Section id="honors" label={pages.cv.honorsLabel}>
           <HonorsList />
         </Section>
       </div>

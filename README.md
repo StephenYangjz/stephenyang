@@ -31,44 +31,25 @@ light palette: opacity, border and highlight all need separate values on a dark 
 
 ## Editing content
 
+Almost everything you'd want to change is in **`website.config.js`**. It opens
+with a map of where each piece lives.
+
 | What | Where |
 | --- | --- |
-| Name, role, socials, experience, education, honors, talks, service | `website.config.js` |
-| Bio, news, miscellaneous | `data/home/*.mdx` |
-| Publications | `data/bib/Publications.bib` |
-| Photography | `photography` in `website.config.js` + files in `public/photos/` |
-| Reading list, notes | `reading` / `notes` in `website.config.js` |
-| Images, CV PDF | `public/` |
-| Design tokens | `:root` and `.dark` in `app/globals.css` |
+| Name, role, tagline, location, social links | `website.config.js` → `personalInfo` |
+| Experience, education, honors | `website.config.js` → `personalInfo` |
+| Every page heading and section label | `website.config.js` → `pages` |
+| Order of the "keep scrolling" links | `website.config.js` → `readingOrder` |
+| The four "At a glance" facts | `website.config.js` → `glanceFacts` |
+| Photography, reading list, notes | `website.config.js` |
+| Bio prose | `data/home/About.mdx` |
+| News list | `data/home/News.mdx` |
+| Personal bullet points | `data/home/Miscellaneous.mdx` |
+| Papers and patents | `data/bib/Publications.bib` |
+| Images, photos, CV PDF | `public/` |
+| Design tokens (colour, radius, spacing) | `:root` / `.dark` in `app/globals.css` |
 
-### Publications
-
-`data/bib/Publications.bib` is parsed at build time and rendered in file order.
-Beyond standard BibTeX fields:
-
-- `venue` — display string for the venue; wins over `journal`/`booktitle`. Once a preprint
-  is accepted, set this to the conference and it supersedes the arXiv listing.
-- `award` — rendered as a highlighted badge.
-- `kind` — `patent` or `other` moves the entry into the "Patents & Other" block at the end.
-- `project`, `pdf`, `arxiv`, `code`, `patent` — link buttons. The title links to the first
-  of project / arXiv / PDF that is present.
-
-Author names matching `SELF` in `components/Publications.js` render bold.
-
-### Photography
-
-Drop images in `public/photos/` and point the `photography` entries in
-`website.config.js` at them. Tile shapes come from CSS grid spans rather than
-the images' own aspect ratios, so any shape works and the rows stay flush —
-the frames crop, and each image pans inside its frame on its own view-timeline.
-
-The **first entry is the large tile** in the mosaic, so lead with your strongest
-frame. Six entries fill the grid exactly; fewer is fine, more keeps tiling in
-the same rhythm. Captions reveal on hover, and are always visible on touch.
-
-The repo ships six labelled SVG placeholders — replace them and delete the
-originals. `reading` and `notes` ship as placeholder text too; setting either
-array to `[]` hides that section.
+No user-facing text lives in the components.
 
 ## Development
 

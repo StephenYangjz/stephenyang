@@ -1278,14 +1278,11 @@
   gap: 20px;
   width: max-content;
   will-change: transform;
-  /* The first frame runs to the page edge so the strip reads as bleeding
-     off-screen; only the trailing side is inset, so the last frame still
-     lands inside the content column. */
-  padding-left: 0;
-  padding-right: max(
-    calc((100vw - 1180px) / 2 + var(--shell-pad)),
-    var(--shell-pad)
-  );
+  /* A modest page margin, not the shell's centred inset. The gallery is a
+     full-width strip, so it keeps its own margin and the section label above
+     it uses the same one — they line up without either being pushed into
+     the narrower text column. */
+  padding-inline: var(--shell-pad);
 }
 
 .pan-card {
@@ -2197,4 +2194,10 @@
    footprint, so it should read as the same kind of object. */
 .glance-card {
   border-radius: var(--r-figure);
+}
+
+
+/* The gallery heading shares the rail's margin rather than the text column's */
+.gallery-head {
+  padding-inline: var(--shell-pad);
 }

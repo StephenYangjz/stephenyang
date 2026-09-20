@@ -5,13 +5,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { RiArrowRightLine } from '@remixicon/react';
 
-/** Reading order of the site. */
-const ORDER = [
-  { href: '/', label: 'Home', kicker: 'Start' },
-  { href: '/publications', label: 'Publications', kicker: 'Research' },
-  { href: '/cv', label: 'CV', kicker: 'Background' },
-  { href: '/personal', label: 'Personal', kicker: 'Off the clock' },
-];
+import { readingOrder as ORDER } from '@/website.config';
 
 const PULL = 520; // px of continued scrolling at the bottom before advancing
 

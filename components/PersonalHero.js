@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import { leadPhoto } from '@/website.config';
+import { leadPhoto, pages } from '@/website.config';
 import { RiArrowDownLine } from '@remixicon/react';
 
 /**
@@ -30,12 +30,9 @@ export default function PersonalHero() {
       <div className="ph-scrim" aria-hidden="true" />
 
       <div className="ph-copy shell">
-        <p className="ph-kicker">Off the clock</p>
-        <h1 className="ph-title">Personal</h1>
-        <p className="ph-note">
-          Photography, things worth reading, and thoughts that have not gone
-          anywhere yet.
-        </p>
+        <p className="ph-kicker">{pages.personal.kicker}</p>
+        <h1 className="ph-title">{pages.personal.title}</h1>
+        <p className="ph-note">{pages.personal.note}</p>
 
         <p className="ph-credit">
           {leadPhoto.caption}
