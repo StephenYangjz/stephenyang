@@ -319,6 +319,25 @@ export const glanceFacts = (info) => [
   ['Previously', 'Google XR · Applied Intuition · Harvard · BAIR'],
 ];
 
+/* ───────────────────────────────────────────────────────────────────────
+   VISITOR MAP — optional, third party, off by default.
+
+   Leave `src` empty and nothing renders. To switch it on:
+     1. Create a map at clustrmaps.com (free) for stephenjyang.com
+     2. Choose the *image* embed, not the JavaScript one
+     3. Paste its image URL into `src` and the page it links to into `href`
+
+   Two things to know. The provider geolocates visitors by IP, which is
+   personal data under GDPR — city-level display and a line in the footer
+   are the usual mitigation. And the map only counts visits once it is live,
+   so it will sit empty for a while.
+   ─────────────────────────────────────────────────────────────────────── */
+export const visitorMap = {
+  src: '',
+  href: '',
+  label: 'Visitors',
+};
+
 export const websiteInfo = {
   description: `${personalInfo.fullName} — ${personalInfo.role} at ${personalInfo.university}. ${personalInfo.tagline}`,
   url: 'https://stephenjyang.com',

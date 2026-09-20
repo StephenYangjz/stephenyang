@@ -2440,3 +2440,63 @@
   color: var(--muted);
   opacity: 0.75;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   VISITOR MAP — small, quiet, and toned to the page
+
+   These widgets ship saturated reds on white, which would be the loudest
+   thing on the site. Desaturated and dimmed at rest, restored on hover, so
+   it reads as a footnote until you look at it.
+   ═══════════════════════════════════════════════════════════════════════ */
+.visitor-map {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-bottom: 22px;
+}
+
+.visitor-map-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.visitor-map-frame {
+  display: block;
+  width: clamp(120px, 18vw, 168px);
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid var(--rule);
+  background: var(--paper-raised);
+  line-height: 0;
+}
+
+.visitor-map-frame img {
+  display: block;
+  width: 100%;
+  height: auto;
+  filter: saturate(0.45) contrast(0.92) opacity(0.72);
+  transition: filter 0.35s ease;
+}
+
+.visitor-map-frame:hover img {
+  filter: none;
+}
+
+.dark .visitor-map-frame img {
+  filter: saturate(0.4) brightness(0.82) invert(0.9) hue-rotate(180deg)
+    opacity(0.8);
+}
+
+.dark .visitor-map-frame:hover img {
+  filter: saturate(0.6) brightness(0.9) invert(0.9) hue-rotate(180deg);
+}
+
+@media (max-width: 560px) {
+  .visitor-map {
+    justify-content: flex-start;
+  }
+}
