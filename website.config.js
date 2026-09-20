@@ -1,7 +1,7 @@
 export const personalInfo = {
   name: 'Stephen Yang',
   fullName: 'Stephen Jiezhi Yang',
-  profilePicture: '/profile.jpg',
+  profilePicture: '/portrait-skogafoss.webp',
   role: 'Research Scientist',
   university: 'Wayve',
   universityWebsite: 'https://wayve.ai/',
@@ -161,6 +161,12 @@ export const personalInfo = {
    READING and NOTES below are placeholder text — replace with your own.
    ─────────────────────────────────────────────────────────────────────── */
 export const photography = [
+  {
+    src: '/photos/skogafoss.webp',
+    caption: 'Skógafoss',
+    place: 'Iceland',
+    year: '2025',
+  },
   {
     src: '/photos/placeholder-01.svg',
     caption: 'Replace with your strongest frame',

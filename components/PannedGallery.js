@@ -1,5 +1,6 @@
 import Image from 'next/image';
-import { photography } from '@/website.config';
+import { photography, photographyLink } from '@/website.config';
+import { RiArrowRightUpLine } from '@remixicon/react';
 
 /**
  * Vertical scroll mapped to horizontal travel, inside a pinned stage. The
@@ -10,10 +11,25 @@ export default function PannedGallery() {
   if (!photography?.length) return null;
 
   return (
-    <section className="pin-track" style={{ height: '260svh' }}>
+    <section className="pin-track" style={{ height: '340svh' }}>
       <div className="pin-stage">
         <div className="shell w-full">
-          <span className="rail-label">Photography</span>
+          <div className="gallery-lead">
+            <span className="rail-label">Photography</span>
+            <span className="gallery-count">
+              {String(photography.length).padStart(2, '0')} frames · scroll →
+            </span>
+            {photographyLink && (
+              <a
+                href={photographyLink.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="pub-link"
+              >
+                {photographyLink.label}
+              </a>
+            )}
+          </div>
         </div>
 
         <div className="mt-8">
@@ -24,7 +40,7 @@ export default function PannedGallery() {
                   src={photo.src}
                   alt={photo.caption || ''}
                   fill
-                  sizes="420px"
+                  sizes="(max-width: 720px) 80vw, 520px"
                   className="photo-img"
                 />
                 {(photo.place || photo.year) && (

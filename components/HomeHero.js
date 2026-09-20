@@ -26,7 +26,7 @@ const ICON = {
  */
 export default function HomeHero() {
   return (
-    <section className="pt-36 md:pt-44">
+    <section className="flex min-h-[100svh] flex-col justify-center pt-32 pb-16">
       <div className="grid gap-12 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center lg:gap-20">
         <div className="min-w-0">
           <h1 className="display">{personalInfo.name}</h1>
@@ -85,13 +85,13 @@ export default function HomeHero() {
           <Image
             src={personalInfo.profilePicture}
             alt={personalInfo.fullName}
-            width={200}
-            height={200}
+            width={824}
+            height={892}
             priority
-            className="order-first h-[124px] w-[124px] rounded-[30px] object-cover lg:order-last lg:h-[200px] lg:w-[200px] lg:rounded-[44px]"
+            className="portrait-frame order-first lg:order-last"
             style={{
               border: '1px solid var(--glass-border)',
-              boxShadow: 'var(--glass-shadow)',
+              boxShadow: 'var(--glass-shadow-lift)',
             }}
           />
         )}
