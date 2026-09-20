@@ -1493,7 +1493,7 @@
    NEXT PAGE
    ═══════════════════════════════════════════════════════════════════════ */
 .next-page {
-  margin-top: 72px;
+  margin-top: 56px;
 }
 
 .next-card {
@@ -1567,7 +1567,6 @@
    stage rather than sitting in it.
    ═══════════════════════════════════════════════════════════════════════ */
 .pan-card {
-  height: clamp(300px, 64svh, 600px);
   width: auto;
   aspect-ratio: 4 / 5;
   flex: none;
@@ -1810,7 +1809,9 @@
 
 /* Taller, closer-packed gallery cards */
 .pan-card {
-  height: clamp(340px, 76svh, 720px);
+  /* Taller frames leave less blank paper above and below; the stage
+     centres them, so this sets both margins directly. */
+  height: clamp(340px, 80svh, 780px);
   transition: transform 0.6s cubic-bezier(0.32, 0.72, 0, 1);
 }
 
@@ -2212,7 +2213,7 @@
 .gallery-head {
   /* Out of flow so it does not bias the stage's centring — see .pin-stage. */
   position: absolute;
-  top: 24px;
+  top: 12px;
   left: 0;
   right: 0;
   padding-inline: var(--shell-pad);

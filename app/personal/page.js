@@ -20,7 +20,7 @@ export default function Page() {
       <div className="content-sheet">
         <PannedGallery />
 
-        <div className="shell flex flex-col gap-24 pb-32 md:gap-28">
+        <div className="shell flex flex-col gap-24 md:gap-28">
           <Section id="reading" label={pages.personal.readingLabel}>
             <ReadingList />
             <div className="mt-14">
@@ -33,7 +33,9 @@ export default function Page() {
               <MiscellaneousMd />
             </div>
           </Section>
+        </div>
 
+        <div className="shell pb-32">
           <NextPage />
         </div>
       </div>
