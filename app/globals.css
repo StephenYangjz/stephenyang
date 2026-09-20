@@ -2256,53 +2256,76 @@
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
-   PAGE TRANSITIONS
+   ROUTE TRANSITION — sideways, behind a band of glass
 
-   The outgoing page lifts and blurs away while the incoming one rises into
-   focus, with the two overlapping — hence the longer incoming duration and
-   the negative delay. The header is excluded: giving it its own
-   view-transition-name takes it out of the root snapshot, so it stays put
-   while the content moves under it, which is what makes the change read as
-   flow rather than as a page swap.
+   --dir is 1 moving forward through the nav order and -1 going back, so the
+   page enters from the side you came from.
+
+   Both animations fill `backwards`, never `both`: a transform or filter
+   left on the wrapper would make it the containing block for every
+   position: fixed descendant — the At a glance card, the scroll cue — and
+   quietly break them once the animation ended.
    ═══════════════════════════════════════════════════════════════════════ */
-@keyframes vt-out {
-  to {
-    opacity: 0;
-    transform: translateY(-18px) scale(0.985);
-    filter: blur(8px);
-  }
-}
-
-@keyframes vt-in {
+@keyframes route-in {
   from {
     opacity: 0;
-    transform: translateY(26px) scale(0.99);
-    filter: blur(10px);
+    transform: translate3d(calc(var(--dir, 1) * 7%), 0, 0);
+    filter: blur(14px);
   }
 }
 
-::view-transition-old(root) {
-  animation: vt-out 0.42s cubic-bezier(0.4, 0, 0.2, 1) both;
+.route-shift {
+  animation: route-in 0.78s cubic-bezier(0.16, 1, 0.3, 1) backwards;
 }
 
-::view-transition-new(root) {
-  animation: vt-in 0.62s cubic-bezier(0.16, 1, 0.3, 1) both;
-  animation-delay: -0.12s;
+/* A pane of glass crossing the viewport, frosting whatever it passes over */
+@keyframes route-sweep {
+  0% {
+    opacity: 0;
+    transform: translate3d(calc(var(--dir, 1) * -128%), 0, 0) skewX(-8deg);
+  }
+  18% {
+    opacity: 1;
+  }
+  72% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(calc(var(--dir, 1) * 128%), 0, 0) skewX(-8deg);
+  }
 }
 
-/* Lifted out of the root snapshot so it does not animate with the content */
-.header-shell {
-  view-transition-name: site-header;
-}
-
-::view-transition-group(site-header) {
-  animation-duration: 0.42s;
+.route-sweep {
+  position: fixed;
+  top: -12vh;
+  bottom: -12vh;
+  left: -46vw;
+  width: 92vw;
+  z-index: 60;
+  pointer-events: none;
+  background: linear-gradient(
+    100deg,
+    transparent 0%,
+    var(--glass-hi-2) 26%,
+    var(--glass-bg) 50%,
+    var(--glass-hi-2) 74%,
+    transparent 100%
+  );
+  backdrop-filter: blur(16px) saturate(150%);
+  -webkit-backdrop-filter: blur(16px) saturate(150%);
+  animation: route-sweep 0.86s cubic-bezier(0.32, 0.72, 0, 1) backwards;
+  will-change: transform, opacity;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  ::view-transition-old(root),
-  ::view-transition-new(root) {
+  .route-shift,
+  .route-sweep {
     animation: none;
+  }
+
+  .route-sweep {
+    display: none;
   }
 }
 

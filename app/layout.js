@@ -5,7 +5,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import Ambient from '@/components/Ambient';
 import ScrollBoot from '@/components/ScrollBoot';
-import PageTransitions from '@/components/PageTransitions';
+import RouteTransition from '@/components/RouteTransition';
 import { ThemeProvider } from '@/components/ThemeProvider';
 
 const inter = Inter({
@@ -55,9 +55,10 @@ export default function RootLayout({ children }) {
         >
           <Ambient />
           <ScrollBoot />
-          <PageTransitions />
           <Header />
-          <div className="relative z-10">{children}</div>
+          <div className="relative z-10">
+            <RouteTransition>{children}</RouteTransition>
+          </div>
           <Footer />
         </ThemeProvider>
       </body>
