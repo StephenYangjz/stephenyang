@@ -9,8 +9,15 @@ import { readingOrder as ORDER } from '@/website.config';
 
 const NEED = 460; // px of pressure that advances the page
 const LEAK = 1400; // px per second that pressure drains away
-const SETTLE = 150; // ms at the end before anything is counted at all
-const RISE = 6; // px of increase that marks fresh input rather than momentum
+// Long enough for the baseline window to absorb the scroll that brought you
+// here, so that arriving cannot itself look like speeding up.
+const SETTLE = 250; // ms at the end before anything is counted at all
+const NEAR_MS = 150; // window for "how fast am I scrolling right now"
+const BASE_MS = 600; // window for "how fast have I been scrolling"
+const HIST_MS = 900; // how much scroll history to keep
+const ACCEL = 1.6; // how much faster than the baseline counts as speeding up
+const ACCEL_FLOOR = 0.25; // px per ms, so small absolute changes never qualify
+const ACCEL_HITS = 2; // consecutive qualifying events, so noise alone cannot
 const STALLS = 3; // repeated unmoved wheels that prove where the end is
 const SLACK = 6; // tolerance on "at the end", for fractional scroll positions
 
@@ -38,14 +45,25 @@ function normalise(path) {
  * looked at the card. Pressure starts at nought when you arrive, no matter
  * how you arrived.
  *
- * Momentum is told apart from intent by its shape rather than by its size.
- * A flick's wheel deltas only ever decay — that is what momentum is — while
- * anything you do with your fingers starts from nothing and rises. So
- * pressure accumulates only once a delta has come in larger than the one
- * before it. A flick, however hard, never produces that; the first push after
- * it always does, because it begins from rest. Leak alone was not enough:
- * a hard flick delivers well over a thousand pixels of tail and simply
- * outpaced it.
+ * Intent is read as acceleration: not how fast you are scrolling, but whether
+ * you have just sped up. Two windows over recent scrolling, the last 150ms
+ * and the last 600ms, and pressure builds only while the short one clearly
+ * outruns the long one. Scrolling faster means doing something new; scrolling
+ * fast means nothing at all.
+ *
+ * Windows rather than per-event rates, because dividing a delta by the gap
+ * since the previous event is hopeless: wheel events arrive unevenly, and one
+ * that lands 2ms after its predecessor reports an enormous phantom rate. That
+ * alone was enough to let steady scrolling trigger this.
+ *
+ * Both of the ways this used to fire by accident are the same mistake read
+ * two ways. A trackpad flick's deltas decay, so the short average falls below
+ * the long one and nothing accumulates. A free-spinning mouse wheel — the
+ * Logitech flywheel — coasts at a high, steady rate instead, which defeated
+ * an earlier rule that merely asked whether each delta exceeded the one
+ * before it: that wheel's deltas fluctuate constantly, so noise cleared the
+ * bar on its own. Against a baseline, coasting is flat however fast it is,
+ * and only a fresh spin registers.
  *
  * There is deliberately no gesture bookkeeping. The rule used to be that a
  * gesture counted only if it began at the end, which needed a gap in wheel
@@ -106,33 +124,48 @@ export default function NextPage() {
     };
 
     let pressure = 0;
+    let pressureT = 0; // when pressure was last brought up to date
     let arrivedAt = null; // when we reached the end
-    let prevDelta = Infinity; // so the first event at the end is never a rise
-    let pushing = false; // has fresh input been seen since arriving?
+    const hist = []; // recent {t, d} wheel samples
+    let accelHits = 0;
+    let pushing = false; // has a deliberate speed-up been seen?
     let raf = 0;
-    let lastT = 0;
+
+    // Leak against the clock rather than against frames. Doing it per frame
+    // meant that whenever rAF was throttled — a background tab, a hidden
+    // window — nothing drained while wheel events kept arriving, so pressure
+    // climbed without bound and fired the instant a frame finally came.
+    const decayTo = (t) => {
+      const dt = Math.max(0, (t - pressureT) / 1000);
+      pressureT = t;
+      pressure = Math.max(0, pressure - LEAK * dt);
+    };
+
+    const advance = () => {
+      if (navigated.current) return true;
+      if (pressure < NEED) return false;
+      navigated.current = true;
+      setProgress(1);
+      router.push(next.href);
+      return true;
+    };
 
     const tick = (t) => {
-      const dt = lastT ? Math.min(0.05, (t - lastT) / 1000) : 0;
-      lastT = t;
-
       const here = atEnd() && cardShown();
       if (!here) {
         pressure = 0;
         arrivedAt = null;
-        prevDelta = Infinity;
         pushing = false;
       } else if (arrivedAt === null) {
         arrivedAt = t;
       }
 
-      pressure = Math.max(0, pressure - LEAK * dt);
+      decayTo(t);
+      if (pressure === 0) pushing = false;
       setProgress(clamp01(pressure / NEED));
       setReady(here);
 
-      if (pressure >= NEED && !navigated.current) {
-        navigated.current = true;
-        router.push(next.href);
+      if (advance()) {
         raf = 0;
         return;
       }
@@ -142,10 +175,7 @@ export default function NextPage() {
     };
 
     const run = () => {
-      if (!raf) {
-        lastT = 0;
-        raf = requestAnimationFrame(tick);
-      }
+      if (!raf) raf = requestAnimationFrame(tick);
     };
 
     const onScroll = () => {
@@ -166,6 +196,27 @@ export default function NextPage() {
       const el = scroller();
       const y = el.scrollTop;
 
+      // Recorded on every event, including well before the end, so that
+      // arriving fast sets a baseline that simply staying fast cannot beat.
+      const t = performance.now();
+      hist.push({ t, d: event.deltaY });
+      while (hist.length && t - hist[0].t > HIST_MS) hist.shift();
+      // Divided by the whole window, so time spent not scrolling counts as
+      // zero. That is what makes picking the wheel up again read as a
+      // speed-up while never letting a steady spin qualify: keep going at one
+      // speed and the long window fills with exactly that speed, so the two
+      // averages converge and nothing happens, however fast you are going.
+      const over = (ms) => {
+        let total = 0;
+        for (let i = hist.length - 1; i >= 0; i -= 1) {
+          if (t - hist[i].t > ms) break;
+          total += hist[i].d;
+        }
+        return total / ms;
+      };
+      const near = over(NEAR_MS);
+      const base = over(BASE_MS);
+
       // Wheel events fire before the scroll is applied, so this reads what the
       // previous event produced. Repeatedly unmoved means the page will not go
       // any further, and that is the end.
@@ -178,25 +229,36 @@ export default function NextPage() {
       lastWheelY = y;
 
       if (!atEnd() || !cardShown()) {
+        arrivedAt = null;
+        decayTo(t);
         run();
         return;
       }
+      if (arrivedAt === null) arrivedAt = t;
 
       // Ignore the first moments at the end: that is where a flick's momentum
       // is strongest, and it is not you deciding anything.
-      const now = performance.now();
-      if (arrivedAt !== null && now - arrivedAt < SETTLE) {
+      if (arrivedAt !== null && t - arrivedAt < SETTLE) {
+        decayTo(t);
         run();
         return;
       }
 
-      // Momentum decays, always. A finger does not: it starts from rest and
-      // rises. One rise is enough to know the difference.
-      const delta = event.deltaY;
-      if (delta > prevDelta + RISE) pushing = true;
-      prevDelta = delta;
+      // Speeding up is the signal, not speed. Coasting — a flywheel, or a
+      // flick's tail — holds the two averages together; a fresh push pulls
+      // the short one above the long one.
+      if (near > base * ACCEL + ACCEL_FLOOR) accelHits += 1;
+      else accelHits = 0;
+      if (accelHits >= ACCEL_HITS) pushing = true;
 
-      if (pushing) pressure += delta;
+      if (pushing) {
+        decayTo(t);
+        pressure += event.deltaY;
+        setProgress(clamp01(pressure / NEED));
+        // Checked here as well as in the frame loop, so advancing never waits
+        // on a frame that may be throttled away.
+        if (advance()) return;
+      }
       run();
     };
 
