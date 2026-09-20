@@ -52,6 +52,12 @@ function normalise(path) {
  * events to spot — and if you simply kept pushing, that gap never came and
  * the state stayed stuck on "still arriving" indefinitely.
  *
+ * Nothing counts at all until the card is on screen. Being at the end is not
+ * enough on its own: the end can be reached, or merely believed to have been
+ * reached, while the card is still below the fold, and a hard scroll should
+ * never carry you somewhere you were not being offered. If you cannot see the
+ * invitation, you cannot accept it by accident.
+ *
  * The end of the page is observed rather than calculated: STALLS downward
  * wheels in a row that leave scrollTop unmoved mean the page will not go
  * further, whatever scrollHeight claims. Several in a row, not one, because
@@ -64,6 +70,7 @@ export default function NextPage() {
   const [progress, setProgress] = useState(0);
   const [ready, setReady] = useState(false);
   const navigated = useRef(false);
+  const card = useRef(null);
 
   const current = normalise(pathname);
   const index = ORDER.findIndex((entry) => entry.href === current);
@@ -79,6 +86,16 @@ export default function NextPage() {
     let lastHeight = 0;
     let lastWheelY = null;
     let stalls = 0;
+
+    // The whole card, including the bar along its bottom edge, has to be on
+    // screen. If it is ever taller than the window, seeing its foot will do.
+    const cardShown = () => {
+      const node = card.current;
+      if (!node) return false;
+      const vh = scroller().clientHeight;
+      const r = node.getBoundingClientRect();
+      return r.bottom <= vh + 1 && (r.top >= -1 || r.height > vh);
+    };
 
     const atEnd = () => {
       const el = scroller();
@@ -99,7 +116,7 @@ export default function NextPage() {
       const dt = lastT ? Math.min(0.05, (t - lastT) / 1000) : 0;
       lastT = t;
 
-      const here = atEnd();
+      const here = atEnd() && cardShown();
       if (!here) {
         pressure = 0;
         arrivedAt = null;
@@ -160,7 +177,7 @@ export default function NextPage() {
       }
       lastWheelY = y;
 
-      if (!atEnd()) {
+      if (!atEnd() || !cardShown()) {
         run();
         return;
       }
@@ -199,7 +216,12 @@ export default function NextPage() {
 
   return (
     <section className="next-page">
-      <Link href={next.href} className="next-card reveal" data-ready={ready}>
+      <Link
+        ref={card}
+        href={next.href}
+        className="next-card reveal"
+        data-ready={ready}
+      >
         <span className="page-link-kicker">Next · {next.kicker}</span>
         <span className="next-title">{next.label}</span>
         <span className="page-link-go">
