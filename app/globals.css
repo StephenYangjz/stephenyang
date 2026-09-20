@@ -2442,83 +2442,57 @@
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
-   VISITOR MAP — a thumbnail in the bottom corner, under the colophon rule
+   VISITOR MAP — an emblem on the colophon line
 
-   It was a full-width band across the foot of the page and that gave it far
-   more weight than it has earned: it is a novelty, not content. Now it sits
-   below the rule at the right, roughly the width of the line of text above
-   it, so it reads as a mark in the corner rather than a section.
+   It began as a full-width band and then a corner thumbnail, and both gave
+   it more weight than a novelty deserves. It now sits inline ahead of the
+   location, sized to the line it is part of, adding nothing to the page's
+   structure.
 
-   Masked at the edges rather than framed, so it settles into the page
-   instead of sitting in a box. The left ramp holds fully transparent for
-   its first 6%: that strip is open ocean, and it is also where the image's
-   built-in zoom control sits, which no parameter removes and which shows as
-   a smudge under a plain ramp.
+   Kept deliberately faint: at this size the continents are a texture, not a
+   map, and the point is that it is there if you look. Hover brings it up,
+   since it is also a link.
    ═══════════════════════════════════════════════════════════════════════ */
-.visitor-map {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 9px;
-  margin-top: 14px;
-}
-
 .visitor-map-frame {
   display: block;
-  width: 168px;
+  width: 48px;
   flex: none;
-  opacity: 0.5;
-  transition: opacity 0.45s ease;
-  /* Feathered on all four edges. The corners need the two axes multiplied
-     together, which is what compositing the layers with intersect does. */
+  opacity: 0.45;
+  transition: opacity 0.4s ease;
+  /* Light feathering only. The heavier ramps used at larger sizes ate most
+     of the continents once this was under 50px wide. The left edge still holds
+     fully transparent briefly: that strip is open ocean, and it is where
+     the image's built-in zoom control sits, which no parameter removes. */
   -webkit-mask-image: linear-gradient(
       to right,
       transparent 0%,
-      transparent 6%,
-      #000 22%,
-      #000 84%,
+      transparent 7%,
+      #000 17%,
+      #000 92%,
       transparent 100%
     ),
-    linear-gradient(to bottom, transparent, #000 18%, #000 78%, transparent);
+    linear-gradient(to bottom, transparent, #000 12%, #000 84%, transparent);
   mask-image: linear-gradient(
       to right,
       transparent 0%,
-      transparent 6%,
-      #000 22%,
-      #000 84%,
+      transparent 7%,
+      #000 17%,
+      #000 92%,
       transparent 100%
     ),
-    linear-gradient(to bottom, transparent, #000 18%, #000 78%, transparent);
+    linear-gradient(to bottom, transparent, #000 12%, #000 84%, transparent);
   -webkit-mask-composite: source-in;
   mask-composite: intersect;
 }
 
 .visitor-map-frame:hover {
-  opacity: 0.8;
+  opacity: 0.85;
 }
 
 .visitor-map-frame img {
   display: block;
   width: 100%;
   height: auto;
-}
-
-/* Beside the map rather than beneath it — stacked, the caption was taller
-   than the thing it captions. */
-.visitor-map-label {
-  font-size: 9.5px;
-  font-weight: 600;
-  letter-spacing: 0.13em;
-  text-transform: uppercase;
-  color: var(--muted);
-  opacity: 0.55;
-  white-space: nowrap;
-}
-
-@media (max-width: 560px) {
-  .visitor-map {
-    justify-content: flex-start;
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {

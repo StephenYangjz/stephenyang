@@ -5,13 +5,16 @@ import { useTheme } from 'next-themes';
 import { visitorMap } from '@/website.config';
 
 /**
- * Where people are reading from, as a band across the foot of the page.
+ * Where people are reading from, as a small mark in the colophon line.
  *
  * MapMyVisitors' image embed: fetching the PNG is what records the visit, so
- * there is no third-party script on the page — a 14KB image is the entire
+ * there is no third-party script on the page — one small image is the entire
  * cost. The globe embed was the first attempt and is worth not repeating; it
  * ships 168KB plus jQuery and then draws nothing, because the data call it
  * makes returns an HTML page rather than the JSONP it parses.
+ *
+ * Renders a bare <a> with no wrapper, because it sits inline inside the
+ * colophon sentence rather than owning any layout of its own.
  *
  * Two source URLs, because the generated PNG cannot have a transparent
  * background and a flat light rectangle in a dark footer looks like a missing
@@ -19,11 +22,6 @@ import { visitorMap } from '@/website.config';
  * still counted exactly once per load. Rendering waits for mount: the theme
  * is not known during SSR, and guessing it would both mismatch hydration and
  * risk fetching the wrong image first — which would count the visit twice.
- *
- * The map is masked away at its edges rather than framed. That hides the zoom
- * control baked into the image's bottom-left corner, which cannot be turned
- * off with a parameter, and it lets the continents settle into the page
- * instead of sitting in a box at the end of it.
  */
 export default function VisitorMap() {
   const { resolvedTheme } = useTheme();
@@ -37,20 +35,18 @@ export default function VisitorMap() {
   if (!src) return null;
 
   return (
-    <div className="visitor-map">
-      <span className="visitor-map-label">{visitorMap.label}</span>
-      <a
-        href={visitorMap.href}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="visitor-map-frame"
-        aria-label={`${visitorMap.label} — view the full map`}
-      >
-        {/* Not next/image: the PNG is generated per request by a third party,
-            and the request itself is the tracking call. */}
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={src} alt="World map of recent visitors" />
-      </a>
-    </div>
+    <a
+      href={visitorMap.href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="visitor-map-frame"
+      title={visitorMap.label}
+      aria-label={visitorMap.label}
+    >
+      {/* Not next/image: the PNG is generated per request by a third party,
+          and the request itself is the tracking call. */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={src} alt="" />
+    </a>
   );
 }
