@@ -282,6 +282,9 @@ export const pages = {
     title: 'Personal',
     note: 'Photography, things worth reading, and thoughts that have not gone anywhere yet.',
     photographyLabel: 'Photography',
+    // Shown beside the gallery heading and under the lead photograph.
+    // Set to '' to drop it.
+    photoCredit: '© Stephen Yang · please ask before reuse',
     readingLabel: 'Reading & notes',
     elsewhereLabel: 'Elsewhere',
   },

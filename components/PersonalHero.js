@@ -38,6 +38,7 @@ export default function PersonalHero() {
           {leadPhoto.caption}
           {leadPhoto.place ? ` · ${leadPhoto.place}` : ''}
           {leadPhoto.year ? ` · ${leadPhoto.year}` : ''}
+          {pages.personal.photoCredit ? ` · ${pages.personal.photoCredit}` : ''}
         </p>
       </div>
 

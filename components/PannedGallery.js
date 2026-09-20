@@ -18,6 +18,11 @@ export default function PannedGallery() {
             <span className="gallery-count">
               {String(photography.length).padStart(2, '0')} frames · scroll →
             </span>
+            {pages.personal.photoCredit && (
+              <span className="gallery-credit">
+                {pages.personal.photoCredit}
+              </span>
+            )}
           </div>
         </div>
 

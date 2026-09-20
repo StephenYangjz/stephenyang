@@ -2430,3 +2430,11 @@
   color: var(--muted);
 }
 
+
+/* Photograph credit, set quieter than the frame count beside it */
+.gallery-credit {
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  opacity: 0.75;
+}
