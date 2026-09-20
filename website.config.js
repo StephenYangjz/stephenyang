@@ -253,6 +253,12 @@ export const reading = [
     quote: 'You will never be able to control what is happening around you.',
     note: "Two words carrying the weight of the Stoic dichotomy of control. We are reliably wrong about how much is ours to begin with — almost none of it reaches other people, nearly all of it sits in where attention goes next, and most unhappiness I can account for comes from having those two figures swapped. The useful half is not the first word but the second: once you stop spending attention on what other people were going to do anyway, you notice how little of it you had been spending on what you actually choose. Less original than it presents itself as, and lighter than the idea deserves — but the reframe survives its own packaging.",
   },
+  {
+    title: 'The Startup of You',
+    author: 'Reid Hoffman & Ben Casnocha',
+    quote: 'For life in permanent beta, the trick is to never stop starting.',
+    note: "The frame is that a career should be run like a start-up, and what is worth keeping is what that implies about time. A plan assumes the world will hold still long enough to be planned for; permanent beta assumes it will not, and treats a life as something iterated rather than designed. That turns a lifetime goal from a destination into a direction — its value is not arrival but knowing which way to lean when the ground moves, which is most of what a goal is for. Identity, read this way, is closer to a practice than a possession: you are whatever you are still willing to revise. The metaphor does wear thin at the edges. A company can pivot away from its past and a person cannot, and the parts of a life that compound hardest — people, commitments, patience — are precisely the ones that suffer from being iterated on.",
+  },
 ];
 
 
