@@ -638,9 +638,13 @@
      minmax(0, 1fr) the grid column sizes to it and drags every other child
      — the section heading included — off to the right. */
   grid-template-columns: minmax(0, 1fr);
-  /* Top-aligned, not centred: centring split the leftover height evenly
-     above and below, so the gap grew with the window. */
-  align-content: start;
+  /* Centred. Top-aligning dumped the whole leftover height below the rail —
+     measured 37px above the frames against 92px below — and pinned the label
+     hard against the stage's top edge. Centring was wrong *before* only
+     because the stage was a full 100svh with padding on top of it; now that
+     the header clearance lives in the sticky offset the leftover is small,
+     so splitting it gives an even margin at both ends. */
+  align-content: center;
   overflow: hidden;
 }
 
