@@ -333,18 +333,25 @@ export const glanceFacts = (info) => [
    page — loaded lazily, once the footer comes near the viewport. It also
    geolocates visitors by IP, which is personal data under GDPR.
    ─────────────────────────────────────────────────────────────────────── */
-// Footer visitor globe. Off by default: MapMyVisitors serves the script fine,
-// but the data call it makes (globe_call_home.js) returns an HTML page instead
-// of JSONP, so the globe renders as an empty circle. That is server-side on
-// their end — it reproduces on a bare page with no site CSS, and the response
-// is identical for a localhost and a real-domain referer.
+// Footer visitor map.
 //
-// Flip `enabled` to true to try it again; nothing else needs to change.
+// This is the plain <img> embed, not the globe. Requesting the image is what
+// records the visit, so the whole feature is one 14KB PNG and no third-party
+// JavaScript on the page at all. (The globe embed was tried first and
+// abandoned: it pulls 168KB plus jQuery, and its data call returns HTML
+// instead of JSONP, so it draws an empty circle.)
+//
+// The PNG is generated per request, so it can be themed to match the page:
+//   cl  land colour      co  background      ct  caption colour
+//   t=n drops the caption strip     w  pixel width
+// The background cannot be made transparent, hence one URL per theme; the
+// component renders whichever matches, so only one is ever fetched.
 export const visitorMap = {
-  enabled: false,
-  script:
-    'https://mapmyvisitors.com/globe.js?d=XEOKPiAofs5Lu9LvxyW4dQeLklnM5xF6pYJkwdsGw7M',
+  enabled: true,
+  href: 'https://mapmyvisitors.com/web/1c8cn',
   label: 'Visitors',
+  light: 'https://mapmyvisitors.com/map.png?d=yMi8GeyXCIVG4js4eQOb-sOwDTaIaUncwULQtGRFoKA&cl=c8c8cf&co=f5f5f7&ct=71717a&t=n&w=760',
+  dark: 'https://mapmyvisitors.com/map.png?d=yMi8GeyXCIVG4js4eQOb-sOwDTaIaUncwULQtGRFoKA&cl=33333c&co=0c0c0e&ct=8a8a93&t=n&w=760',
 };
 
 export const websiteInfo = {

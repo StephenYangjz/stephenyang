@@ -2442,52 +2442,83 @@
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
-   VISITOR MAP — small and toned to the page
+   VISITOR MAP — a band of continents dissolving into the foot of the page
 
-   The widget injects its own markup and sizes itself, so the frame clips
-   it rather than trying to lay it out. Desaturated at rest and restored on
-   hover: these widgets ship saturated reds, which would be the loudest
-   thing on a page this quiet.
+   Masked at every edge rather than framed. Two reasons: the generated PNG
+   has a zoom control burned into its bottom-left corner that no parameter
+   removes, and a hard rectangle of map above the colophon reads as an
+   advertisement. Fading it out on all sides makes it read as a watermark
+   the page happens to be sitting on.
+
+   Held well back at rest — it is the least important thing here — and
+   brought up on hover, since it is also a link.
    ═══════════════════════════════════════════════════════════════════════ */
 .visitor-map {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: flex-end;
-  gap: 14px;
-  margin-bottom: 26px;
-  min-height: 0;
-}
-
-.visitor-map-label {
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--muted);
+  gap: 10px;
+  margin-bottom: 30px;
 }
 
 .visitor-map-frame {
   display: block;
-  width: 116px;
-  height: 116px;
-  border-radius: 999px;
-  overflow: hidden;
-  position: relative;
-  filter: saturate(0.5) opacity(0.78);
-  transition: filter 0.35s ease;
+  width: 100%;
+  max-width: 660px;
+  opacity: 0.55;
+  transition: opacity 0.45s ease;
+  /* Feathered on all four edges; the corners need the two axes multiplied
+     together, which is what compositing the second layer with intersect
+     does. The left ramp holds fully transparent for its first 6% rather
+     than starting to climb immediately — that strip is open ocean, and it
+     is also where the image's built-in zoom control sits. A plain ramp
+     left the control showing as a faint smudge. */
+  -webkit-mask-image: linear-gradient(
+      to right,
+      transparent 0%,
+      transparent 6%,
+      #000 24%,
+      #000 82%,
+      transparent 100%
+    ),
+    linear-gradient(to bottom, transparent, #000 22%, #000 74%, transparent);
+  mask-image: linear-gradient(
+      to right,
+      transparent 0%,
+      transparent 6%,
+      #000 24%,
+      #000 82%,
+      transparent 100%
+    ),
+    linear-gradient(to bottom, transparent, #000 22%, #000 74%, transparent);
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
 }
 
 .visitor-map-frame:hover {
-  filter: none;
+  opacity: 0.85;
 }
 
-/* The widget draws into its own absolutely positioned elements */
-.visitor-map-frame > * {
-  max-width: 100%;
+.visitor-map-frame img {
+  display: block;
+  width: 100%;
+  height: auto;
 }
 
-@media (max-width: 560px) {
-  .visitor-map {
-    justify-content: flex-start;
+.visitor-map-label {
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  opacity: 0.7;
+  /* Pulled up under the faded lower edge of the map so the label and the
+     continents read as one object rather than a caption below a picture. */
+  margin-top: -18px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .visitor-map-frame {
+    transition: none;
   }
 }
