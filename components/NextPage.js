@@ -7,10 +7,14 @@ import { RiArrowRightLine } from '@remixicon/react';
 
 import { readingOrder as ORDER } from '@/website.config';
 
-const TAIL = 280; // px before the end of the page over which the bar fills
+// The bar fills over the last half-screen of scrolling, with a floor for
+// short windows. A fixed 280px was far too little on a large display: you
+// cross it in a blink and the bar looks like it never filled at all.
+const TAIL_RATIO = 0.5;
+const TAIL_MIN = 260;
 const GESTURE_GAP = 130; // wheel silence that separates one gesture from the next
 const COMMIT = 40; // px within the committing gesture, so a stray tick is not one
-const SLACK = 4; // tolerance on "at the end", for fractional scroll heights
+const SLACK = 6; // tolerance on "at the end", for fractional scroll heights
 
 const clamp01 = (n) => (n < 0 ? 0 : n > 1 ? 1 : n);
 
@@ -61,8 +65,11 @@ export default function NextPage() {
 
   useEffect(() => {
     if (!next) return;
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
+    // Deliberately not gated on prefers-reduced-motion. This is navigation the
+    // reader asks for, not decoration, and a 2px indicator is not the kind of
+    // motion that setting is about — whereas gating it meant the bar silently
+    // never moved and nothing explained why.
     const scroller = () => document.scrollingElement || document.documentElement;
 
     const read = () => {
@@ -86,7 +93,10 @@ export default function NextPage() {
         setReady(false);
         return;
       }
-      const tail = Math.min(TAIL, max);
+      const tail = Math.min(
+        Math.max(TAIL_MIN, Math.round(window.innerHeight * TAIL_RATIO)),
+        max
+      );
       // Pinned to exactly 1 at the end rather than left to arithmetic. Scroll
       // heights are fractional, so the ratio lands at 0.98 while atEnd() is
       // already true, which would leave a bar just short of full sitting next
@@ -118,6 +128,7 @@ export default function NextPage() {
         pushed = 0;
       }
       lastWheel = now;
+      onScroll(); // scroll events stop at the clamp; keep the bar truthful
 
       if (!counts || event.deltaY <= 0 || !atEnd()) return;
 
