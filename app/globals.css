@@ -28,7 +28,11 @@
        The fill is thinner so the blur has something to do, and the edge is
        a faint dark hairline rather than a white one so the pane reads as an
        object sitting above the page. */
-    --glass-bg: rgba(255, 255, 255, 0.42);
+    --glass-bg: rgba(255, 255, 255, 0.34);
+    --glass-sheen-top: rgba(255, 255, 255, 0.72);
+    --glass-sheen-bottom: rgba(255, 255, 255, 0.16);
+    --glass-edge-lit: rgba(255, 255, 255, 1);
+    --glass-edge-shade: rgba(18, 18, 22, 0.055);
     --glass-border: rgba(18, 18, 22, 0.1);
     --glass-hi: rgba(255, 255, 255, 0.9);
     --glass-hi-2: rgba(255, 255, 255, 0.3);
@@ -41,10 +45,12 @@
 
     /* Ambient wash — one hue family only. Colour here is a lighting
        effect for the glass to refract, not decoration. */
-    --wash-1: #c3c5cc;
-    --wash-2: #d0d1d6;
-    --wash-3: #c8cad1;
-    --wash-opacity: 0.45;
+    /* These were tuned so close to the paper that they stopped registering,
+       which left the glass nothing to work with. Darker, still hue-free. */
+    --wash-1: #a8abb5;
+    --wash-2: #bdbfc7;
+    --wash-3: #b2b5be;
+    --wash-opacity: 0.62;
     --wash-blur: 90px;
 
     /* The portrait and the At a glance card occupy the same footprint, so
@@ -72,7 +78,11 @@
     --award-bg: rgba(240, 190, 80, 0.14);
     --award-ink: #efc97e;
 
-    --glass-bg: rgba(26, 26, 30, 0.55);
+    --glass-bg: rgba(26, 26, 30, 0.5);
+    --glass-sheen-top: rgba(255, 255, 255, 0.1);
+    --glass-sheen-bottom: rgba(255, 255, 255, 0.015);
+    --glass-edge-lit: rgba(255, 255, 255, 0.22);
+    --glass-edge-shade: rgba(0, 0, 0, 0.25);
     --glass-border: rgba(255, 255, 255, 0.12);
     --glass-hi: rgba(255, 255, 255, 0.18);
     --glass-hi-2: rgba(255, 255, 255, 0.04);
@@ -83,10 +93,10 @@
     --glass-sat: 140%;
     --glass-bright: 1;
 
-    --wash-1: #24252a;
-    --wash-2: #1b1c20;
-    --wash-3: #1f2025;
-    --wash-opacity: 0.55;
+    --wash-1: #32333a;
+    --wash-2: #232429;
+    --wash-3: #2a2b31;
+    --wash-opacity: 0.7;
     --wash-blur: 100px;
   }
 
@@ -244,15 +254,26 @@
 /* ═══════════════════════════════════════════════════════════════════════
    GLASS
    ═══════════════════════════════════════════════════════════════════════ */
+/* backdrop-filter alone cannot make glass visible over flat ground: blurring
+   a uniform colour returns that same colour. At the top of the page there is
+   nothing behind the bar but paper, so the pane needs a material of its own —
+   a vertical fall-off across the fill, a lit top edge and a shaded bottom
+   one. That reads as a curved surface catching light whether or not there is
+   anything behind it to refract. */
 .glass {
-  background: var(--glass-bg);
+  background-image: linear-gradient(
+    to bottom,
+    var(--glass-sheen-top),
+    var(--glass-sheen-bottom)
+  );
+  background-color: var(--glass-bg);
   backdrop-filter: blur(26px) saturate(var(--glass-sat))
     brightness(var(--glass-bright));
   -webkit-backdrop-filter: blur(26px) saturate(var(--glass-sat))
     brightness(var(--glass-bright));
   border: 1px solid var(--glass-border);
-  box-shadow: inset 0 1px 0 var(--glass-hi), inset 0 -1px 0 var(--glass-hi-2),
-    var(--glass-shadow);
+  box-shadow: inset 0 1px 0 var(--glass-edge-lit),
+    inset 0 -1px 0 var(--glass-edge-shade), var(--glass-shadow);
 }
 
 /* Specular sheen along the top-left edge — the detail that reads as a
