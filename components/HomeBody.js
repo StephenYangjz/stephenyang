@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import LineReveal from '@/components/LineReveal';
-import AboutMd from '@/data/home/About.mdx';
+import RichText from '@/components/RichText';
 import NewsMd from '@/data/home/News.mdx';
 import { personalInfo, pages, glanceFacts } from '@/website.config';
 import { RiArrowRightUpLine, RiArrowRightLine } from '@remixicon/react';
@@ -61,7 +61,11 @@ export default function HomeBody() {
             reference ambiguous and silently deactivates the timeline. */}
         <LineReveal className="reveal-seq">
           <div className="prose-body">
-            <AboutMd />
+            {personalInfo.bio.map((paragraph, i) => (
+              <p key={i}>
+                <RichText text={paragraph} />
+              </p>
+            ))}
           </div>
 
           <div id="news" className="mt-24">

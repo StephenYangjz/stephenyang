@@ -1,9 +1,14 @@
 /* ═══════════════════════════════════════════════════════════════════════
    SITE CONTENT — everything you are likely to want to edit lives here.
 
-   This file:   name, role, links, experience, education, honors,
-                photography, reading, notes, and every page's headings.
-   data/home/About.mdx          your bio (prose, supports links)
+   This file:   name, role, bio, tagline, links, experience, education,
+                honors, photography, reading, and every page's heading.
+
+   The bio is `personalInfo.bio`, one string per paragraph. Write links as
+   [text](url) — they are rendered as real anchors.
+
+   Still in markdown, because they are lists:
+
    data/home/News.mdx           the news list
    data/home/Miscellaneous.mdx  the personal bullet points
    data/bib/Publications.bib    papers and patents (BibTeX)
@@ -18,11 +23,19 @@ export const personalInfo = {
   fullName: 'Stephen Jiezhi Yang',
   profilePicture: '/portrait-skogafoss.webp',
   role: 'Research Scientist',
-  university: 'Wayve',
+  university: 'Wayve Labs',
   universityWebsite: 'https://wayve.ai/',
   location: 'Sunnyvale, CA',
 
-  // One line, used for the hero sub-head and the page description.
+  // The bio, one string per paragraph. `[text](url)` becomes a link.
+  bio: [
+    "Stephen Jiezhi Yang is a research scientist at [Wayve Labs](https://wayve.ai/), where he works at the Spatial Intelligence team. His research is about recovering the world from sparse observations, predicting how it will evolve, and turning both into something an agent can act on.",
+    "He earned his S.M. in Computational Science & Engineering from [Harvard](https://www.harvard.edu/), cross-registering at [MIT](https://www.mit.edu/), and before that graduated with high distinction from the [EECS Honors Program](https://eecs.berkeley.edu/resources/undergrads/honors) at [UC Berkeley](https://www.berkeley.edu/) with a B.A. in Computer Science and Cognitive Science. He is grateful to have learned from exceptional people at [BAIR](https://bair.berkeley.edu/) under Prof. [Joseph Gonzalez](https://people.eecs.berkeley.edu/~jegonzal/) and Prof. [Trevor Darrell](https://people.eecs.berkeley.edu/~trevor/), and at Harvard's [Computational Robotics Group](https://computationalrobotics.seas.harvard.edu/) under Prof. [Heng Yang](https://hankyang.seas.harvard.edu/).",
+    "Most recently he was at [Google XR](https://www.google.com/) building 3D foundation models for streaming reconstruction. He joined [Applied Intuition](https://www.appliedintuition.com/) as one of its early researchers under Chief Scientist [Dr. Wei Zhan](https://zhanwei.site/), and has interned at [Qualcomm AI Research](https://www.qualcomm.com/research/artificial-intelligence/ai-research) and [Robert Bosch Research](https://www.bosch.com/).",
+  ],
+
+  // One line, used for the hero sub-head, the page description and the
+  // At a glance card.
   tagline: 'Building geometric foundation models and spatial intelligence.',
 
   socialMedia: [
@@ -65,7 +78,7 @@ export const personalInfo = {
       startDate: '2024',
       endDate: '2026',
       responsibilities: [
-        'Feed-forward 3D reconstruction and driving world models.',
+        '4D reconstruction, vision-action model pretraining, and driving world models.',
         'Four papers at CVPR and ECCV 2026.',
       ],
     },
@@ -98,7 +111,7 @@ export const personalInfo = {
       startDate: '2022',
       endDate: '2023',
       responsibilities: [
-        '3D scene forecasting for driving.',
+        '3D scene forecasting for uncertainty estimation.',
         'Diffusion and NeRF projects.',
       ],
     },
@@ -177,7 +190,7 @@ export const leadPhoto = {
   src: '/photos/bixby-night.jpg',
   caption: 'Bixby Bridge',
   place: 'Big Sur, California',
-  year: '2024',
+  year: '2026',
 };
 
 export const photography = [
@@ -284,7 +297,7 @@ export const pages = {
     photographyLabel: 'Photography',
     // Shown beside the gallery heading and under the lead photograph.
     // Set to '' to drop it.
-    photoCredit: '© Stephen Yang · please ask before reuse',
+    photoCredit: '© Stephen Yang',
     readingLabel: 'Reading & notes',
     elsewhereLabel: 'Elsewhere',
   },
