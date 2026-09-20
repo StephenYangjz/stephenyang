@@ -7,11 +7,12 @@ import { RiArrowRightLine } from '@remixicon/react';
 
 import { readingOrder as ORDER } from '@/website.config';
 
-const PULL = 240; // px of scrolling at the bottom that fills the bar
-const GESTURE_GAP = 120; // wheel silence that ends the gesture you arrived on
-const MAX_STEP = 90; // ceiling on one event, so the bar sweeps rather than jumps
-const DECAY = 500; // stop pushing and the bar empties again
-const SLACK = 4; // px of tolerance on "at the bottom", for fractional layout
+const TAIL = 280; // px before the end of the page over which the bar fills
+const GESTURE_GAP = 130; // wheel silence that separates one gesture from the next
+const COMMIT = 40; // px within the committing gesture, so a stray tick is not one
+const SLACK = 4; // tolerance on "at the end", for fractional scroll heights
+
+const clamp01 = (n) => (n < 0 ? 0 : n > 1 ? 1 : n);
 
 function normalise(path) {
   if (!path) return '/';
@@ -20,35 +21,29 @@ function normalise(path) {
 }
 
 /**
- * At the bottom of the page, scrolling on fills a bar and then moves to the
- * next page.
+ * Two steps, and each one is visible: scroll to the end of the page, then
+ * scroll once more to go to the next one.
  *
- * Only one thing here is subtle, and it is momentum: a trackpad flick keeps
- * delivering wheel events long after the page has stopped against the bottom,
- * so if every event counted, the gesture that brought you to the end would
- * carry you off it. The fix is to wait for the wheel to fall silent once —
- * momentum events arrive an order of magnitude closer together than
- * GESTURE_GAP, so that silence can only fall between gestures, never inside
- * one. After it does, scrolling fills the bar normally.
+ * The bar is the first step, and it is drawn straight from scroll position —
+ * it fills across the last TAIL pixels of the page. So the thing you can see
+ * happening, the content moving up, *is* the thing filling the bar. Every
+ * previous version drove the bar from wheel deltas instead, which meant there
+ * was a stretch at the end where the page was visibly scrolling and the bar
+ * sat at nought, and no way to tell whether it was broken or waiting.
  *
- * Everything else is deliberately dumb, because the clever versions were
- * worse:
+ * Being position-derived also means it cannot get stuck. It is recomputed
+ * from scrollTop on every frame, so there is no accumulator to strand and no
+ * flag to latch: scroll down and it fills, scroll up and it empties, every
+ * time, with no history to get wrong. That was the actual defect in the last
+ * three attempts — a latched "armed" flag that could be cleared by trackpad
+ * jitter, after which nothing you did had any effect and nothing said why.
  *
- *   The bar always starts empty. A previous attempt let the arrival gesture
- *   pre-fill it to give early feedback, which just looked like the bar was
- *   broken and already half full before you had done anything.
- *
- *   The bar empties when you stop. A previous attempt made progress
- *   permanent so that returning to it was cheap; in practice it meant a
- *   half-filled bar sitting there indefinitely with no way to clear it.
- *
- *   Being armed survives stray upward events. This was the real bug: the
- *   arming flag was cleared by any negative deltaY, and trackpads emit those
- *   constantly as your fingers lift. Every stray tick demoted you back to
- *   "still arriving", so the bar would refuse to fill and there was no way to
- *   tell why. Arming is now cleared only by actually leaving the bottom,
- *   which is the one thing that unambiguously means you are not there any
- *   more.
+ * The second step is a single rule: a gesture counts only if its *first*
+ * event happened at the end of the page. Momentum cannot satisfy it, because
+ * the flick that carries you to the end began further up, and its tail is the
+ * same gesture — no gap, so no new gesture. Nothing is remembered between
+ * gestures, so there is nothing to reset and nothing to jam. COMMIT exists
+ * only so a single stray tick is not mistaken for a push.
  *
  * The link is always clickable, and the whole behaviour is disabled under
  * prefers-reduced-motion.
@@ -57,7 +52,7 @@ export default function NextPage() {
   const router = useRouter();
   const pathname = usePathname();
   const [progress, setProgress] = useState(0);
-  const pulled = useRef(0);
+  const [ready, setReady] = useState(false);
   const navigated = useRef(false);
 
   const current = normalise(pathname);
@@ -68,65 +63,80 @@ export default function NextPage() {
     if (!next) return;
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
-    let gapTimer;
-    let decayTimer;
-    let armed = false;
+    const scroller = () => document.scrollingElement || document.documentElement;
 
-    const atBottom = () =>
-      window.innerHeight + window.scrollY >=
-      document.documentElement.scrollHeight - SLACK;
-
-    const empty = () => {
-      pulled.current = 0;
-      setProgress(0);
+    const read = () => {
+      const el = scroller();
+      const max = el.scrollHeight - el.clientHeight;
+      return { max, y: el.scrollTop };
     };
 
-    // Leaving the bottom is the only thing that puts us back to square one.
-    const onScroll = () => {
-      if (atBottom()) return;
-      armed = false;
-      clearTimeout(gapTimer);
-      clearTimeout(decayTimer);
-      empty();
+    const atEnd = () => {
+      const { max, y } = read();
+      return max > 0 && y >= max - SLACK;
     };
 
-    const onWheel = (event) => {
-      if (navigated.current || !atBottom()) return;
-      // Upward ticks at the bottom are noise from a lifting hand, not intent.
-      if (event.deltaY <= 0) return;
-
-      if (!armed) {
-        // Pushed back by every event, so it can only fire once the flick that
-        // delivered us here has finished.
-        clearTimeout(gapTimer);
-        gapTimer = setTimeout(() => {
-          armed = atBottom();
-        }, GESTURE_GAP);
+    let raf = 0;
+    const frame = () => {
+      raf = 0;
+      const { max, y } = read();
+      // A page too short to scroll gets no bar and no scroll-to-advance.
+      if (max <= 0) {
+        setProgress(0);
+        setReady(false);
         return;
       }
+      const tail = Math.min(TAIL, max);
+      // Pinned to exactly 1 at the end rather than left to arithmetic. Scroll
+      // heights are fractional, so the ratio lands at 0.98 while atEnd() is
+      // already true, which would leave a bar just short of full sitting next
+      // to a label still asking you to keep scrolling.
+      const end = y >= max - SLACK;
+      const p = end ? 1 : clamp01((y - (max - tail)) / tail);
+      setProgress(p);
+      setReady(end);
+    };
 
-      pulled.current = Math.min(
-        PULL,
-        pulled.current + Math.min(event.deltaY, MAX_STEP)
-      );
-      setProgress(pulled.current / PULL);
+    const onScroll = () => {
+      if (!raf) raf = requestAnimationFrame(frame);
+    };
 
-      clearTimeout(decayTimer);
-      decayTimer = setTimeout(empty, DECAY);
+    // Per-gesture only. Deliberately not stored in a ref: nothing here should
+    // outlive the gesture it describes.
+    let lastWheel = 0;
+    let counts = false;
+    let pushed = 0;
 
-      if (pulled.current >= PULL) {
+    const onWheel = (event) => {
+      if (navigated.current) return;
+
+      const now = performance.now();
+      if (now - lastWheel > GESTURE_GAP) {
+        // A new gesture. It only counts if it began at the end of the page,
+        // which the tail of an arriving flick can never do.
+        counts = atEnd();
+        pushed = 0;
+      }
+      lastWheel = now;
+
+      if (!counts || event.deltaY <= 0 || !atEnd()) return;
+
+      pushed += event.deltaY;
+      if (pushed >= COMMIT) {
         navigated.current = true;
         router.push(next.href);
       }
     };
 
-    window.addEventListener('wheel', onWheel, { passive: true });
+    frame();
     window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+    window.addEventListener('wheel', onWheel, { passive: true });
     return () => {
-      window.removeEventListener('wheel', onWheel);
       window.removeEventListener('scroll', onScroll);
-      clearTimeout(gapTimer);
-      clearTimeout(decayTimer);
+      window.removeEventListener('resize', onScroll);
+      window.removeEventListener('wheel', onWheel);
+      cancelAnimationFrame(raf);
     };
   }, [next, router]);
 
@@ -134,11 +144,12 @@ export default function NextPage() {
 
   return (
     <section className="next-page">
-      <Link href={next.href} className="next-card reveal">
+      <Link href={next.href} className="next-card reveal" data-ready={ready}>
         <span className="page-link-kicker">Next · {next.kicker}</span>
         <span className="next-title">{next.label}</span>
         <span className="page-link-go">
-          Keep scrolling, or click <RiArrowRightLine size={14} />
+          {ready ? 'Scroll again, or click' : 'Keep scrolling, or click'}{' '}
+          <RiArrowRightLine size={14} />
         </span>
         <span className="next-bar" aria-hidden="true">
           <span
