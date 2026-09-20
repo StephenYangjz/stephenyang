@@ -7,15 +7,11 @@ import { RiArrowRightLine } from '@remixicon/react';
 
 import { readingOrder as ORDER } from '@/website.config';
 
-// Tuned so that advancing is something you do, not something that happens —
-// but only just. Nearly all of the protection here comes from arming rather
-// than from distance, so the distance can stay short: once you are at the
-// bottom and have stopped, there is nothing left to scroll, and pushing on
-// anyway is hard to read as anything other than wanting the next page.
-const PULL = 420; // px of deliberate overscroll before advancing
-const ARM_IDLE = 170; // wheel silence that marks the end of the flick you arrived on
-const DECAY = 650; // stop pushing and the bar unwinds
-const MAX_STEP = 120; // ceiling on one event, so a single jolt cannot fill the bar
+// A single gesture never advances, however far it carries. Once it has died
+// out at the bottom, the next one does, immediately.
+const ARM_IDLE = 170; // wheel silence that marks the end of the gesture you arrived on
+const NUDGE = 60; // px in the new gesture — enough that a stray tick is not a push
+const DECAY = 400; // a lone tick that goes nowhere unwinds
 
 function normalise(path) {
   if (!path) return '/';
@@ -24,22 +20,24 @@ function normalise(path) {
 }
 
 /**
- * Once you reach the bottom, continuing to scroll fills a progress bar and
- * then moves to the next page.
+ * At the bottom of the page, one more scroll moves to the next page.
  *
- * The thing that makes this feel like a trap is momentum. A trackpad flick
- * keeps firing wheel events long after the page has stopped at the bottom,
- * so counting every event means the same gesture that brought you to the end
- * carries you off it. Hence arming: while at the bottom, wheel input is
- * ignored until it has fallen silent for a moment. That silence is the end
- * of the flick you arrived on, and only what comes after it counts.
+ * The rule is about gestures, not distance: a single gesture never advances,
+ * however far it carries, and the one after it advances immediately. That is
+ * what stops the page turning by accident, because the thing that used to
+ * turn it was momentum — a trackpad flick keeps delivering wheel events long
+ * after the page has stopped against the bottom, so the gesture that brought
+ * you to the end carried you off it.
  *
- * Because that check does the real work, the distance afterwards is kept
- * short — roughly a flick of a trackpad, or four notches of a wheel — so
- * that choosing to go is quick. A single event still contributes at most
- * MAX_STEP, so one jolt from a jumpy wheel cannot fill the bar on its own;
- * the bar unwinds if you stop pushing; and scrolling up, or leaving the
- * bottom at all, disarms and resets it.
+ * Separating the two is a matter of listening for the silence between them.
+ * While at the bottom, wheel input is ignored until it has been quiet for
+ * ARM_IDLE; every event pushes that timer back, so it cannot elapse mid-flick,
+ * and momentum events arrive far closer together than that. Once it does
+ * elapse, the gesture is over and anything further is a fresh one.
+ *
+ * NUDGE is only there so that a stray tick or a jittery wheel is not mistaken
+ * for a gesture; it is a fraction of any real scroll, and unwinds on its own.
+ * Scrolling up, or leaving the bottom, resets everything.
  *
  * The link is always clickable, and the whole behaviour is disabled under
  * prefers-reduced-motion.
@@ -99,16 +97,13 @@ export default function NextPage() {
         return;
       }
 
-      pulled.current = Math.min(
-        PULL,
-        pulled.current + Math.min(event.deltaY, MAX_STEP)
-      );
-      setProgress(pulled.current / PULL);
+      pulled.current = Math.min(NUDGE, pulled.current + event.deltaY);
+      setProgress(pulled.current / NUDGE);
 
       clearTimeout(decay);
       decay = setTimeout(reset, DECAY);
 
-      if (pulled.current >= PULL) {
+      if (pulled.current >= NUDGE) {
         navigated.current = true;
         router.push(next.href);
       }
@@ -130,7 +125,7 @@ export default function NextPage() {
         <span className="page-link-kicker">Next · {next.kicker}</span>
         <span className="next-title">{next.label}</span>
         <span className="page-link-go">
-          Keep scrolling, or click <RiArrowRightLine size={14} />
+          Scroll again, or click <RiArrowRightLine size={14} />
         </span>
         <span className="next-bar" aria-hidden="true">
           <span
