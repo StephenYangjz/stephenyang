@@ -35,7 +35,7 @@ export default function Page() {
           </Section>
         </div>
 
-        <div className="shell pb-32">
+        <div className="shell pb-16">
           <NextPage />
         </div>
       </div>

@@ -4,7 +4,7 @@ import NextPage from '@/components/NextPage';
 
 export default function Page() {
   return (
-    <main className="shell pb-8">
+    <main className="shell pb-16">
       <HomeHero />
       <HomeBody />
       <NextPage />

@@ -11,7 +11,7 @@ export const metadata = {
 
 export default function Page() {
   return (
-    <main className="shell pb-32">
+    <main className="shell pb-16">
       <Masthead
         kicker={pages.research.kicker}
         title={pages.research.title}

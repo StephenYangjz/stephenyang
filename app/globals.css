@@ -1809,9 +1809,13 @@
 
 /* Taller, closer-packed gallery cards */
 .pan-card {
-  /* Taller frames leave less blank paper above and below; the stage
-     centres them, so this sets both margins directly. */
-  height: clamp(340px, 80svh, 780px);
+  /* Sized against the stage rather than the viewport, so the leftover — and
+     therefore the margin above and below the frames — is a fixed 68px at any
+     window height instead of growing with it. 78px is the header offset the
+     stage already sits below. A plain svh value could not go much taller
+     without the heading colliding with the frames on short windows. */
+  height: min(86svh, calc(100svh - 78px - 68px));
+  min-height: 300px;
   transition: transform 0.6s cubic-bezier(0.32, 0.72, 0, 1);
 }
 
@@ -2213,7 +2217,7 @@
 .gallery-head {
   /* Out of flow so it does not bias the stage's centring — see .pin-stage. */
   position: absolute;
-  top: 12px;
+  top: 4px;
   left: 0;
   right: 0;
   padding-inline: var(--shell-pad);
