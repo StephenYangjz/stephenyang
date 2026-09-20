@@ -621,6 +621,10 @@
 /* ── pinned stage scaffolding ──────────────────────────────────────── */
 .pin-track {
   position: relative;
+  /* The gallery and the section after it are siblings with no gap, so the
+     frames sat 86px below the sheet's edge but flush against the next
+     heading. Mirrors .content-sheet's padding-top. */
+  margin-bottom: 32px;
 }
 
 .pin-stage {
@@ -2185,7 +2189,9 @@
   z-index: 1;
   background: var(--paper);
   border-radius: var(--r-sheet) var(--r-sheet) 0 0;
-  padding-top: 40px;
+  /* Matches .pin-track's margin-bottom so the gallery has the same air
+     above it as below it. */
+  padding-top: 32px;
   box-shadow: 0 -30px 70px rgba(6, 10, 22, 0.28);
 }
 
