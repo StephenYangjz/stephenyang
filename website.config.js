@@ -298,7 +298,7 @@ export const pages = {
   research: {
     kicker: 'Research',
     title: 'Research',
-    note: 'Geometric foundation models, world models, among others. Preprints are listed at their accepted venue once one exists.',
+    note: 'Geometric foundation models, world models, among others.',
   },
 
   cv: {

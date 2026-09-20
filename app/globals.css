@@ -1486,16 +1486,16 @@
    NEXT PAGE
    ═══════════════════════════════════════════════════════════════════════ */
 .next-page {
-  margin-top: 96px;
+  margin-top: 72px;
 }
 
 .next-card {
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  padding: 40px clamp(24px, 4vw, 44px) 44px;
-  border-radius: 24px;
+  gap: 6px;
+  padding: 24px clamp(20px, 3vw, 30px) 26px;
+  border-radius: var(--r-figure);
   border: 1px solid var(--rule);
   background: var(--glass-bg);
   backdrop-filter: blur(18px) saturate(150%);
@@ -1509,11 +1509,13 @@
   box-shadow: var(--glass-shadow-lift);
 }
 
+/* Sized as a closing link, not a second masthead — it was competing with
+   the page title above it. */
 .next-title {
-  font-size: clamp(2rem, 5vw, 3.2rem);
+  font-size: clamp(1.4rem, 2.6vw, 1.85rem);
   font-weight: 600;
-  letter-spacing: -0.042em;
-  line-height: 1.02;
+  letter-spacing: -0.032em;
+  line-height: 1.1;
 }
 
 .next-bar {
@@ -1521,7 +1523,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  height: 3px;
+  height: 2px;
   background: var(--rule);
 }
 
