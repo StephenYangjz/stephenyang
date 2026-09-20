@@ -263,64 +263,6 @@
   );
 }
 
-/* The name reveals as the hero leaves.
-   This is scrubbed by the scroll timeline rather than toggled by a class at a
-   fixed threshold — a class toggle restarts the transition every time you
-   cross the boundary, which is what made it flash. */
-.pill-name {
-  display: inline-block;
-  max-width: 0;
-  opacity: 0;
-  overflow: hidden;
-  white-space: nowrap;
-  will-change: max-width, opacity;
-}
-
-@keyframes pill-name-in {
-  from {
-    max-width: 0;
-    opacity: 0;
-    margin-inline: 0;
-  }
-  to {
-    max-width: 190px;
-    opacity: 1;
-    margin-inline: 2px 6px;
-  }
-}
-
-@supports (animation-timeline: scroll()) {
-  .pill-name {
-    animation: pill-name-in linear both;
-    animation-timeline: scroll(root block);
-    animation-range: 120px 300px;
-  }
-}
-
-/* Class-driven fallback only where scroll timelines are unavailable */
-@supports not (animation-timeline: scroll()) {
-  .pill-name {
-    transition: max-width 0.45s cubic-bezier(0.32, 0.72, 0, 1),
-      opacity 0.3s ease, margin 0.45s cubic-bezier(0.32, 0.72, 0, 1);
-  }
-
-  .is-scrolled .pill-name {
-    max-width: 190px;
-    opacity: 1;
-    margin-inline: 2px 6px;
-  }
-}
-
-@media (max-width: 640px) {
-  .pill-name {
-    animation: none !important;
-    max-width: 0 !important;
-    opacity: 0 !important;
-    margin-inline: 0 !important;
-  }
-}
-
-
 /* ═══════════════════════════════════════════════════════════════════════
    TYPE
    ═══════════════════════════════════════════════════════════════════════ */
@@ -2122,13 +2064,6 @@
   letter-spacing: -0.022em;
   color: var(--text);
   white-space: nowrap;
-}
-
-.header-brand-full {
-  font-size: 14px;
-  font-weight: 600;
-  letter-spacing: -0.022em;
-  color: var(--text);
 }
 
 /* Push the controls to the far end of the wide bar */

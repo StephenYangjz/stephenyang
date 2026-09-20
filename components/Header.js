@@ -12,15 +12,6 @@ import {
 } from '@remixicon/react';
 import { personalInfo, navigations } from '@/website.config';
 
-function initials(name) {
-  return name
-    .split(' ')
-    .map((part) => part[0])
-    .join('')
-    .slice(0, 2)
-    .toUpperCase();
-}
-
 /** Trailing slashes differ between dev and the exported build. */
 function normalise(path) {
   if (!path) return '/';
@@ -66,14 +57,8 @@ export default function Header() {
             className="header-brand"
             aria-current={isHome ? 'page' : undefined}
           >
-            {isHome ? initials(personalInfo.name) : personalInfo.name}
+            {personalInfo.name}
           </Link>
-
-          {isHome && (
-            <span className="pill-name header-brand-full" aria-hidden="true">
-              {personalInfo.name}
-            </span>
-          )}
 
           <div className="header-actions">
             <div className="hidden sm:flex items-center gap-1">
