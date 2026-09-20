@@ -76,15 +76,6 @@ export default function HomeHero() {
                     </a>
                   );
                 })}
-                <a
-                  href={personalInfo.cvUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="social-btn"
-                >
-                  <RiArrowRightUpLine size={14} />
-                  CV
-                </a>
               </div>
             </div>
 

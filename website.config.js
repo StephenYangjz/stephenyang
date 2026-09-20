@@ -31,9 +31,9 @@ export const personalInfo = {
       name: 'Google Scholar',
       url: 'https://scholar.google.com/citations?user=BzyVxVUAAAAJ&hl=en',
     },
-    { name: 'GitHub', url: 'https://github.com/StephenYangjz' },
     { name: 'LinkedIn', url: 'https://www.linkedin.com/in/stephenyangjz/' },
     { name: 'X', url: 'https://x.com/Stepenyang' },
+    { name: 'GitHub', url: 'https://github.com/StephenYangjz' },
   ],
 
 
