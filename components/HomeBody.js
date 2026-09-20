@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import LineReveal from '@/components/LineReveal';
 import AboutMd from '@/data/home/About.mdx';
 import NewsMd from '@/data/home/News.mdx';
 import { personalInfo } from '@/website.config';
@@ -60,14 +61,14 @@ export default function HomeBody() {
   return (
     <section
       id="about"
-      className="grid gap-12 lg:grid-cols-[minmax(0,1fr)_300px] lg:gap-20"
+      className="grid gap-12 lg:grid-cols-[minmax(0,1fr)_var(--figure-w)] lg:gap-20"
     >
       <div className="home-column min-w-0">
         {/* Bio and news share ONE reveal sequence. They must also share one
             timeline element: two elements declaring the same
             view-timeline-name puts the name in scope twice, which makes the
             reference ambiguous and silently deactivates the timeline. */}
-        <div className="reveal-seq">
+        <LineReveal className="reveal-seq">
           <div className="prose-body">
             <AboutMd />
           </div>
@@ -78,7 +79,7 @@ export default function HomeBody() {
               <NewsMd />
             </div>
           </div>
-        </div>
+        </LineReveal>
 
         <div id="more" className="mt-24">
           <p className="block-label reveal">Elsewhere</p>

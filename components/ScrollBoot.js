@@ -126,7 +126,7 @@ export default function ScrollBoot() {
       );
 
       document
-        .querySelectorAll('.reveal, .reveal-lag, .hero-reveal, .reveal-seq .prose-body > p, .reveal-seq .news-list li, .reveal-seq .seq-line')
+        .querySelectorAll('.reveal, .reveal-lag, .hero-reveal, .lr-ready .lr-w, .lr-ready .seq-line')
         .forEach((el) => observer.observe(el));
     }
 

@@ -42,6 +42,11 @@
     --wash-3: #c2d0e6;
     --wash-opacity: 0.4;
     --wash-blur: 90px;
+
+    /* The portrait and the At a glance card occupy the same footprint, so
+       the card lands exactly where the photo dissolved from. One token. */
+    --figure-w: clamp(200px, 48vw, 280px);
+    --shell-pad: clamp(20px, 5vw, 56px);
   }
 
   .dark {
@@ -118,7 +123,7 @@
     width: 100%;
     max-width: 1180px;
     margin-inline: auto;
-    padding-inline: clamp(20px, 5vw, 56px);
+    padding-inline: var(--shell-pad);
   }
 
   /* A section is a two-column editorial grid: a sticky label rail on the
@@ -1432,30 +1437,26 @@
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
-   BIO -> NEWS — lines pop in one at a time, in place
+   BIO -> NEWS — real lines, one at a time
 
-   Two things this gets wrong easily:
+   LineReveal wraps each word in a .lr-w span. Every span rides its own
+   view() timeline, so words sharing a visual line share a vertical position
+   and animate together, while the next line sits a line-height lower and
+   crosses the trigger window slightly later. The cascade is a consequence
+   of the layout, so it stays right when the text reflows.
 
-   1. Giving each line its own view() timeline. A line's own timeline
-      completes the moment that line has entered the viewport, and several
-      lines fit on one screen, so they all resolved together. One container
-      owns the timeline and each line takes a slice of it instead.
+   Staggering whole paragraphs — which is what the previous versions did —
+   can never look like this: a paragraph is four or five lines that all
+   arrive at once.
 
-   2. Declaring that timeline name on more than one element. The name then
-      sits in scope twice, the reference is ambiguous, and the timeline goes
-      inactive — every animation silently stops applying. Exactly one
-      element may carry `view-timeline-name`.
-
-   No translation: the lines fade and sharpen in place rather than sliding.
+   Opacity only. Blur on a few hundred spans is genuinely expensive.
    ═══════════════════════════════════════════════════════════════════════ */
 @keyframes line-in {
   from {
     opacity: 0;
-    filter: blur(7px);
   }
   to {
     opacity: 1;
-    filter: blur(0);
   }
 }
 
@@ -1463,50 +1464,36 @@
   margin-bottom: 1.35em;
 }
 
-@supports (animation-timeline: view()) {
-  /* Each line rides its own view() timeline. A named timeline on the
-     container would be tidier, but Chrome left the named one permanently
-     inactive here — an identical ViewTimeline built in JS over the same
-     subject and scroller reported 103% while the CSS-named one reported
-     null — so this uses the mechanism that demonstrably works.
+/* Until the split runs, text must stay readable (and visible to crawlers) */
+.line-reveal:not(.lr-ready) {
+  opacity: 1;
+}
 
-     The range matters more than the mechanism: `cover 22% -> 42%` fires
-     while a line is travelling from roughly three-quarters down the screen
-     to the middle. Because consecutive lines are offset by their own
-     spacing, they cross that window one after another, which is what makes
-     them pop in sequence while you are actually looking at them. The
-     earlier `entry`-based range fired as each line first peeked over the
-     bottom edge, so the whole block resolved in the first few hundred
-     pixels of scroll, before you had read any of it. */
-  .reveal-seq .prose-body > p,
-  .reveal-seq .news-list li,
-  .reveal-seq .seq-line {
+@supports (animation-timeline: view()) {
+  .lr-ready .lr-w,
+  .lr-ready .seq-line {
+    display: inline-block;
     animation: line-in linear both;
     animation-timeline: view();
-    animation-range: cover 22% cover 42%;
-    will-change: opacity, filter;
+    animation-range: cover 30% cover 46%;
+    will-change: opacity;
   }
 }
 
-.no-sda .reveal-seq .prose-body > p,
-.no-sda .reveal-seq .news-list li,
-.no-sda .reveal-seq .seq-line {
+.no-sda .lr-ready .lr-w,
+.no-sda .lr-ready .seq-line {
   opacity: 0;
-  filter: blur(7px);
-  transition: opacity 0.7s cubic-bezier(0.22, 0.8, 0.3, 1), filter 0.7s ease;
+  transition: opacity 0.6s ease;
 }
 
-.no-sda .reveal-seq .in-view {
+.no-sda .lr-ready .in-view {
   opacity: 1;
-  filter: blur(0);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .reveal-seq .prose-body > p,
-  .reveal-seq .news-list li,
-  .reveal-seq .seq-line {
+  .lr-w,
+  .seq-line {
     opacity: 1 !important;
-    filter: none !important;
   }
 }
 
@@ -1760,13 +1747,17 @@
    dissolved only the text and left the photo, which read as a paint failure.
    ═══════════════════════════════════════════════════════════════════════ */
 @keyframes hero-dissolve {
-  from {
+  0% {
     opacity: 1;
     filter: blur(0px);
   }
-  to {
-    opacity: 0.02;
-    filter: blur(13px);
+  55% {
+    opacity: 0.55;
+    filter: blur(5px);
+  }
+  100% {
+    opacity: 0;
+    filter: blur(18px);
   }
 }
 
@@ -1873,4 +1864,154 @@
 
 .pan-card .photo-img {
   transition: filter 0.6s ease;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   HERO — a held stage. The page scrolls; the hero stays and dissolves.
+   ═══════════════════════════════════════════════════════════════════════ */
+.hero-track {
+  position: relative;
+  height: 178svh;
+}
+
+.hero-stage {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-content: center;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   AT A GLANCE — genuinely fixed, not sticky. Pinned to the right edge of
+   the shell's content box, faded in once the hero has gone and back out
+   before the footer so it never collides with either.
+   ═══════════════════════════════════════════════════════════════════════ */
+@media (min-width: 1024px) {
+  .glance-rail {
+    position: fixed;
+    /* Centred in the viewport and flush to the shell's right edge — the
+       same place the portrait sat, so the card takes over its footprint
+       rather than appearing somewhere new. */
+    top: 50%;
+    transform: translateY(-50%);
+    width: var(--figure-w);
+    right: max(calc((100vw - 1180px) / 2 + var(--shell-pad)), var(--shell-pad));
+    z-index: 5;
+  }
+
+  /* Same 4:5 block as the photograph */
+  .glance-rail > div {
+    aspect-ratio: 4 / 5;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  @keyframes glance-presence {
+    0%,
+    9% {
+      opacity: 0;
+      visibility: hidden;
+    }
+    16%,
+    78% {
+      opacity: 1;
+      visibility: visible;
+    }
+    92%,
+    100% {
+      opacity: 0;
+      visibility: hidden;
+    }
+  }
+
+  @supports (animation-timeline: scroll()) {
+    .glance-rail {
+      animation: glance-presence linear both;
+      animation-timeline: scroll(root block);
+    }
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   PHOTOGRAPHS — feathered into the page
+
+   A dark photograph as a hard-edged rectangle on pale paper reads as pasted
+   on. Masking the outer edge to transparent lets it sit in the page
+   instead, so the border and drop shadow come off — they were drawing the
+   very edge the mask is there to dissolve.
+   ═══════════════════════════════════════════════════════════════════════ */
+.portrait-wrap {
+  position: relative;
+  isolation: isolate;
+}
+
+.portrait-frame {
+  width: var(--figure-w);
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  object-position: 42% 62%;
+  border: 0;
+  box-shadow: none;
+  border-radius: 28px;
+  -webkit-mask-image: radial-gradient(
+    118% 112% at 50% 42%,
+    #000 58%,
+    rgba(0, 0, 0, 0.55) 80%,
+    transparent 100%
+  );
+  mask-image: radial-gradient(
+    118% 112% at 50% 42%,
+    #000 58%,
+    rgba(0, 0, 0, 0.55) 80%,
+    transparent 100%
+  );
+}
+
+@media (min-width: 1024px) {
+  :root,
+  .dark {
+    --figure-w: clamp(280px, 27vw, 360px);
+  }
+
+  .portrait-frame {
+    border-radius: 34px;
+  }
+}
+
+/* Full-bleed lead photograph fades into the paper top and bottom */
+.lead-frame {
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    #000 16%,
+    #000 82%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    #000 16%,
+    #000 82%,
+    transparent 100%
+  );
+  border: 0;
+}
+
+/* Gallery cards get a softer edge than a hard crop too */
+.pan-card {
+  border: 0;
+  -webkit-mask-image: radial-gradient(
+    125% 118% at 50% 50%,
+    #000 72%,
+    transparent 100%
+  );
+  mask-image: radial-gradient(
+    125% 118% at 50% 50%,
+    #000 72%,
+    transparent 100%
+  );
 }
