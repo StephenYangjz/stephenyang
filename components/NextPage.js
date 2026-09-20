@@ -7,11 +7,15 @@ import { RiArrowRightLine } from '@remixicon/react';
 
 import { readingOrder as ORDER } from '@/website.config';
 
-// Tuned so that advancing is something you do, not something that happens.
-const PULL = 800; // px of deliberate overscroll before advancing
-const ARM_IDLE = 260; // wheel silence that marks the end of the flick you arrived on
+// Tuned so that advancing is something you do, not something that happens —
+// but only just. Nearly all of the protection here comes from arming rather
+// than from distance, so the distance can stay short: once you are at the
+// bottom and have stopped, there is nothing left to scroll, and pushing on
+// anyway is hard to read as anything other than wanting the next page.
+const PULL = 420; // px of deliberate overscroll before advancing
+const ARM_IDLE = 170; // wheel silence that marks the end of the flick you arrived on
 const DECAY = 650; // stop pushing and the bar unwinds
-const MAX_STEP = 90; // ceiling on one event, so a single jolt cannot fill the bar
+const MAX_STEP = 120; // ceiling on one event, so a single jolt cannot fill the bar
 
 function normalise(path) {
   if (!path) return '/';
@@ -30,10 +34,12 @@ function normalise(path) {
  * ignored until it has fallen silent for a moment. That silence is the end
  * of the flick you arrived on, and only what comes after it counts.
  *
- * Beyond that, a single event contributes at most MAX_STEP, so one jolt from
- * a mouse wheel or a jumpy driver cannot fill the bar on its own; the bar
- * unwinds if you stop pushing; and scrolling up, or leaving the bottom at
- * all, disarms and resets it.
+ * Because that check does the real work, the distance afterwards is kept
+ * short — roughly a flick of a trackpad, or four notches of a wheel — so
+ * that choosing to go is quick. A single event still contributes at most
+ * MAX_STEP, so one jolt from a jumpy wheel cannot fill the bar on its own;
+ * the bar unwinds if you stop pushing; and scrolling up, or leaving the
+ * bottom at all, disarms and resets it.
  *
  * The link is always clickable, and the whole behaviour is disabled under
  * prefers-reduced-motion.
