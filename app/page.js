@@ -1,6 +1,7 @@
 import HomeHero from '@/components/HomeHero';
 import HomeBody from '@/components/HomeBody';
 import NextPage from '@/components/NextPage';
+import ScrollCue from '@/components/ScrollCue';
 
 export default function Page() {
   return (
@@ -8,6 +9,7 @@ export default function Page() {
       <HomeHero />
       <HomeBody />
       <NextPage />
+      <ScrollCue />
     </main>
   );
 }

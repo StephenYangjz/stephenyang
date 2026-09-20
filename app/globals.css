@@ -2254,3 +2254,126 @@
     background-image: none;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   PAGE TRANSITIONS
+
+   The outgoing page lifts and blurs away while the incoming one rises into
+   focus, with the two overlapping — hence the longer incoming duration and
+   the negative delay. The header is excluded: giving it its own
+   view-transition-name takes it out of the root snapshot, so it stays put
+   while the content moves under it, which is what makes the change read as
+   flow rather than as a page swap.
+   ═══════════════════════════════════════════════════════════════════════ */
+@keyframes vt-out {
+  to {
+    opacity: 0;
+    transform: translateY(-18px) scale(0.985);
+    filter: blur(8px);
+  }
+}
+
+@keyframes vt-in {
+  from {
+    opacity: 0;
+    transform: translateY(26px) scale(0.99);
+    filter: blur(10px);
+  }
+}
+
+::view-transition-old(root) {
+  animation: vt-out 0.42s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+::view-transition-new(root) {
+  animation: vt-in 0.62s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: -0.12s;
+}
+
+/* Lifted out of the root snapshot so it does not animate with the content */
+.header-shell {
+  view-transition-name: site-header;
+}
+
+::view-transition-group(site-header) {
+  animation-duration: 0.42s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   SCROLL CUE — floating glass pill on the first screen
+   ═══════════════════════════════════════════════════════════════════════ */
+.scroll-cue {
+  position: fixed;
+  left: 50%;
+  bottom: clamp(22px, 4svh, 40px);
+  z-index: 40;
+  translate: -50% 0;
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 999px;
+  color: var(--text-soft);
+  cursor: pointer;
+  transition: color 0.25s ease, width 0.4s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.scroll-cue:hover {
+  color: var(--text);
+  width: 58px;
+}
+
+/* The arrow drifts inside the pill so the cue reads as alive at rest */
+.scroll-cue-icon {
+  display: grid;
+  place-items: center;
+  animation: cue-drift 2.6s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+
+@keyframes cue-drift {
+  0%,
+  100% {
+    transform: translateY(-3px);
+    opacity: 0.55;
+  }
+  50% {
+    transform: translateY(3px);
+    opacity: 1;
+  }
+}
+
+/* Scrubbed away as you scroll rather than toggled at a threshold */
+@keyframes cue-dismiss {
+  to {
+    opacity: 0;
+    transform: translateY(26px) scale(0.86);
+  }
+}
+
+@supports (animation-timeline: scroll()) {
+  .scroll-cue {
+    animation: cue-dismiss linear both;
+    animation-timeline: scroll(root block);
+    animation-range: 0 34svh;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scroll-cue-icon {
+    animation: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .scroll-cue {
+    width: 42px;
+    height: 42px;
+  }
+}
