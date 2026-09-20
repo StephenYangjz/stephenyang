@@ -296,7 +296,9 @@
    TYPE
    ═══════════════════════════════════════════════════════════════════════ */
 .display {
-  font-size: clamp(2.75rem, 7.5vw, 5.25rem);
+  /* Was 7.5vw capped at 5.25rem — 84px on a wide display, which overwhelmed
+     everything under it. */
+  font-size: clamp(2.5rem, 6.2vw, 4.25rem);
   font-weight: 600;
   letter-spacing: -0.045em;
   line-height: 0.98;
