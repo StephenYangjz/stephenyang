@@ -625,21 +625,22 @@
 
 .pin-stage {
   position: sticky;
-  top: 0;
-  height: 100svh;
+  /* Header clearance belongs in the sticky offset, not in padding.
+     Padding occupies space at every scroll position, including while the
+     stage is still travelling — which put a band of blank paper between the
+     top of the sheet and the label at exactly the moment the sheet arrives.
+     A sticky `top` only takes effect once the stage actually sticks, so the
+     content can start flush and still clear the header when pinned. */
+  top: 88px;
+  height: calc(100svh - 88px);
   display: grid;
   /* The rail is intentionally wider than the viewport. Without an explicit
      minmax(0, 1fr) the grid column sizes to it and drags every other child
      — the section heading included — off to the right. */
   grid-template-columns: minmax(0, 1fr);
-  /* Top-aligned, not centred. Centring split the leftover height evenly
-     above and below, so on a tall window the label drifted far down the
-     sheet behind a band of blank paper — and the taller the window, the
-     worse it got. Anchoring to the top clears the header by a fixed amount
-     instead, so the gap no longer scales with viewport height. */
+  /* Top-aligned, not centred: centring split the leftover height evenly
+     above and below, so the gap grew with the window. */
   align-content: start;
-  /* Header bottom edge sits at 78px; keep clear of it on short windows. */
-  padding-top: clamp(108px, 13svh, 142px);
   overflow: hidden;
 }
 
@@ -2178,9 +2179,7 @@
   z-index: 1;
   background: var(--paper);
   border-radius: var(--r-sheet) var(--r-sheet) 0 0;
-  /* Was 64px, which stacked on top of the pinned gallery's own centring
-     and left ~130px of blank paper above the first label. */
-  padding-top: 18px;
+  padding-top: 10px;
   box-shadow: 0 -30px 70px rgba(6, 10, 22, 0.28);
 }
 

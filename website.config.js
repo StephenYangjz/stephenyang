@@ -8,7 +8,7 @@ export const personalInfo = {
   location: 'Sunnyvale, CA',
 
   // One line, used for the hero sub-head and the page description.
-  tagline: 'Geometric foundation models and spatial intelligence.',
+  tagline: 'Building geometric foundation models and spatial intelligence.',
 
   socialMedia: [
     { name: 'Email', url: 'mailto:stephenyang@berkeley.edu' },
