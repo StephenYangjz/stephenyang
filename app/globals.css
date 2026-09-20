@@ -764,6 +764,8 @@
    resolve the percentage against the wrapper and under-pan. */
 @keyframes pan-x {
   to {
+    /* 100% is the rail's own width including its padding, so this lands the
+       rail's right edge on the viewport's right edge exactly. */
     transform: translate3d(calc(100vw - 100%), 0, 0);
   }
 }
@@ -1272,10 +1274,17 @@
    ═══════════════════════════════════════════════════════════════════════ */
 .pan-rail {
   display: flex;
-  gap: 18px;
-  padding-inline: clamp(20px, 5vw, 56px);
+  align-items: center;
+  gap: 20px;
   width: max-content;
   will-change: transform;
+  /* Must start at the shell's content edge, not the viewport's. The shell is
+     centred at max-width 1180px, so on a wide window a raw viewport inset
+     left the first card far to the left of the section label above it. */
+  padding-inline: max(
+    calc((100vw - 1180px) / 2 + var(--shell-pad)),
+    var(--shell-pad)
+  );
 }
 
 .pan-card {
@@ -1565,10 +1574,6 @@
   border-radius: var(--r-figure);
 }
 
-.pan-rail {
-  gap: 22px;
-  align-items: center;
-}
 
 /* Legible captions over photographs need a scrim, not just a chip */
 .pan-card .photo-cap {
@@ -1806,9 +1811,6 @@
   transform: translateY(-6px);
 }
 
-.pan-rail {
-  gap: 20px;
-}
 
 .pan-card .photo-img {
   transition: filter 0.6s ease;
@@ -2179,7 +2181,7 @@
   z-index: 1;
   background: var(--paper);
   border-radius: var(--r-sheet) var(--r-sheet) 0 0;
-  padding-top: 10px;
+  padding-top: 40px;
   box-shadow: 0 -30px 70px rgba(6, 10, 22, 0.28);
 }
 
