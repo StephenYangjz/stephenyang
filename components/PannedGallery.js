@@ -32,7 +32,7 @@ export default function PannedGallery() {
           </div>
         </div>
 
-        <div className="mt-8">
+        <div className="mt-5">
           <div className="pan-rail pan-x">
             {photography.map((photo) => (
               <figure key={photo.src} className="pan-card">

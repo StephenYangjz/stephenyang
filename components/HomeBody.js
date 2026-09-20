@@ -20,7 +20,7 @@ const ELSEWHERE = [
 
 function Glance() {
   return (
-    <div className="glass glass-sheen relative rounded-[22px] p-5">
+    <div className="glass glass-sheen glance-card relative p-5">
       <p className="block-label">At a glance</p>
 
       <dl className="mt-4 flex flex-col gap-3">

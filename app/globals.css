@@ -47,6 +47,10 @@
        the card lands exactly where the photo dissolved from. One token. */
     --figure-w: clamp(200px, 48vw, 280px);
     --shell-pad: clamp(20px, 5vw, 56px);
+    /* One radius for every figure-sized surface — portrait, At a glance,
+       gallery cards — so they read as the same family of objects. */
+    --r-figure: 26px;
+    --r-sheet: 34px;
   }
 
   .dark {
@@ -1246,7 +1250,6 @@
   flex: none;
   width: clamp(240px, 34vw, 420px);
   aspect-ratio: 4 / 5;
-  border-radius: 18px;
   overflow: hidden;
   border: 1px solid var(--rule);
   background: var(--paper-raised);
@@ -1519,11 +1522,14 @@
   width: auto;
   aspect-ratio: 4 / 5;
   flex: none;
-  border-radius: 22px;
 }
 
 .pan-card:first-child {
   aspect-ratio: 3 / 4;
+}
+
+.pan-card {
+  border-radius: var(--r-figure);
 }
 
 .pan-rail {
@@ -1760,7 +1766,6 @@
 /* Taller, closer-packed gallery cards */
 .pan-card {
   height: clamp(340px, 76svh, 720px);
-  border-radius: 20px;
   transition: transform 0.6s cubic-bezier(0.32, 0.72, 0, 1);
 }
 
@@ -1867,7 +1872,7 @@
   object-position: 42% 62%;
   border: 0;
   box-shadow: none;
-  border-radius: 28px;
+  border-radius: var(--r-figure);
   -webkit-mask-image: radial-gradient(
     118% 112% at 50% 42%,
     #000 58%,
@@ -1886,10 +1891,11 @@
   :root,
   .dark {
     --figure-w: clamp(280px, 27vw, 360px);
+    --r-figure: 30px;
   }
 
   .portrait-frame {
-    border-radius: 34px;
+    /* radius comes from --r-figure */
   }
 }
 
@@ -2139,8 +2145,10 @@
   position: relative;
   z-index: 1;
   background: var(--paper);
-  border-radius: 30px 30px 0 0;
-  padding-top: 64px;
+  border-radius: var(--r-sheet) var(--r-sheet) 0 0;
+  /* Was 64px, which stacked on top of the pinned gallery's own centring
+     and left ~130px of blank paper above the first label. */
+  padding-top: 18px;
   box-shadow: 0 -30px 70px rgba(6, 10, 22, 0.28);
 }
 
@@ -2148,4 +2156,11 @@
   .ph-cue {
     animation: none;
   }
+}
+
+
+/* At a glance shares the figure radius — it occupies the portrait's
+   footprint, so it should read as the same kind of object. */
+.glance-card {
+  border-radius: var(--r-figure);
 }
