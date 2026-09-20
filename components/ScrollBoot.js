@@ -52,6 +52,13 @@ export default function ScrollBoot() {
 
       if (supportsSDA || reduced) return;
 
+      // Hero dissolve progress (0 -> 1 over the first ~78% of a viewport)
+      const heroSpan = window.innerHeight * 0.78 - 40;
+      const hp = heroSpan > 0 ? clamp01((y - 40) / heroSpan) : 0;
+      document.querySelectorAll('.hero-dissolve').forEach((el) => {
+        el.style.setProperty('--hp', String(hp));
+      });
+
       // Pinned tracks: progress across the portion where the stage is held.
       document.querySelectorAll('.pin-track').forEach((track) => {
         const rect = track.getBoundingClientRect();
@@ -119,7 +126,7 @@ export default function ScrollBoot() {
       );
 
       document
-        .querySelectorAll('.reveal, .reveal-lag, .hero-reveal, .bio-reveal > p, .bio-reveal li')
+        .querySelectorAll('.reveal, .reveal-lag, .hero-reveal, .reveal-seq .prose-body > p, .reveal-seq .news-list li, .reveal-seq .seq-line')
         .forEach((el) => observer.observe(el));
     }
 

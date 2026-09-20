@@ -26,7 +26,7 @@ const ICON = {
  */
 export default function HomeHero() {
   return (
-    <section className="flex min-h-[100svh] flex-col justify-center pt-32 pb-16">
+    <section className="hero-dissolve flex min-h-[100svh] flex-col justify-center pt-32 pb-16">
       <div className="grid gap-12 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center lg:gap-20">
         <div className="min-w-0">
           <h1 className="display">{personalInfo.name}</h1>

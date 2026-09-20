@@ -1432,44 +1432,81 @@
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
-   BIO — paragraphs arrive one at a time as you read down
+   BIO -> NEWS — lines pop in one at a time, in place
+
+   Two things this gets wrong easily:
+
+   1. Giving each line its own view() timeline. A line's own timeline
+      completes the moment that line has entered the viewport, and several
+      lines fit on one screen, so they all resolved together. One container
+      owns the timeline and each line takes a slice of it instead.
+
+   2. Declaring that timeline name on more than one element. The name then
+      sits in scope twice, the reference is ambiguous, and the timeline goes
+      inactive — every animation silently stops applying. Exactly one
+      element may carry `view-timeline-name`.
+
+   No translation: the lines fade and sharpen in place rather than sliding.
    ═══════════════════════════════════════════════════════════════════════ */
-@supports (animation-timeline: view()) {
-  .bio-reveal > p,
-  .bio-reveal li {
-    animation: rise-in linear both;
-    animation-timeline: view();
-    /* Tied to `entry` rather than `cover`: each line finishes arriving as it
-       clears the bottom edge, so they unveil one at a time on the way down
-       instead of the whole block resolving at once. */
-    animation-range: entry 0% entry 92%;
+@keyframes line-in {
+  from {
+    opacity: 0;
+    filter: blur(7px);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
   }
 }
 
-/* Extra air so consecutive lines cross the viewport edge at distinct moments */
-.bio-reveal > p {
-  margin-bottom: 1.5em;
+.reveal-seq .prose-body > p {
+  margin-bottom: 1.35em;
 }
 
-.no-sda .bio-reveal > p,
-.no-sda .bio-reveal li {
+@supports (animation-timeline: view()) {
+  /* Each line rides its own view() timeline. A named timeline on the
+     container would be tidier, but Chrome left the named one permanently
+     inactive here — an identical ViewTimeline built in JS over the same
+     subject and scroller reported 103% while the CSS-named one reported
+     null — so this uses the mechanism that demonstrably works.
+
+     The range matters more than the mechanism: `cover 22% -> 42%` fires
+     while a line is travelling from roughly three-quarters down the screen
+     to the middle. Because consecutive lines are offset by their own
+     spacing, they cross that window one after another, which is what makes
+     them pop in sequence while you are actually looking at them. The
+     earlier `entry`-based range fired as each line first peeked over the
+     bottom edge, so the whole block resolved in the first few hundred
+     pixels of scroll, before you had read any of it. */
+  .reveal-seq .prose-body > p,
+  .reveal-seq .news-list li,
+  .reveal-seq .seq-line {
+    animation: line-in linear both;
+    animation-timeline: view();
+    animation-range: cover 22% cover 42%;
+    will-change: opacity, filter;
+  }
+}
+
+.no-sda .reveal-seq .prose-body > p,
+.no-sda .reveal-seq .news-list li,
+.no-sda .reveal-seq .seq-line {
   opacity: 0;
-  transform: translateY(28px);
-  transition: opacity 0.7s cubic-bezier(0.22, 0.8, 0.3, 1),
-    transform 0.7s cubic-bezier(0.22, 0.8, 0.3, 1);
+  filter: blur(7px);
+  transition: opacity 0.7s cubic-bezier(0.22, 0.8, 0.3, 1), filter 0.7s ease;
 }
 
-.no-sda .bio-reveal > p.in-view,
-.no-sda .bio-reveal li.in-view {
+.no-sda .reveal-seq .in-view {
   opacity: 1;
-  transform: none;
+  filter: blur(0);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .bio-reveal > p,
-  .bio-reveal li {
+  .reveal-seq .prose-body > p,
+  .reveal-seq .news-list li,
+  .reveal-seq .seq-line {
     opacity: 1 !important;
-    transform: none !important;
+    filter: none !important;
   }
 }
 
@@ -1599,4 +1636,241 @@
   letter-spacing: 0.08em;
   color: var(--muted);
   font-variant-numeric: tabular-nums;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   FIRST PAGE — one typographic scale for Bio, News and Elsewhere.
+   These previously took their size from three different wrappers, so they
+   rendered at 17px, 15.5px and 13.5px respectively and read as mismatched.
+   ═══════════════════════════════════════════════════════════════════════ */
+.home-column {
+  font-size: 16px;
+  line-height: 1.72;
+}
+
+@media (min-width: 768px) {
+  .home-column {
+    font-size: 17px;
+  }
+}
+
+.home-column .prose-body p,
+.home-column .news-list li {
+  font-size: inherit;
+  line-height: inherit;
+  color: var(--text-soft);
+}
+
+/* Section labels on the first page, all identical */
+.block-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--rule);
+}
+
+.home-column .news-list li > strong:first-child {
+  font-size: 13px;
+}
+
+.glance-key {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.glance-val {
+  margin-top: 3px;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--text-soft);
+}
+
+/* The card holds position beside the entire column */
+.glance-rail {
+  position: static;
+}
+
+@media (min-width: 1024px) {
+  .glance-rail {
+    position: sticky;
+    top: 92px;
+    align-self: start;
+  }
+}
+
+/* Elsewhere as rows rather than cards — cards competed with the glass card
+   next to them and made the column feel busy */
+.elsewhere-row {
+  display: grid;
+  grid-template-columns: minmax(0, auto) minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: 18px;
+  padding: 20px 0;
+  border-bottom: 1px solid var(--rule);
+  transition: padding-left 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.elsewhere-row:hover {
+  padding-left: 10px;
+}
+
+.elsewhere-title {
+  font-size: clamp(1.15rem, 2vw, 1.4rem);
+  font-weight: 600;
+  letter-spacing: -0.028em;
+  color: var(--text);
+}
+
+.elsewhere-note {
+  font-size: 13.5px;
+  color: var(--muted);
+}
+
+.elsewhere-arrow {
+  color: var(--muted);
+  align-self: center;
+  transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1), color 0.3s ease;
+}
+
+.elsewhere-row:hover .elsewhere-arrow {
+  transform: translateX(5px);
+  color: var(--accent);
+}
+
+@media (max-width: 560px) {
+  .elsewhere-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .elsewhere-note {
+    grid-column: 1 / -1;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   HERO DISSOLVE
+   The whole hero goes together — text and portrait. An earlier version
+   dissolved only the text and left the photo, which read as a paint failure.
+   ═══════════════════════════════════════════════════════════════════════ */
+@keyframes hero-dissolve {
+  from {
+    opacity: 1;
+    filter: blur(0px);
+  }
+  to {
+    opacity: 0.02;
+    filter: blur(13px);
+  }
+}
+
+@supports (animation-timeline: scroll()) {
+  .hero-dissolve {
+    animation: hero-dissolve linear both;
+    animation-timeline: scroll(root block);
+    animation-range: 40px 78svh;
+    will-change: opacity, filter;
+  }
+}
+
+.no-sda .hero-dissolve {
+  opacity: calc(1 - var(--hp, 0) * 0.98);
+  filter: blur(calc(var(--hp, 0) * 13px));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-dissolve {
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   PERSONAL — full-bleed lead frame
+   ═══════════════════════════════════════════════════════════════════════ */
+.bleed {
+  position: relative;
+  width: 100vw;
+  margin-left: 50%;
+  translate: -50% 0;
+}
+
+.lead-frame {
+  position: relative;
+  height: clamp(340px, 76svh, 760px);
+  overflow: hidden;
+}
+
+.lead-frame img {
+  object-fit: cover;
+  object-position: 50% 58%;
+}
+
+.lead-frame::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+      to top,
+      var(--paper) 1%,
+      rgba(0, 0, 0, 0) 34%
+    ),
+    linear-gradient(to bottom, var(--paper) 1%, rgba(0, 0, 0, 0) 22%);
+}
+
+.lead-caption {
+  position: absolute;
+  left: 50%;
+  bottom: clamp(28px, 7vh, 72px);
+  translate: -50% 0;
+  width: 100%;
+  max-width: 1180px;
+  padding-inline: clamp(20px, 5vw, 56px);
+  z-index: 2;
+}
+
+.lead-caption h2 {
+  font-size: clamp(2rem, 6vw, 4rem);
+  font-weight: 600;
+  letter-spacing: -0.045em;
+  line-height: 1;
+  color: #fff;
+  text-shadow: 0 2px 30px rgba(0, 0, 0, 0.45);
+}
+
+.lead-caption p {
+  margin-top: 12px;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.82);
+  text-shadow: 0 1px 16px rgba(0, 0, 0, 0.55);
+}
+
+/* Taller, closer-packed gallery cards */
+.pan-card {
+  height: clamp(340px, 76svh, 720px);
+  border-radius: 20px;
+  transition: transform 0.6s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.pan-card:hover {
+  transform: translateY(-6px);
+}
+
+.pan-rail {
+  gap: 20px;
+}
+
+.pan-card .photo-img {
+  transition: filter 0.6s ease;
 }
