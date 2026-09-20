@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import { usePathname } from 'next/navigation';
 import { useTheme } from 'next-themes';
 import { RiMenuLine, RiCloseLine, RiSunLine, RiMoonLine } from '@remixicon/react';
 import { personalInfo, navigations } from '@/website.config';
@@ -19,6 +20,12 @@ export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const { resolvedTheme, setTheme } = useTheme();
+  const pathname = usePathname();
+
+  // The homepage hero carries the name, so the pill starts as a monogram and
+  // reveals it on scroll. Every other page has no such hero — show it outright
+  // rather than making the identity depend on scrolling.
+  const isHome = pathname === '/';
 
   useEffect(() => setMounted(true), []);
 
@@ -41,20 +48,22 @@ export default function Header() {
         >
           <Link
             href="/"
-            className="nav-link !px-3 font-semibold tracking-[-0.02em] text-[13.5px]"
+            className="nav-link !px-3 font-semibold tracking-[-0.02em] text-[13.5px] whitespace-nowrap"
             style={{ color: 'var(--text)' }}
           >
-            {initials(personalInfo.name)}
+            {isHome ? initials(personalInfo.name) : personalInfo.name}
           </Link>
 
-          {/* Slides in once the hero has receded */}
-          <span
-            className="pill-name text-[13.5px] font-semibold tracking-[-0.022em]"
-            style={{ color: 'var(--text)' }}
-            aria-hidden="true"
-          >
-            {personalInfo.name}
-          </span>
+          {/* On the homepage only, the full name slides in as the hero recedes */}
+          {isHome && (
+            <span
+              className="pill-name text-[13.5px] font-semibold tracking-[-0.022em]"
+              style={{ color: 'var(--text)' }}
+              aria-hidden="true"
+            >
+              {personalInfo.name}
+            </span>
+          )}
 
           <div className="hidden sm:flex items-center gap-[2px]">
             {navigations.map((item) => (

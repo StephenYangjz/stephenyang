@@ -1,4 +1,5 @@
 import Masthead from '@/components/Masthead';
+import NextPage from '@/components/NextPage';
 import Section from '@/components/Section';
 import {
   ExperienceList,
@@ -45,6 +46,8 @@ export default function Page() {
           <HonorsList />
         </Section>
       </div>
+
+      <NextPage />
     </main>
   );
 }

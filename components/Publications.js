@@ -129,37 +129,19 @@ function PublicationRow({ item }) {
 }
 
 export default function Publications({ bibtex }) {
-  const entries = bibtexParse.toJSON(bibtex).map(toRecord);
-
-  const papers = entries.filter((item) => item.kind === 'paper');
-  const appendix = entries.filter((item) => item.kind !== 'paper');
+  // One continuous list. Patents and other work are no longer split into a
+  // trailing block — they carry their own venue chip ("US Patent App. …"),
+  // which is enough to tell them apart inline.
+  const entries = bibtexParse
+    .toJSON(bibtex)
+    .map(toRecord)
+    .sort((a, b) => Number(b.year || 0) - Number(a.year || 0));
 
   return (
     <div>
-      <div>
-        {papers.map((item) => (
-          <PublicationRow key={item.key} item={item} />
-        ))}
-      </div>
-
-      {appendix.length > 0 && (
-        <div className="mt-12">
-          <h3
-            className="rail-label reveal"
-            style={{ marginBottom: '2px' }}
-          >
-            Patents &amp; Other
-          </h3>
-          <div
-            className="mt-4 pt-1"
-            style={{ borderTop: '1px solid var(--rule)' }}
-          >
-            {appendix.map((item) => (
-              <PublicationRow key={item.key} item={item} />
-            ))}
-          </div>
-        </div>
-      )}
+      {entries.map((item) => (
+        <PublicationRow key={item.key} item={item} />
+      ))}
     </div>
   );
 }

@@ -1,4 +1,5 @@
 import Masthead from '@/components/Masthead';
+import NextPage from '@/components/NextPage';
 import Publications from '@/components/Publications';
 import bibtex from '@/data/bib/Publications.bib';
 
@@ -16,6 +17,8 @@ export default function Page() {
         note="Work on 3D foundation models, feed-forward reconstruction, and world models for driving. Preprints are listed at their accepted venue once a venue exists."
       />
       <Publications bibtex={bibtex} />
+
+      <NextPage />
     </main>
   );
 }

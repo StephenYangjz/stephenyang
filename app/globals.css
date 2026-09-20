@@ -1426,3 +1426,85 @@
   height: 1px;
   background: var(--rule);
 }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   BIO — paragraphs arrive one at a time as you read down
+   ═══════════════════════════════════════════════════════════════════════ */
+@supports (animation-timeline: view()) {
+  .bio-reveal > p {
+    animation: rise-in linear both;
+    animation-timeline: view();
+    animation-range: entry 12% cover 36%;
+  }
+}
+
+.no-sda .bio-reveal > p {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.7s cubic-bezier(0.22, 0.8, 0.3, 1),
+    transform 0.7s cubic-bezier(0.22, 0.8, 0.3, 1);
+}
+
+.no-sda .bio-reveal > p.in-view {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bio-reveal > p {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   NEXT PAGE
+   ═══════════════════════════════════════════════════════════════════════ */
+.next-page {
+  margin-top: 96px;
+}
+
+.next-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 40px clamp(24px, 4vw, 44px) 44px;
+  border-radius: 24px;
+  border: 1px solid var(--rule);
+  background: var(--glass-bg);
+  backdrop-filter: blur(18px) saturate(150%);
+  -webkit-backdrop-filter: blur(18px) saturate(150%);
+  overflow: hidden;
+  transition: border-color 0.3s ease, box-shadow 0.4s ease;
+}
+
+.next-card:hover {
+  border-color: var(--rule-strong);
+  box-shadow: var(--glass-shadow-lift);
+}
+
+.next-title {
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  font-weight: 600;
+  letter-spacing: -0.042em;
+  line-height: 1.02;
+}
+
+.next-bar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 3px;
+  background: var(--rule);
+}
+
+.next-bar-fill {
+  display: block;
+  height: 100%;
+  background: var(--accent);
+  transform-origin: 0 50%;
+  transform: scaleX(0);
+  transition: transform 0.12s linear;
+}

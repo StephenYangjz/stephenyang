@@ -1,4 +1,5 @@
 import Masthead from '@/components/Masthead';
+import NextPage from '@/components/NextPage';
 import Section from '@/components/Section';
 import PannedGallery from '@/components/PannedGallery';
 import { ReadingList, NotesList } from '@/components/Personal';
@@ -37,6 +38,8 @@ export default function Page() {
           </div>
         </Section>
       </div>
+
+      <NextPage />
     </main>
   );
 }

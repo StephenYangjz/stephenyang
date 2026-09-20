@@ -29,9 +29,9 @@ export default function HeroPinned() {
     <section className="pin-track" style={{ height: '185svh' }}>
       <div className="pin-stage">
         <div className="shell w-full">
-          <div className="hero-dolly">
-            <div className="grid gap-12 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center lg:gap-20">
-              <div className="min-w-0">
+          <div className="grid gap-12 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center lg:gap-20">
+            <div className="hero-dolly min-w-0">
+              <div>
                 <h1 className="display">{personalInfo.name}</h1>
 
                 <p className="mt-6 text-[18px] md:text-[21px] tracking-[-0.02em]">
@@ -85,30 +85,30 @@ export default function HeroPinned() {
                   </a>
                 </div>
               </div>
+            </div>
 
-              {personalInfo.profilePicture && (
-                <Image
+            {personalInfo.profilePicture && (
+              <Image
                   src={personalInfo.profilePicture}
                   alt={personalInfo.fullName}
                   width={200}
                   height={200}
                   priority
-                  className="order-first h-[124px] w-[124px] rounded-[30px] object-cover lg:order-last lg:h-[200px] lg:w-[200px] lg:rounded-[44px]"
-                  style={{
-                    border: '1px solid var(--glass-border)',
-                    boxShadow: 'var(--glass-shadow)',
-                  }}
-                />
-              )}
-            </div>
+                  className="portrait-drift order-first h-[124px] w-[124px] rounded-[30px] object-cover lg:order-last lg:h-[200px] lg:w-[200px] lg:rounded-[44px]"
+                style={{
+                  border: '1px solid var(--glass-border)',
+                  boxShadow: 'var(--glass-shadow)',
+                }}
+              />
+            )}
+          </div>
 
-            <div
-              className="mt-16 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.16em]"
-              style={{ color: 'var(--muted)' }}
-            >
-              <RiArrowDownLine size={13} />
-              Scroll
-            </div>
+          <div
+            className="hero-dolly mt-16 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.16em]"
+            style={{ color: 'var(--muted)' }}
+          >
+            <RiArrowDownLine size={13} />
+            Scroll
           </div>
         </div>
       </div>
