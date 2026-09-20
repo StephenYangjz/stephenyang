@@ -38,11 +38,6 @@ export const personalInfo = {
 
 
 
-  teaching: [
-    { title: 'CS182: Deep Learning', term: 'Spring', year: 2023 },
-    { title: 'CS188: Introduction to AI', term: 'Summer', year: 2022 },
-    { title: 'CS61B: Data Structures', term: 'Spring', year: 2022 },
-  ],
 
   experience: [
     {
@@ -183,8 +178,6 @@ export const leadPhoto = {
   caption: 'Bixby Bridge',
   place: 'Big Sur, California',
   year: '2024',
-  width: 2000,
-  height: 1333,
 };
 
 export const photography = [
@@ -232,11 +225,6 @@ export const photography = [
   },
 ];
 
-// Where the full set lives, if anywhere. Set to null to hide the link.
-export const photographyLink = {
-  label: 'More on Bilibili',
-  url: 'https://www.bilibili.com/video/BV154411C7Z8/#reply66991918',
-};
 
 export const reading = [
   {
@@ -337,7 +325,6 @@ export const glanceFacts = (info) => [
 ];
 
 export const websiteInfo = {
-  title: personalInfo.name,
   description: `${personalInfo.fullName} — ${personalInfo.role} at ${personalInfo.university}. ${personalInfo.tagline}`,
   url: 'https://stephenjyang.com',
   teaserImage: '/profile.jpg',
@@ -350,4 +337,3 @@ export const navigations = [
 ];
 
 
-export const fontStyle = 'sans'; // "sans" | "serif" | "mono"
