@@ -5,10 +5,10 @@ export const personalInfo = {
   role: 'Research Scientist',
   university: 'Wayve',
   universityWebsite: 'https://wayve.ai/',
-  location: 'London, UK',
+  location: 'Sunnyvale, CA',
 
   // One line, used for the hero sub-head and the page description.
-  tagline: '3D foundation models and world models for embodied agents.',
+  tagline: 'Geometric foundation models and spatial intelligence.',
 
   socialMedia: [
     { name: 'Email', url: 'mailto:stephenyang@berkeley.edu' },
@@ -33,7 +33,7 @@ export const personalInfo = {
     {
       position: 'Research Scientist',
       company: 'Wayve',
-      location: 'London, UK',
+      location: 'Sunnyvale, CA',
       startDate: '2026',
       endDate: null,
       responsibilities: ['End-to-end driving foundation models.'],

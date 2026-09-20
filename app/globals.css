@@ -632,7 +632,14 @@
      minmax(0, 1fr) the grid column sizes to it and drags every other child
      — the section heading included — off to the right. */
   grid-template-columns: minmax(0, 1fr);
-  align-content: center;
+  /* Top-aligned, not centred. Centring split the leftover height evenly
+     above and below, so on a tall window the label drifted far down the
+     sheet behind a band of blank paper — and the taller the window, the
+     worse it got. Anchoring to the top clears the header by a fixed amount
+     instead, so the gap no longer scales with viewport height. */
+  align-content: start;
+  /* Header bottom edge sits at 78px; keep clear of it on short windows. */
+  padding-top: clamp(108px, 13svh, 142px);
   overflow: hidden;
 }
 
