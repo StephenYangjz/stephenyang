@@ -7,10 +7,11 @@ import { RiArrowRightLine } from '@remixicon/react';
 
 import { readingOrder as ORDER } from '@/website.config';
 
-const PULL = 420; // px of overscroll that fills the bar
-const ARRIVAL_CAP = 0.55; // how far the gesture you arrived on may fill it
-const GESTURE_GAP = 110; // wheel silence that marks the end of a gesture
+const PULL = 240; // px of scrolling at the bottom that fills the bar
+const GESTURE_GAP = 120; // wheel silence that ends the gesture you arrived on
 const MAX_STEP = 90; // ceiling on one event, so the bar sweeps rather than jumps
+const DECAY = 500; // stop pushing and the bar empties again
+const SLACK = 4; // px of tolerance on "at the bottom", for fractional layout
 
 function normalise(path) {
   if (!path) return '/';
@@ -22,24 +23,32 @@ function normalise(path) {
  * At the bottom of the page, scrolling on fills a bar and then moves to the
  * next page.
  *
- * The difficulty is momentum. A trackpad flick keeps delivering wheel events
- * long after the page has stopped against the bottom, so if every event
- * counts, the gesture that brought you to the end carries you off it. The
- * previous fix was to ignore input until the wheel fell silent, which did
- * work, but it meant the bar sat dead at nought while you were already
- * pushing — the arrival read as unresponsive precisely because it was.
+ * Only one thing here is subtle, and it is momentum: a trackpad flick keeps
+ * delivering wheel events long after the page has stopped against the bottom,
+ * so if every event counted, the gesture that brought you to the end would
+ * carry you off it. The fix is to wait for the wheel to fall silent once —
+ * momentum events arrive an order of magnitude closer together than
+ * GESTURE_GAP, so that silence can only fall between gestures, never inside
+ * one. After it does, scrolling fills the bar normally.
  *
- * So the gesture you arrive on is not ignored; it is capped. It fills the bar
- * to ARRIVAL_CAP and stops there, which gives immediate feedback and makes
- * plain that something is happening, while no amount of momentum can finish
- * the job. The cap lifts once the wheel has been quiet for GESTURE_GAP —
- * momentum events arrive an order of magnitude closer together than that, so
- * it can only elapse between gestures, never inside one.
+ * Everything else is deliberately dumb, because the clever versions were
+ * worse:
  *
- * Progress does not time out. Once the bar is part-filled it stays that way,
- * so coming back to it a minute later still only costs the remainder. It
- * clears when you scroll up or leave the bottom, which are the two things
- * that actually mean you did not want to go.
+ *   The bar always starts empty. A previous attempt let the arrival gesture
+ *   pre-fill it to give early feedback, which just looked like the bar was
+ *   broken and already half full before you had done anything.
+ *
+ *   The bar empties when you stop. A previous attempt made progress
+ *   permanent so that returning to it was cheap; in practice it meant a
+ *   half-filled bar sitting there indefinitely with no way to clear it.
+ *
+ *   Being armed survives stray upward events. This was the real bug: the
+ *   arming flag was cleared by any negative deltaY, and trackpads emit those
+ *   constantly as your fingers lift. Every stray tick demoted you back to
+ *   "still arriving", so the bar would refuse to fill and there was no way to
+ *   tell why. Arming is now cleared only by actually leaving the bottom,
+ *   which is the one thing that unambiguously means you are not there any
+ *   more.
  *
  * The link is always clickable, and the whole behaviour is disabled under
  * prefers-reduced-motion.
@@ -60,42 +69,50 @@ export default function NextPage() {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
     let gapTimer;
-    // False while the gesture that brought us to the bottom is still running.
-    let gestureEnded = false;
+    let decayTimer;
+    let armed = false;
 
     const atBottom = () =>
       window.innerHeight + window.scrollY >=
-      document.documentElement.scrollHeight - 2;
+      document.documentElement.scrollHeight - SLACK;
 
-    const reset = () => {
-      clearTimeout(gapTimer);
-      gestureEnded = false;
+    const empty = () => {
       pulled.current = 0;
       setProgress(0);
     };
 
-    const onWheel = (event) => {
-      if (navigated.current) return;
+    // Leaving the bottom is the only thing that puts us back to square one.
+    const onScroll = () => {
+      if (atBottom()) return;
+      armed = false;
+      clearTimeout(gapTimer);
+      clearTimeout(decayTimer);
+      empty();
+    };
 
-      // Scrolling up, or no longer pinned to the bottom: you did not mean it.
-      if (event.deltaY <= 0 || !atBottom()) {
-        reset();
+    const onWheel = (event) => {
+      if (navigated.current || !atBottom()) return;
+      // Upward ticks at the bottom are noise from a lifting hand, not intent.
+      if (event.deltaY <= 0) return;
+
+      if (!armed) {
+        // Pushed back by every event, so it can only fire once the flick that
+        // delivered us here has finished.
+        clearTimeout(gapTimer);
+        gapTimer = setTimeout(() => {
+          armed = atBottom();
+        }, GESTURE_GAP);
         return;
       }
 
-      // Every event pushes this back, so it only fires in the gap between one
-      // gesture and the next — never inside a single flick's momentum tail.
-      clearTimeout(gapTimer);
-      gapTimer = setTimeout(() => {
-        gestureEnded = true;
-      }, GESTURE_GAP);
-
-      const ceiling = gestureEnded ? PULL : PULL * ARRIVAL_CAP;
       pulled.current = Math.min(
-        ceiling,
+        PULL,
         pulled.current + Math.min(event.deltaY, MAX_STEP)
       );
       setProgress(pulled.current / PULL);
+
+      clearTimeout(decayTimer);
+      decayTimer = setTimeout(empty, DECAY);
 
       if (pulled.current >= PULL) {
         navigated.current = true;
@@ -104,9 +121,12 @@ export default function NextPage() {
     };
 
     window.addEventListener('wheel', onWheel, { passive: true });
+    window.addEventListener('scroll', onScroll, { passive: true });
     return () => {
       window.removeEventListener('wheel', onWheel);
+      window.removeEventListener('scroll', onScroll);
       clearTimeout(gapTimer);
+      clearTimeout(decayTimer);
     };
   }, [next, router]);
 
