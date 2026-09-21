@@ -282,13 +282,15 @@ export const reading = [
     title: 'The Power of Now',
     author: 'Eckhart Tolle',
     quote:
-      'Whenever you are able to observe your mind, you are no longer trapped in it.',
+      'The moment you realize you are not present, you are present. Whenever you are able to observe your mind, you are no longer trapped in it.',
     note: "Tolle's actual claim is narrower than the shelf around it suggests: the voice narrating your life is not the same thing as you, and much of what we call suffering is the interest paid on confusing the two. The mind is very good at presenting its own commentary as perception, and most of what I have learned about thinking clearly has really been learning to notice that gap — a thought arriving does not make it a finding. He treats this as a problem of attention rather than of belief, which is why the practice survives even when the metaphysics does not. Meaning, read this way, is less something discovered than something maintained: it decays if you stop attending to it, which is an oddly practical conclusion for a question that sounds so grand.",
   },
   {
     title: 'The Let Them Theory',
     author: 'Mel Robbins',
-    quote: 'You will never be able to control what is happening around you.',
+    quote:
+      "Focusing on what you can't control makes you stressed. "
+      + 'Focusing on what you can control makes you powerful.',
     note: "Two words carrying the weight of the Stoic dichotomy of control. We are reliably wrong about how much is ours to begin with — almost none of it reaches other people, nearly all of it sits in where attention goes next, and most unhappiness I can account for comes from having those two figures swapped. The useful half is not the first word but the second: once you stop spending attention on what other people were going to do anyway, you notice how little of it you had been spending on what you actually choose. Less original than it presents itself as, and lighter than the idea deserves — but the reframe survives its own packaging.",
   },
   {
