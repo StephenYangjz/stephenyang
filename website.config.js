@@ -222,7 +222,7 @@ export const photography = [
   },
   {
     src: '/photos/yosemite-valley.jpg',
-    place: 'Yosemite National Park',
+    place: 'Yosemite National Park, California',
     aspect: '3 / 2',
     year: '2026',
   },
@@ -260,19 +260,19 @@ export const photography = [
     src: '/photos/iceland-strokkur.jpg',
     place: 'Strokkur Geyser, Haukadalur, Iceland',
     aspect: '3 / 2',
-    year: '2025',
+    year: '2024',
   },
   {
     src: '/photos/iceland-vatnajokull-ice-cave.jpg',
     place: 'Vatnajökull Glacier, Iceland',
     aspect: '3 / 2',
-    year: '2025',
+    year: '2024',
   },
   {
     src: '/photos/iceland-jokulsarlon.jpg',
     place: 'Jökulsárlón Glacier Lagoon, Iceland',
     aspect: '3 / 2',
-    year: '2025',
+    year: '2024',
   },
 ];
 
