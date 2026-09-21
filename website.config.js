@@ -289,9 +289,8 @@ export const reading = [
     title: 'The Let Them Theory',
     author: 'Mel Robbins',
     quote:
-      "Focusing on what you can't control makes you stressed. "
-      + 'Focusing on what you can control makes you powerful.',
-    note: "Two words carrying the weight of the Stoic dichotomy of control. We are reliably wrong about how much is ours to begin with — almost none of it reaches other people, nearly all of it sits in where attention goes next, and most unhappiness I can account for comes from having those two figures swapped. The useful half is not the first word but the second: once you stop spending attention on what other people were going to do anyway, you notice how little of it you had been spending on what you actually choose. Less original than it presents itself as, and lighter than the idea deserves — but the reframe survives its own packaging.",
+      'This is the hardest part of the Let Them Theory to put into practice\u2014learning to feel my raw emotions without immediately reacting.',
+    note: "This sits close to Tolle, further up the page, and the pair says more than either alone. He describes watching the mind; she describes the bodily version of the same move — staying inside a feeling long enough not to act on it. Both point at one interval: the moment between a state arriving and it becoming the thing you are. What Robbins adds is an accounting rather than a virtue. Attention is finite, so the question worth asking is not whether you are right about someone but what the rehearsal costs, and that is a question I would rather keep open than settle. I doubt the gap is an insight you have once; it seems to be somewhere you re-enter, which is an odd conclusion for a book that sells itself as a tool. Less original than it presents itself as, and lighter than the idea deserves — but the reframe survives its packaging.",
   },
   {
     title: 'The Startup of You',
