@@ -9,15 +9,7 @@ import { readingOrder as ORDER } from '@/website.config';
 
 const NEED = 460; // px of pressure that advances the page
 const LEAK = 1400; // px per second that pressure drains away
-// Long enough for the baseline window to absorb the scroll that brought you
-// here, so that arriving cannot itself look like speeding up.
-const SETTLE = 250; // ms at the end before anything is counted at all
-const NEAR_MS = 150; // window for "how fast am I scrolling right now"
-const BASE_MS = 600; // window for "how fast have I been scrolling"
-const HIST_MS = 900; // how much scroll history to keep
-const ACCEL = 1.6; // how much faster than the baseline counts as speeding up
-const ACCEL_FLOOR = 0.25; // px per ms, so small absolute changes never qualify
-const ACCEL_HITS = 2; // consecutive qualifying events, so noise alone cannot
+const GESTURE_GAP = 200; // ms of wheel silence that separates one gesture from the next
 const STALLS = 3; // repeated unmoved wheels that prove where the end is
 const SLACK = 6; // tolerance on "at the end", for fractional scroll positions
 
@@ -45,25 +37,19 @@ function normalise(path) {
  * looked at the card. Pressure starts at nought when you arrive, no matter
  * how you arrived.
  *
- * Intent is read as acceleration: not how fast you are scrolling, but whether
- * you have just sped up. Two windows over recent scrolling, the last 150ms
- * and the last 600ms, and pressure builds only while the short one clearly
- * outruns the long one. Scrolling faster means doing something new; scrolling
- * fast means nothing at all.
+ * Intent is a gesture that *begins* at the end of the page. One continuous
+ * scroll — however long, however fast — is a single gesture that began
+ * further up, so it never qualifies, and that covers both the shapes that
+ * used to fire by accident: a trackpad flick's momentum tail is the same
+ * gesture as the flick, and a free-spinning mouse wheel is one long gesture
+ * from wherever the spin started.
  *
- * Windows rather than per-event rates, because dividing a delta by the gap
- * since the previous event is hopeless: wheel events arrive unevenly, and one
- * that lands 2ms after its predecessor reports an enormous phantom rate. That
- * alone was enough to let steady scrolling trigger this.
- *
- * Both of the ways this used to fire by accident are the same mistake read
- * two ways. A trackpad flick's deltas decay, so the short average falls below
- * the long one and nothing accumulates. A free-spinning mouse wheel — the
- * Logitech flywheel — coasts at a high, steady rate instead, which defeated
- * an earlier rule that merely asked whether each delta exceeded the one
- * before it: that wheel's deltas fluctuate constantly, so noise cleared the
- * bar on its own. Against a baseline, coasting is flat however fast it is,
- * and only a fresh spin registers.
+ * Gestures are separated by silence. A flywheel emits continuously while it
+ * turns, so no gap appears until it actually stops; the deliberate nudge
+ * after that is a new gesture, and it begins where you already are, at the
+ * end. Reading speed instead of gesture boundaries was a mistake: a free
+ * wheel's rate fluctuates enough that "is this faster than before" answers
+ * yes on noise alone.
  *
  * There is deliberately no gesture bookkeeping. The rule used to be that a
  * gesture counted only if it began at the end, which needed a gap in wheel
@@ -125,10 +111,8 @@ export default function NextPage() {
 
     let pressure = 0;
     let pressureT = 0; // when pressure was last brought up to date
-    let arrivedAt = null; // when we reached the end
-    const hist = []; // recent {t, d} wheel samples
-    let accelHits = 0;
-    let pushing = false; // has a deliberate speed-up been seen?
+    let lastWheel = 0;
+    let pushing = false; // did this gesture begin at the end of the page?
     let raf = 0;
 
     // Leak against the clock rather than against frames. Doing it per frame
@@ -154,10 +138,7 @@ export default function NextPage() {
       const here = atEnd() && cardShown();
       if (!here) {
         pressure = 0;
-        arrivedAt = null;
         pushing = false;
-      } else if (arrivedAt === null) {
-        arrivedAt = t;
       }
 
       decayTo(t);
@@ -196,30 +177,9 @@ export default function NextPage() {
       const el = scroller();
       const y = el.scrollTop;
 
-      // Recorded on every event, including well before the end, so that
-      // arriving fast sets a baseline that simply staying fast cannot beat.
-      const t = performance.now();
-      hist.push({ t, d: event.deltaY });
-      while (hist.length && t - hist[0].t > HIST_MS) hist.shift();
-      // Divided by the whole window, so time spent not scrolling counts as
-      // zero. That is what makes picking the wheel up again read as a
-      // speed-up while never letting a steady spin qualify: keep going at one
-      // speed and the long window fills with exactly that speed, so the two
-      // averages converge and nothing happens, however fast you are going.
-      const over = (ms) => {
-        let total = 0;
-        for (let i = hist.length - 1; i >= 0; i -= 1) {
-          if (t - hist[i].t > ms) break;
-          total += hist[i].d;
-        }
-        return total / ms;
-      };
-      const near = over(NEAR_MS);
-      const base = over(BASE_MS);
-
-      // Wheel events fire before the scroll is applied, so this reads what the
-      // previous event produced. Repeatedly unmoved means the page will not go
-      // any further, and that is the end.
+      // Where the page actually stops. Wheel events fire before the scroll is
+      // applied, so this reads what the previous one produced; repeatedly
+      // unmoved means it will not go further, whatever scrollHeight claims.
       if (lastWheelY !== null && y <= lastWheelY + 0.5) {
         stalls += 1;
         if (stalls >= STALLS) endY = y;
@@ -228,28 +188,19 @@ export default function NextPage() {
       }
       lastWheelY = y;
 
-      if (!atEnd() || !cardShown()) {
-        arrivedAt = null;
-        decayTo(t);
-        run();
-        return;
+      const t = performance.now();
+      // A gesture boundary is silence, not speed. Everything inside one
+      // continuous scroll belongs to the gesture that started it, so a long
+      // spin of a free wheel is one gesture that began far up the page.
+      if (t - lastWheel > GESTURE_GAP) {
+        // Recomputed per gesture, so there is no flag to strand.
+        pushing = atEnd() && cardShown();
       }
-      if (arrivedAt === null) arrivedAt = t;
+      lastWheel = t;
 
-      // Ignore the first moments at the end: that is where a flick's momentum
-      // is strongest, and it is not you deciding anything.
-      if (arrivedAt !== null && t - arrivedAt < SETTLE) {
-        decayTo(t);
-        run();
-        return;
-      }
-
-      // Speeding up is the signal, not speed. Coasting — a flywheel, or a
-      // flick's tail — holds the two averages together; a fresh push pulls
-      // the short one above the long one.
-      if (near > base * ACCEL + ACCEL_FLOOR) accelHits += 1;
-      else accelHits = 0;
-      if (accelHits >= ACCEL_HITS) pushing = true;
+      // Leaving the end mid-gesture ends it; the rest of that scroll should
+      // not keep counting on the way past.
+      if (pushing && !(atEnd() && cardShown())) pushing = false;
 
       if (pushing) {
         decayTo(t);
