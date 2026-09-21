@@ -2499,3 +2499,17 @@
     transition: none;
   }
 }
+
+/* Joint-first-authorship marker and its one-line explanation. Quiet: it is a
+   footnote, and the names beside it are the content. */
+.pub-equal {
+  font-size: 0.7em;
+  color: var(--muted);
+  margin-left: 1px;
+}
+
+.pub-legend {
+  margin-top: 26px;
+  font-size: 12.5px;
+  color: var(--muted);
+}

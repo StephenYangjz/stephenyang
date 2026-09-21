@@ -22,7 +22,12 @@ function parseAuthors(raw) {
   return (raw || '')
     .split(/\s+and\s+/i)
     .map((author) => {
-      const name = clean(author);
+      const raw = clean(author);
+      // A trailing asterisk marks joint first authorship. It has to come off
+      // before anything else looks at the name, or "Jiezhi Yang*" fails to
+      // match SELF and my own name stops rendering bold.
+      const equal = /\*\s*$/.test(raw);
+      const name = raw.replace(/\*/g, '').trim();
       // "Last, First" -> "First Last", but only for a genuine inversion.
       // A trailing suffix ("Qualcomm Technologies, Inc.") must not be flipped.
       const parts = name.split(',').map((p) => p.trim()).filter(Boolean);
@@ -33,7 +38,7 @@ function parseAuthors(raw) {
       const isSelf = SELF.includes(
         normalised.toLowerCase().replace(/[().]/g, '').replace(/\s+/g, ' ')
       );
-      return { name: isSelf ? SELF_DISPLAY : normalised, isSelf };
+      return { name: isSelf ? SELF_DISPLAY : normalised, isSelf, equal };
     })
     .filter((a) => a.name);
 }
@@ -89,6 +94,7 @@ function PublicationRow({ item }) {
             {item.authors.map((author, index) => (
               <span key={`${author.name}-${index}`}>
                 {author.isSelf ? <strong>{author.name}</strong> : author.name}
+                {author.equal && <sup className="pub-equal">*</sup>}
                 {index < item.authors.length - 1 ? ', ' : ''}
               </span>
             ))}
@@ -137,11 +143,21 @@ export default function Publications({ bibtex }) {
     .map(toRecord)
     .sort((a, b) => Number(b.year || 0) - Number(a.year || 0));
 
+  // Only explain the asterisk if one is actually on the page.
+  const hasEqual = entries.some((item) =>
+    item.authors.some((author) => author.equal)
+  );
+
   return (
     <div>
       {entries.map((item) => (
         <PublicationRow key={item.key} item={item} />
       ))}
+      {hasEqual && (
+        <p className="pub-legend">
+          <span className="pub-equal">*</span> Equal contribution.
+        </p>
+      )}
     </div>
   );
 }
