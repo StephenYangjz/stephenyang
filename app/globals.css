@@ -2562,6 +2562,19 @@
   /* Gallery frames are sized from viewport *height*, which on a phone makes a
      3:2 photograph 882px wide inside a 375px window — you could only ever see
      a slice. Let width lead instead, and let the aspect ratio set the height. */
+  /* The floating down arrow is an invitation to keep scrolling, and on a
+     phone it is pointing at something that does not exist: advancing here is
+     a tap, not an overscroll. It was also outstaying its welcome — it is
+     dismissed on a scroll timeline, which does not run on the phone path, so
+     it hovered over the footer at the very bottom of the page suggesting
+     there was more below it. There is not.
+
+     Desktop keeps it: there the arrow is accurate, and it is how the
+     scroll-to-advance gesture announces itself. */
+  .scroll-cue {
+    display: none;
+  }
+
   /* At a glance is a desktop device: on a wide screen it sits fixed beside
      the bio, saying the same things the reader can see. Stacked on a phone
      it lands at the very bottom, repeating what the hero said several
