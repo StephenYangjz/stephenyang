@@ -38,7 +38,7 @@ export default function PannedGallery() {
               >
                 <Image
                   src={photo.src}
-                  alt={photo.caption || ''}
+                  alt={[photo.place, photo.year].filter(Boolean).join(', ')}
                   fill
                   sizes="(max-width: 720px) 90vw, 46vw"
                   className="photo-img"

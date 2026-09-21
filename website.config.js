@@ -196,66 +196,62 @@ export const leadPhoto = {
 // `aspect` is the frame's own shape. The rail sizes each card to its
 // photograph rather than cropping every photograph to one card, so a
 // landscape frame stays landscape and the upright one stays upright.
+//
+// No caption here: the rail only ever shows `place · year`, and a field that
+// is written but never read is a field that quietly goes stale. Alt text is
+// built from place and year instead. (leadPhoto does keep a caption — that
+// one is genuinely displayed, at the top of the personal page.)
 export const photography = [
   {
     src: '/photos/water-lantern-san-jose.jpg',
-    caption: 'Water Lantern Festival',
     place: 'San Jose, California',
     aspect: '3 / 2',
     year: '2026',
   },
   {
     src: '/photos/pinnacles-airglow.jpg',
-    caption: 'Airglow over the ridgeline',
     place: 'Pinnacles National Park',
     aspect: '3 / 2',
     year: '2026',
   },
   {
     src: '/photos/pinnacles-milky-way.jpg',
-    caption: 'The Milky Way, and one meteor',
     place: 'Pinnacles National Park',
     aspect: '3 / 2',
     year: '2026',
   },
   {
     src: '/photos/yosemite-valley.jpg',
-    caption: 'The valley from Tunnel View',
     place: 'Yosemite National Park',
     aspect: '3 / 2',
     year: '2026',
   },
   {
     src: '/photos/hearst-castle-roman-pool.jpg',
-    caption: 'The Roman Pool',
     place: 'Hearst Castle, California',
     aspect: '3 / 2',
     year: '2026',
   },
   {
     src: '/photos/rocky-mountain-lake.jpg',
-    caption: 'Snowmelt and standing water',
     place: 'Rocky Mountain National Park',
     aspect: '3 / 2',
     year: '2026',
   },
   {
     src: '/photos/sf-golden-gate.jpg',
-    caption: 'The Golden Gate through the haze',
     place: 'San Francisco',
     aspect: '3 / 2',
     year: '2026',
   },
   {
     src: '/photos/sf-skyline.jpg',
-    caption: 'Coit Tower at sundown',
     place: 'San Francisco',
     aspect: '3 / 2',
     year: '2026',
   },
   {
     src: '/photos/sf-california-street.jpg',
-    caption: 'Cable car tracks running west',
     place: 'San Francisco',
     aspect: '2 / 3',
     year: '2026',
