@@ -2514,6 +2514,13 @@
   color: var(--muted);
 }
 
+/* Scroll length the pinned pan needs: the stage stays put for this long
+   while the rail travels across it. Was an inline style on the section,
+   where no media query could reach it. */
+.pin-track {
+  height: 340svh;
+}
+
 /* ═══════════════════════════════════════════════════════════════════════
    PHONES — everything below this line is scoped to narrow screens
 
@@ -2555,10 +2562,98 @@
   /* Gallery frames are sized from viewport *height*, which on a phone makes a
      3:2 photograph 882px wide inside a 375px window — you could only ever see
      a slice. Let width lead instead, and let the aspect ratio set the height. */
-  .pan-card {
-    width: 86vw;
+  /* At a glance is a desktop device: on a wide screen it sits fixed beside
+     the bio, saying the same things the reader can see. Stacked on a phone
+     it lands at the very bottom, repeating what the hero said several
+     screens earlier, to nobody's benefit. */
+  .glance-rail {
+    display: none;
+  }
+
+  /* ── The gallery stops being a pinned pan ──────────────────────────
+     Scroll-hijacked horizontal panning is a desktop idea. On a phone it
+     produced all three of the reported faults at once: the stage is a full
+     viewport tall while the frames inside it are ~215px, so most of it is
+     empty paper you have to scroll past; the rail is driven by a transform
+     tied to scroll, so a finger-flick fights it and the compositor shows
+     seams of background mid-move; and getting past the section at all means
+     scrolling the whole track.
+
+     A phone already has a gesture for this. Unpin the stage, drop the
+     transform, and let the rail be a snap-scrolling strip you swipe. */
+  .pin-track {
+    /* Nothing is pinned, so the section is just as tall as its contents. */
     height: auto;
-    max-height: 68svh;
+    view-timeline-name: none;
+    margin-bottom: 20px;
+  }
+
+  .pin-stage {
+    position: static;
+    height: auto;
+    overflow: visible;
+    align-content: start;
+  }
+
+  .gallery-head {
+    position: static;
+    margin-bottom: 12px;
+  }
+
+  .pan-rail {
+    width: auto;
+    gap: 12px;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    /* Both the scroll-driven animation and its no-sda fallback write a
+       transform here. Neither should survive on a phone. */
+    animation: none !important;
+    transform: none !important;
+    will-change: auto;
+  }
+
+  .pan-rail::-webkit-scrollbar {
+    display: none;
+  }
+
+  .pan-card {
+    scroll-snap-align: center;
+    /* One shape for the whole strip. Per-photo aspect ratios are right on a
+       desktop, where the frames sit side by side and the variety reads as
+       deliberate. In a single-file strip the tallest frame sets the row
+       height and every shorter one floats in a band of empty paper — which
+       is the white space above and below the landscape shots. Eleven of the
+       twelve are 3:2, so that is the shape the strip takes; the upright one
+       is cropped by object-fit, which it already was on the other axis. */
+    aspect-ratio: 3 / 2 !important;
+    width: 88vw;
+    height: auto;
+    max-height: none;
+    /* The radial mask feathers a frame into the paper. At thumbnail size it
+       eats the picture, and it is what reads as background bleeding through
+       when the rail moves. */
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+
+  /* One line, or it covers a third of the photograph. */
+  .pan-card .photo-cap {
+    left: 10px;
+    bottom: 10px;
+    right: 10px;
+    font-size: 10.5px;
+    padding: 5px 10px;
+    max-width: max-content;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Nothing is pinned any more, so a lift on tap just jitters the row. */
+  .pan-card:hover {
+    transform: none;
   }
 
   /* Less dead air under the colophon on a small screen. Needs the class as
