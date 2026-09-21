@@ -287,7 +287,13 @@ export default function NextPage() {
         <span className="page-link-kicker">Next · {next.kicker}</span>
         <span className="next-title">{next.label}</span>
         <span className="page-link-go">
-          {ready ? 'Keep scrolling to continue' : 'Keep scrolling, or click'}{' '}
+          {/* Both are rendered; CSS shows whichever suits the pointer. A
+              touch device has no wheel events, so telling a phone to keep
+              scrolling is an instruction it cannot carry out. */}
+          <span className="go-scroll">
+            {ready ? 'Keep scrolling to continue' : 'Keep scrolling, or click'}
+          </span>
+          <span className="go-tap">Tap to continue</span>{' '}
           <RiArrowRightLine size={14} />
         </span>
         <span className="next-bar" aria-hidden="true">

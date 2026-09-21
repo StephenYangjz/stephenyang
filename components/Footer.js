@@ -14,10 +14,7 @@ export default function Footer() {
           </span>
           <span className="flex items-center gap-2.5">
             <VisitorMap />
-            <span>
-              {personalInfo.location} · Built with Next.js, deployed on GitHub
-              Pages
-            </span>
+            <span>{personalInfo.location} · Built with Next.js</span>
           </span>
         </div>
       </div>

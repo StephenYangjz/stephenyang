@@ -2513,3 +2513,58 @@
   font-size: 12.5px;
   color: var(--muted);
 }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   PHONES — everything below this line is scoped to narrow screens
+
+   Desktop layout and behaviour are untouched: 640px sits well under any
+   laptop, and under an iPad in portrait too.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* The next-page card speaks to the pointer it has. Touch devices emit no
+   wheel events, so the scroll-to-advance simply cannot fire there — the card
+   was asking for a gesture the device does not have. The bar goes with it,
+   since it only ever measured that gesture. */
+.go-tap {
+  display: none;
+}
+
+@media (max-width: 640px) {
+  .go-scroll {
+    display: none;
+  }
+  .go-tap {
+    display: inline;
+  }
+  .next-bar {
+    display: none;
+  }
+
+  /* The bio is revealed a line at a time against a narrow trigger band. On a
+     phone the column is tall and the band is a fraction of it, so the lower
+     half of whatever is on screen has always not-yet-revealed — the text
+     appears to stop halfway down. Show all of it and let the page be read. */
+  .lr-ready .lr-w,
+  .lr-ready .seq-line,
+  .no-sda .lr-ready .lr-w,
+  .no-sda .lr-ready .seq-line {
+    animation: none !important;
+    opacity: 1 !important;
+  }
+
+  /* Gallery frames are sized from viewport *height*, which on a phone makes a
+     3:2 photograph 882px wide inside a 375px window — you could only ever see
+     a slice. Let width lead instead, and let the aspect ratio set the height. */
+  .pan-card {
+    width: 86vw;
+    height: auto;
+    max-height: 68svh;
+  }
+
+  /* Less dead air under the colophon on a small screen. Needs the class as
+     well as the element: the footer carries Tailwind's pb-16, and a bare
+     element selector loses to it on specificity. */
+  footer.pb-16 {
+    padding-bottom: 28px;
+  }
+}
