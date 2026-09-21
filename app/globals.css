@@ -2562,18 +2562,6 @@
   /* Gallery frames are sized from viewport *height*, which on a phone makes a
      3:2 photograph 882px wide inside a 375px window — you could only ever see
      a slice. Let width lead instead, and let the aspect ratio set the height. */
-  /* Elastic overscroll: a hard flick at the end carries a long way past the
-     footer before springing back, which reads as blank page rather than as a
-     bounce. This is the half of the earlier fix that demonstrably worked.
-
-     Releasing the root scroll container (overflow-y: visible) was the other
-     half, and it is deliberately not here: it turned "scrolls too far" into
-     "does not scroll far enough", which is the worse failure. The gutter
-     html reserves on desktop stays reserved on phones too. */
-  html {
-    overscroll-behavior-y: none;
-  }
-
   /* At a glance is a desktop device: on a wide screen it sits fixed beside
      the bio, saying the same things the reader can see. Stacked on a phone
      it lands at the very bottom, repeating what the hero said several
