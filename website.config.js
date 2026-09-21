@@ -204,19 +204,19 @@ export const leadPhoto = {
 export const photography = [
   {
     src: '/photos/water-lantern-san-jose.jpg',
-    place: 'San Jose, California',
+    place: 'Water Lantern Festival, San Jose, California',
     aspect: '3 / 2',
     year: '2026',
   },
   {
     src: '/photos/pinnacles-airglow.jpg',
-    place: 'Pinnacles National Park',
+    place: 'Pinnacles National Park, California',
     aspect: '3 / 2',
     year: '2026',
   },
   {
     src: '/photos/pinnacles-milky-way.jpg',
-    place: 'Pinnacles National Park',
+    place: 'The Meteor Shower, California',
     aspect: '3 / 2',
     year: '2026',
   },
@@ -234,27 +234,45 @@ export const photography = [
   },
   {
     src: '/photos/rocky-mountain-lake.jpg',
-    place: 'Rocky Mountain National Park',
+    place: 'Rocky Mountain National Park, Colorado',
     aspect: '3 / 2',
     year: '2026',
   },
   {
     src: '/photos/sf-golden-gate.jpg',
-    place: 'San Francisco',
+    place: 'Golden Gate Bridge, California',
     aspect: '3 / 2',
     year: '2026',
   },
   {
     src: '/photos/sf-skyline.jpg',
-    place: 'San Francisco',
+    place: 'San Francisco, California',
     aspect: '3 / 2',
     year: '2026',
   },
   {
     src: '/photos/sf-california-street.jpg',
-    place: 'San Francisco',
+    place: 'California Street, California',
     aspect: '2 / 3',
     year: '2026',
+  },
+  {
+    src: '/photos/iceland-strokkur.jpg',
+    place: 'Strokkur Geyser, Haukadalur, Iceland',
+    aspect: '3 / 2',
+    year: '2025',
+  },
+  {
+    src: '/photos/iceland-vatnajokull-ice-cave.jpg',
+    place: 'Vatnajökull Glacier, Iceland',
+    aspect: '3 / 2',
+    year: '2025',
+  },
+  {
+    src: '/photos/iceland-jokulsarlon.jpg',
+    place: 'Jökulsárlón Glacier Lagoon, Iceland',
+    aspect: '3 / 2',
+    year: '2025',
   },
 ];
 
