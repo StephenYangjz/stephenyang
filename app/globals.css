@@ -2562,6 +2562,24 @@
   /* Gallery frames are sized from viewport *height*, which on a phone makes a
      3:2 photograph 882px wide inside a 375px window — you could only ever see
      a slice. Let width lead instead, and let the aspect ratio set the height. */
+  /* Two causes of being able to scroll past the end of the page.
+     
+     html carries overflow-y: scroll so a desktop always has a scrollbar
+     gutter and pages do not jump sideways when one appears. That makes the
+     root its own scroll container, and on a phone — which has no persistent
+     scrollbar to reserve room for, and a toolbar that collapses as you
+     scroll — the container ends up sized to the tall viewport while the
+     content is shorter, leaving scrollable emptiness under the last line.
+     Phones do not need the gutter, so they do not get the container.
+
+     And the elastic overscroll on top of that: a hard flick at the end
+     carries well past the footer before springing back, which reads as more
+     blank page rather than as a bounce. */
+  html {
+    overflow-y: visible;
+    overscroll-behavior-y: none;
+  }
+
   /* At a glance is a desktop device: on a wide screen it sits fixed beside
      the bio, saying the same things the reader can see. Stacked on a phone
      it lands at the very bottom, repeating what the hero said several
