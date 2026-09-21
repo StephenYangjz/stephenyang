@@ -31,12 +31,16 @@ export default function PannedGallery() {
         <div>
           <div className="pan-rail pan-x">
             {photography.map((photo) => (
-              <figure key={photo.src} className="pan-card">
+              <figure
+                key={photo.src}
+                className="pan-card"
+                style={photo.aspect ? { aspectRatio: photo.aspect } : undefined}
+              >
                 <Image
                   src={photo.src}
                   alt={photo.caption || ''}
                   fill
-                  sizes="(max-width: 720px) 80vw, 520px"
+                  sizes="(max-width: 720px) 90vw, 46vw"
                   className="photo-img"
                 />
                 {(photo.place || photo.year) && (

@@ -193,48 +193,72 @@ export const leadPhoto = {
   year: '2026',
 };
 
+// `aspect` is the frame's own shape. The rail sizes each card to its
+// photograph rather than cropping every photograph to one card, so a
+// landscape frame stays landscape and the upright one stays upright.
 export const photography = [
   {
-    src: '/photos/skogafoss.webp',
-    caption: 'Skógafoss',
-    place: 'Iceland',
-    year: '2025',
-  },
-  {
-    src: '/photos/placeholder-01.svg',
-    caption: 'Replace with your strongest frame',
-    place: 'Qingdao',
-    year: '2023',
-  },
-  {
-    src: '/photos/placeholder-02.svg',
-    caption: 'Aerial work',
-    place: 'Yellow Sea',
-    year: '2023',
-  },
-  {
-    src: '/photos/placeholder-03.svg',
-    caption: 'Caption goes here',
-    place: 'Cambridge',
-    year: '2024',
-  },
-  {
-    src: '/photos/placeholder-04.svg',
-    caption: 'Caption goes here',
-    place: 'Berkeley',
-    year: '2023',
-  },
-  {
-    src: '/photos/placeholder-05.svg',
-    caption: 'Caption goes here',
-    place: 'London',
+    src: '/photos/water-lantern-san-jose.jpg',
+    caption: 'Water Lantern Festival',
+    place: 'San Jose, California',
+    aspect: '3 / 2',
     year: '2026',
   },
   {
-    src: '/photos/placeholder-06.svg',
-    caption: 'Caption goes here',
-    place: 'Mountain View',
-    year: '2025',
+    src: '/photos/pinnacles-airglow.jpg',
+    caption: 'Airglow over the ridgeline',
+    place: 'Pinnacles National Park',
+    aspect: '3 / 2',
+    year: '2026',
+  },
+  {
+    src: '/photos/pinnacles-milky-way.jpg',
+    caption: 'The Milky Way, and one meteor',
+    place: 'Pinnacles National Park',
+    aspect: '3 / 2',
+    year: '2026',
+  },
+  {
+    src: '/photos/yosemite-valley.jpg',
+    caption: 'The valley from Tunnel View',
+    place: 'Yosemite National Park',
+    aspect: '3 / 2',
+    year: '2026',
+  },
+  {
+    src: '/photos/hearst-castle-roman-pool.jpg',
+    caption: 'The Roman Pool',
+    place: 'Hearst Castle, California',
+    aspect: '3 / 2',
+    year: '2026',
+  },
+  {
+    src: '/photos/rocky-mountain-lake.jpg',
+    caption: 'Snowmelt and standing water',
+    place: 'Rocky Mountain National Park',
+    aspect: '3 / 2',
+    year: '2026',
+  },
+  {
+    src: '/photos/sf-golden-gate.jpg',
+    caption: 'The Golden Gate through the haze',
+    place: 'San Francisco',
+    aspect: '3 / 2',
+    year: '2026',
+  },
+  {
+    src: '/photos/sf-skyline.jpg',
+    caption: 'Coit Tower at sundown',
+    place: 'San Francisco',
+    aspect: '3 / 2',
+    year: '2026',
+  },
+  {
+    src: '/photos/sf-california-street.jpg',
+    caption: 'Cable car tracks running west',
+    place: 'San Francisco',
+    aspect: '2 / 3',
+    year: '2026',
   },
 ];
 

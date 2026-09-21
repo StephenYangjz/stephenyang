@@ -1534,9 +1534,8 @@
   flex: none;
 }
 
-.pan-card:first-child {
-  aspect-ratio: 3 / 4;
-}
+/* No first-child exception any more: each card carries its own aspect-ratio
+   inline, from the shape of the photograph inside it. */
 
 .pan-card {
   border-radius: var(--r-figure);
