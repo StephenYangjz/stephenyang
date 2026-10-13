@@ -221,6 +221,12 @@ export const photography = [
     year: '2026',
   },
   {
+    src: '/photos/pigeon-point-lighthouse.jpg',
+    place: 'Pigeon Point Lighthouse, Pescadero, California',
+    aspect: '3 / 2',
+    year: '2026',
+  },
+  {
     src: '/photos/yosemite-valley.jpg',
     place: 'Yosemite National Park, California',
     aspect: '3 / 2',
@@ -254,12 +260,6 @@ export const photography = [
     src: '/photos/sf-california-street.jpg',
     place: 'California Street, California',
     aspect: '2 / 3',
-    year: '2026',
-  },
-  {
-    src: '/photos/pigeon-point-lighthouse.jpg',
-    place: 'Pigeon Point Lighthouse, Pescadero, California',
-    aspect: '3 / 2',
     year: '2026',
   },
   {
