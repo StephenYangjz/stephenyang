@@ -257,6 +257,12 @@ export const photography = [
     year: '2026',
   },
   {
+    src: '/photos/pigeon-point-lighthouse.jpg',
+    place: 'Pigeon Point Lighthouse, Pescadero, California',
+    aspect: '3 / 2',
+    year: '2026',
+  },
+  {
     src: '/photos/iceland-strokkur.jpg',
     place: 'Strokkur Geyser, Haukadalur, Iceland',
     aspect: '3 / 2',
